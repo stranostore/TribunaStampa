@@ -1,0 +1,1633 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Tribuna Calcio | Quotidiano Sportivo Indipendente</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Oswald:wght@500;600;700&family=Merriweather:ital,wght@0,300;0,400;0,700;1,300&display=swap" rel="stylesheet">
+
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            heading: ['Oswald', 'sans-serif'],
+            serif: ['Merriweather', 'serif']
+          },
+          colors: {
+            pitch: {
+              50: '#f0fdf4',
+              100: '#dcfce7',
+              500: '#22c55e',
+              600: '#16a34a',
+              700: '#15803d',
+              800: '#166534',
+              900: '#14532d',
+              950: '#052e16'
+            },
+            gold: {
+              400: '#fbbf24',
+              500: '#f59e0b',
+              600: '#d97706'
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    .gold-gradient {
+      background: linear-gradient(135deg, #18181b 0%, #27272a 50%, #1c1917 100%);
+      border-bottom: 2px solid #f59e0b;
+    }
+    .custom-scroll::-webkit-scrollbar {
+      height: 6px;
+      width: 6px;
+    }
+    .custom-scroll::-webkit-scrollbar-thumb {
+      background: #16a34a;
+      border-radius: 4px;
+    }
+    .ticker-wrap {
+      overflow: hidden;
+      white-space: nowrap;
+    }
+    .ticker-move {
+      display: inline-block;
+      white-space: nowrap;
+      animation: ticker 35s linear infinite;
+    }
+    .ticker-move:hover {
+      animation-play-state: paused;
+    }
+    @keyframes ticker {
+      0% { transform: translate3d(0, 0, 0); }
+      100% { transform: translate3d(-50%, 0, 0); }
+    }
+  </style>
+</head>
+<body class="bg-stone-100 text-stone-900 dark:bg-stone-950 dark:text-stone-100 min-h-screen flex flex-col font-sans transition-colors duration-200">
+
+  <!-- ========================================== -->
+  <!-- BARRA ESCLUSIVA FONDATORE (VISIBILE SOLO AL FONDATORE) -->
+  <!-- ========================================== -->
+  <div id="founder-cockpit" class="hidden gold-gradient text-stone-200 px-4 py-2.5 text-xs shadow-xl sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-3">
+      <div class="flex items-center space-x-3">
+        <span class="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-bold bg-amber-500 text-stone-950 tracking-wider">
+          ★ VISIONE FONDATORE
+        </span>
+        <span class="font-medium text-stone-300">
+          Benvenuto nel tuo centro di controllo, <strong class="text-amber-400" id="cockpit-founder-name">Direttore Supremo</strong>
+        </span>
+      </div>
+
+      <div class="flex items-center gap-4">
+        <div class="hidden md:flex items-center space-x-4 text-stone-300 text-[11px] border-r border-stone-700 pr-4">
+          <span>👥 Iscritti Totali: <b class="text-white" id="stat-total-users">0</b></span>
+          <span>📰 Articoli: <b class="text-white" id="stat-total-articles">0</b></span>
+          <span>💬 Commenti: <b class="text-white" id="stat-total-comments">0</b></span>
+        </div>
+        <button onclick="openFounderPortal('dashboard')" class="bg-amber-500 hover:bg-amber-400 text-stone-950 font-bold px-3 py-1 rounded shadow flex items-center gap-1.5 transition">
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+          IL MIO PORTALE FONDATORE
+        </button>
+        <button onclick="openFounderPortal('editor')" class="bg-emerald-600 hover:bg-emerald-500 text-white font-bold px-3 py-1 rounded shadow flex items-center gap-1.5 transition">
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+          Scrivi Articolo
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- CALCIOMERCATO TICKER -->
+  <div class="bg-stone-900 text-stone-300 border-b border-stone-800 text-xs py-1.5 px-4 flex items-center">
+    <div class="flex items-center gap-2 font-heading tracking-wider uppercase text-amber-400 font-bold bg-stone-950 px-2.5 py-0.5 rounded mr-3 shrink-0">
+      <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+      DIRETTA CAMPO
+    </div>
+    <div class="ticker-wrap flex-1">
+      <div class="ticker-move flex gap-8">
+        <span>⚡ <b>SERIE A:</b> Posticipo di fuoco a San Siro domenica sera, arbitra designato Rocchi.</span>
+        <span>🔥 <b>MERCATO:</b> Accordo totale per il rinnovo del bomber: clausola da 130 milioni.</span>
+        <span>🏆 <b>CHAMPIONS LEAGUE:</b> Sorteggi quarti: italiane evitano il Clasico.</span>
+        <span>📋 <b>INFORTUNI:</b> Risonanza magnetica negativa per il capitano, torna in gruppo.</span>
+        <span>⚡ <b>SERIE A:</b> Posticipo di fuoco a San Siro domenica sera, arbitra designato Rocchi.</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- TESTATA PRINCIPALE (HEADER) -->
+  <header class="bg-white dark:bg-stone-900 border-b border-stone-200 dark:border-stone-800 sticky top-0 z-40 shadow-sm">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex items-center justify-between h-16">
+        
+        <!-- LOGO TESTATA -->
+        <div class="flex items-center space-x-3 cursor-pointer" onclick="navigate('home')">
+          <div class="w-10 h-10 rounded-lg bg-pitch-700 flex items-center justify-center text-white font-heading text-2xl shadow-md border-2 border-emerald-400">
+            ⚽
+          </div>
+          <div>
+            <div class="flex items-center gap-2">
+              <span class="font-heading text-2xl tracking-wider text-pitch-800 dark:text-emerald-400 font-bold leading-none">TRIBUNA CALCIO</span>
+              <span id="header-founder-badge" class="hidden text-[10px] font-bold px-1.5 py-0.5 rounded bg-amber-500 text-stone-950 uppercase tracking-widest">
+                FONDATORE
+              </span>
+            </div>
+            <p class="text-[11px] text-stone-500 font-medium tracking-tight">IL QUOTIDIANO DEI TIFOSI E DEL CAMPO</p>
+          </div>
+        </div>
+
+        <!-- CATEGORIE NAV -->
+        <nav class="hidden md:flex space-x-1 lg:space-x-4">
+          <button onclick="filterCategory('Tutti')" class="category-pill active px-3 py-1 rounded-full text-xs font-bold uppercase transition bg-stone-200 dark:bg-stone-800 text-stone-900 dark:text-white" data-cat="Tutti">Tutti</button>
+          <button onclick="filterCategory('Serie A')" class="category-pill px-3 py-1 rounded-full text-xs font-bold uppercase transition text-stone-600 dark:text-stone-400 hover:text-emerald-600" data-cat="Serie A">Serie A</button>
+          <button onclick="filterCategory('Calciomercato')" class="category-pill px-3 py-1 rounded-full text-xs font-bold uppercase transition text-stone-600 dark:text-stone-400 hover:text-emerald-600" data-cat="Calciomercato">Calciomercato</button>
+          <button onclick="filterCategory('Champions')" class="category-pill px-3 py-1 rounded-full text-xs font-bold uppercase transition text-stone-600 dark:text-stone-400 hover:text-emerald-600" data-cat="Champions">Champions</button>
+          <button onclick="filterCategory('Tattica & Pagelle')" class="category-pill px-3 py-1 rounded-full text-xs font-bold uppercase transition text-stone-600 dark:text-stone-400 hover:text-emerald-600" data-cat="Tattica & Pagelle">Tattica & Pagelle</button>
+        </nav>
+
+        <!-- SEZIONE UTENTE & AZIONI -->
+        <div class="flex items-center space-x-3">
+          <!-- Toggle Tema -->
+          <button onclick="toggleTheme()" class="p-2 rounded-lg text-stone-500 hover:bg-stone-100 dark:hover:bg-stone-800 transition" title="Cambia tema">
+            <span id="theme-icon">🌙</span>
+          </button>
+
+          <!-- SE NON LOGGATO -->
+          <div id="guest-actions" class="flex items-center space-x-2">
+            <button onclick="openAuthModal('login')" class="text-xs font-semibold px-3 py-1.5 rounded-lg border border-stone-300 dark:border-stone-700 hover:bg-stone-100 dark:hover:bg-stone-800 transition">
+              Accedi
+            </button>
+            <button onclick="openAuthModal('register')" class="text-xs font-bold px-3 py-1.5 rounded-lg bg-pitch-700 hover:bg-pitch-800 text-white shadow transition">
+              Registrati
+            </button>
+          </div>
+
+          <!-- SE LOGGATO -->
+          <div id="user-menu-wrap" class="hidden relative">
+            <button onclick="toggleUserDropdown()" class="flex items-center space-x-2 p-1 rounded-lg hover:bg-stone-100 dark:hover:bg-stone-800 transition">
+              <div id="user-avatar" class="w-8 h-8 rounded-full bg-pitch-700 text-white font-bold flex items-center justify-center text-xs border border-emerald-500">
+                U
+              </div>
+              <div class="text-left hidden sm:block">
+                <div class="text-xs font-bold leading-tight" id="user-name">Utente</div>
+                <div class="text-[10px] text-stone-500 leading-tight" id="user-role-label">Tifoso</div>
+              </div>
+              <svg class="w-3.5 h-3.5 text-stone-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+            </button>
+
+            <!-- Dropdown Profilo -->
+            <div id="user-dropdown" class="hidden absolute right-0 mt-2 w-56 bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 rounded-xl shadow-2xl py-2 z-50">
+              <div class="px-4 py-2 border-b border-stone-100 dark:border-stone-800">
+                <p class="text-[11px] text-stone-400 uppercase tracking-wider font-semibold">Tesserato</p>
+                <p class="text-sm font-bold text-stone-900 dark:text-stone-100 truncate" id="dropdown-name">Nome</p>
+                <p class="text-xs text-stone-500 truncate" id="dropdown-email">email@test.it</p>
+                <div id="dropdown-badge-container" class="mt-1"></div>
+              </div>
+
+              <!-- Tasto speciale solo per Fondatore nel menu -->
+              <div id="founder-dropdown-options" class="hidden">
+                <a href="#" onclick="openFounderPortal('dashboard'); return false;" class="flex items-center gap-2 px-4 py-2 text-xs font-bold text-amber-600 dark:text-amber-400 hover:bg-amber-50 dark:hover:bg-stone-800">
+                  <span>👑</span> Apri Portale Fondatore
+                </a>
+                <a href="#" onclick="openFounderPortal('editor'); return false;" class="flex items-center gap-2 px-4 py-2 text-xs font-bold text-emerald-600 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-stone-800">
+                  <span>✍️</span> Scrivi Nuovo Articolo
+                </a>
+                <div class="border-t border-stone-100 dark:border-stone-800 my-1"></div>
+              </div>
+
+              <a href="#" onclick="openBookmarks(); return false;" class="flex items-center gap-2 px-4 py-2 text-xs text-stone-700 dark:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-800">
+                <span>🔖</span> I Miei Articoli Salvati
+              </a>
+              <div class="border-t border-stone-100 dark:border-stone-800 my-1"></div>
+              <button onclick="logout()" class="w-full text-left px-4 py-2 text-xs text-red-600 hover:bg-red-50 dark:hover:bg-red-950/30 transition flex items-center gap-2">
+                <span>🚪</span> Disconnetti
+              </button>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- CONTENITORE VISTE -->
+  <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
+
+    <!-- ============================================================== -->
+    <!-- 1. VISTA HOME (NOTIZIE, PRIMA PAGINA & SIDEBAR) -->
+    <!-- ============================================================== -->
+    <div id="view-home" class="space-y-8">
+      
+      <!-- RICERCA E INTRO -->
+      <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white dark:bg-stone-900 p-4 rounded-2xl border border-stone-200 dark:border-stone-800 shadow-sm">
+        <div>
+          <h1 class="text-xl font-heading tracking-wide uppercase text-stone-900 dark:text-white flex items-center gap-2">
+            <span>🏟️</span> Prima Pagina & Notizie dal Campo
+          </h1>
+          <p class="text-xs text-stone-500">Analisi, calciomercato e approfondimenti calcistici senza filtri.</p>
+        </div>
+        <div class="relative w-full md:w-80">
+          <input type="text" id="search-input" oninput="handleSearch()" placeholder="Cerca squadra, giocatore, tema..." class="w-full pl-9 pr-4 py-2 text-xs rounded-xl bg-stone-100 dark:bg-stone-800 border border-stone-200 dark:border-stone-700 focus:outline-none focus:ring-2 focus:ring-emerald-500">
+          <svg class="w-4 h-4 text-stone-400 absolute left-3 top-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+        </div>
+      </div>
+
+      <!-- PRIMA PAGINA / ARTICOLO IN PRIMO PIANO -->
+      <div id="hero-article-container"></div>
+
+      <!-- LAYOUT A DUE COLONNE: GRIGLIA ARTICOLI + BARRA LATERALE SPORTIVA -->
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        
+        <!-- COLONNA PRINCIPALE (ARTICOLI) -->
+        <div class="lg:col-span-2 space-y-6">
+          <div class="flex items-center justify-between border-b-2 border-pitch-700 pb-2">
+            <h2 class="font-heading text-xl uppercase tracking-wider text-stone-900 dark:text-white">
+              Ultimi Articoli & Notizie
+            </h2>
+            <span class="text-xs text-stone-500 font-semibold" id="articles-count-label">Caricamento...</span>
+          </div>
+
+          <div id="articles-grid" class="grid grid-cols-1 sm:grid-cols-2 gap-6"></div>
+          <div id="no-articles-found" class="hidden text-center py-12 bg-white dark:bg-stone-900 rounded-2xl border border-dashed border-stone-300 dark:border-stone-800">
+            <p class="text-stone-400 text-sm">Nessun articolo trovato per questa ricerca o categoria.</p>
+          </div>
+        </div>
+
+        <!-- SIDEBAR SPORTIVA -->
+        <aside class="space-y-6">
+          
+          <!-- CLASSIFICA SERIE A LIVE WIDGET -->
+          <div class="bg-white dark:bg-stone-900 rounded-2xl p-5 border border-stone-200 dark:border-stone-800 shadow-sm">
+            <div class="flex items-center justify-between mb-4 border-b border-stone-100 dark:border-stone-800 pb-2">
+              <h3 class="font-heading text-base uppercase tracking-wider text-pitch-800 dark:text-emerald-400 flex items-center gap-2">
+                <span>🏆</span> Serie A - Vertice
+              </h3>
+              <span class="text-[10px] bg-stone-100 dark:bg-stone-800 px-2 py-0.5 rounded text-stone-500">Giornata 29</span>
+            </div>
+            <table class="w-full text-xs">
+              <thead>
+                <tr class="text-stone-400 border-b border-stone-100 dark:border-stone-800 text-[10px]">
+                  <th class="text-left pb-2 font-semibold">POS</th>
+                  <th class="text-left pb-2 font-semibold">CLUB</th>
+                  <th class="text-center pb-2 font-semibold">G</th>
+                  <th class="text-right pb-2 font-semibold">PT</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-stone-100 dark:divide-stone-800">
+                <tr class="font-semibold"><td class="py-2 text-emerald-600 font-bold">1</td><td class="py-2">Inter</td><td class="text-center text-stone-500">29</td><td class="text-right font-bold text-pitch-700">76</td></tr>
+                <tr><td class="py-2 text-blue-600 font-bold">2</td><td class="py-2">Milan</td><td class="text-center text-stone-500">29</td><td class="text-right font-bold">62</td></tr>
+                <tr><td class="py-2 text-blue-600 font-bold">3</td><td class="py-2">Juventus</td><td class="text-center text-stone-500">29</td><td class="text-right font-bold">59</td></tr>
+                <tr><td class="py-2 text-blue-600 font-bold">4</td><td class="py-2">Bologna</td><td class="text-center text-stone-500">29</td><td class="text-right font-bold">54</td></tr>
+                <tr><td class="py-2 text-amber-600 font-bold">5</td><td class="py-2">Roma</td><td class="text-center text-stone-500">29</td><td class="text-right font-bold">51</td></tr>
+                <tr><td class="py-2 text-stone-400">6</td><td class="py-2">Atalanta</td><td class="text-center text-stone-500">29</td><td class="text-right font-bold">47</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- SONDAGGIO DEL TIFOSO -->
+          <div class="bg-gradient-to-br from-pitch-900 to-stone-900 text-white rounded-2xl p-5 shadow-lg border border-pitch-700">
+            <span class="text-[10px] font-bold bg-amber-500 text-stone-950 px-2 py-0.5 rounded uppercase tracking-wider">Sondaggio del Bar dello Sport</span>
+            <h4 class="font-heading text-lg mt-2 mb-3">Chi merita il premio di Miglior Allenatore dell'Anno?</h4>
+            <div class="space-y-2 text-xs" id="poll-options">
+              <button onclick="votePoll(0)" class="w-full text-left p-2.5 rounded-xl bg-white/10 hover:bg-white/20 transition flex justify-between items-center border border-white/5">
+                <span>Simone Inzaghi</span>
+                <span class="font-bold text-emerald-400" id="poll-0">61%</span>
+              </button>
+              <button onclick="votePoll(1)" class="w-full text-left p-2.5 rounded-xl bg-white/10 hover:bg-white/20 transition flex justify-between items-center border border-white/5">
+                <span>Thiago Motta</span>
+                <span class="font-bold text-emerald-400" id="poll-1">29%</span>
+              </button>
+              <button onclick="votePoll(2)" class="w-full text-left p-2.5 rounded-xl bg-white/10 hover:bg-white/20 transition flex justify-between items-center border border-white/5">
+                <span>Daniele De Rossi</span>
+                <span class="font-bold text-emerald-400" id="poll-2">10%</span>
+              </button>
+            </div>
+            <p class="text-[10px] text-stone-400 mt-3 text-center">Voto anonimo dei tesserati del blog</p>
+          </div>
+
+          <!-- BANNER TRIBUNA CALCIO INFO -->
+          <div class="bg-white dark:bg-stone-900 rounded-2xl p-5 border border-stone-200 dark:border-stone-800 text-xs space-y-2">
+            <h4 class="font-heading uppercase text-sm tracking-wide text-stone-900 dark:text-white">Chi siamo</h4>
+            <p class="text-stone-500 dark:text-stone-400 leading-relaxed">
+              Testata e community indipendente fondata per raccontare il calcio giocato, la lavagna tattica e il mercato senza sensazionalismi.
+            </p>
+            <div class="pt-2 border-t border-stone-100 dark:border-stone-800 flex items-center justify-between text-[11px] text-stone-400">
+              <span>Fondatore: <b>Direttore Supremo</b></span>
+              <span class="text-emerald-600 font-bold">100% Calcio</span>
+            </div>
+          </div>
+
+        </aside>
+
+      </div>
+    </div>
+
+    <!-- ============================================================== -->
+    <!-- 2. VISTA LETTURA COMPLETA ARTICOLO + COMMENTI -->
+    <!-- ============================================================== -->
+    <div id="view-article" class="hidden max-w-4xl mx-auto space-y-8">
+      <button onclick="navigate('home')" class="inline-flex items-center text-xs font-bold text-pitch-700 dark:text-emerald-400 hover:underline">
+        ← Torna alla Prima Pagina
+      </button>
+
+      <article class="bg-white dark:bg-stone-900 rounded-3xl overflow-hidden border border-stone-200 dark:border-stone-800 shadow-sm">
+        <img id="detail-image" src="" alt="Copertina" class="w-full h-80 sm:h-96 object-cover">
+        
+        <div class="p-6 sm:p-10 space-y-6">
+          <div class="flex flex-wrap items-center justify-between gap-3 text-xs">
+            <div class="flex items-center gap-2">
+              <span id="detail-category" class="font-heading uppercase px-3 py-1 rounded-full bg-pitch-100 text-pitch-800 dark:bg-emerald-950 dark:text-emerald-400 font-bold"></span>
+              <span class="text-stone-400">•</span>
+              <span id="detail-readtime" class="text-stone-500"></span>
+            </div>
+            <div class="flex items-center gap-3">
+              <button onclick="toggleBookmarkCurrent()" id="btn-detail-bookmark" class="p-2 rounded-full border border-stone-200 dark:border-stone-700 hover:bg-stone-100 dark:hover:bg-stone-800 transition" title="Salva">
+                🔖
+              </button>
+              <button onclick="shareCurrentArticle()" class="p-2 rounded-full border border-stone-200 dark:border-stone-700 hover:bg-stone-100 dark:hover:bg-stone-800 transition" title="Condividi">
+                📤
+              </button>
+            </div>
+          </div>
+
+          <h1 id="detail-title" class="font-heading text-3xl sm:text-5xl font-bold uppercase leading-tight text-stone-900 dark:text-white"></h1>
+
+          <div class="flex items-center justify-between py-4 border-y border-stone-100 dark:border-stone-800">
+            <div class="flex items-center space-x-3">
+              <div id="detail-author-avatar" class="w-11 h-11 rounded-full bg-pitch-700 text-white font-bold flex items-center justify-center text-sm"></div>
+              <div>
+                <p id="detail-author" class="text-sm font-bold text-stone-900 dark:text-stone-100"></p>
+                <p id="detail-date" class="text-xs text-stone-400"></p>
+              </div>
+            </div>
+            <div class="flex items-center gap-2">
+              <button onclick="clapCurrentArticle()" class="flex items-center gap-2 px-4 py-2 rounded-full bg-stone-100 dark:bg-stone-800 hover:bg-pitch-50 dark:hover:bg-pitch-950/40 text-stone-800 dark:text-stone-200 border border-stone-200 dark:border-stone-700 transition">
+                <span>👏 Olè</span>
+                <b id="detail-claps" class="text-emerald-600 dark:text-emerald-400">0</b>
+              </button>
+            </div>
+          </div>
+
+          <p id="detail-summary" class="text-lg font-serif italic text-stone-600 dark:text-stone-300 leading-relaxed bg-stone-50 dark:bg-stone-800/40 p-4 rounded-xl border-l-4 border-pitch-600"></p>
+
+          <div id="detail-content" class="font-serif text-base sm:text-lg leading-relaxed text-stone-800 dark:text-stone-200 space-y-4"></div>
+        </div>
+      </article>
+
+      <!-- SEZIONE COMMENTI / BAR DELLO SPORT -->
+      <section class="bg-white dark:bg-stone-900 rounded-3xl p-6 sm:p-10 border border-stone-200 dark:border-stone-800 shadow-sm space-y-6">
+        <div class="flex items-center justify-between border-b border-stone-200 dark:border-stone-800 pb-4">
+          <h3 class="font-heading text-xl uppercase tracking-wider text-stone-900 dark:text-white flex items-center gap-2">
+            <span>🗣️</span> Bar dello Sport — Dibattito dei Tifosi
+          </h3>
+          <span id="detail-comments-count" class="text-xs font-bold text-stone-400">0 commenti</span>
+        </div>
+
+        <!-- FORM COMMENTO (SOLO PER UTENTI REGISTRATI / LOGGATI) -->
+        <div id="comment-form-container">
+          <!-- Questo contenitore cambia dinamicamente se loggato o no -->
+        </div>
+
+        <!-- LISTA COMMENTI -->
+        <div id="comments-list" class="space-y-4"></div>
+      </section>
+    </div>
+
+    <!-- ============================================================== -->
+    <!-- 3. IL PORTALE ESCLUSIVO DEL FONDATORE (ACCESSO SOLO SUPREMO) -->
+    <!-- ============================================================== -->
+    <div id="view-founder-portal" class="hidden space-y-6">
+      
+      <!-- INTESTAZIONE PORTALE DEL FONDATORE -->
+      <div class="bg-stone-900 text-white rounded-3xl p-6 sm:p-8 border-2 border-amber-500 shadow-2xl relative overflow-hidden">
+        <div class="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div>
+            <div class="flex items-center gap-2 mb-2">
+              <span class="bg-amber-500 text-stone-950 font-heading tracking-widest text-xs px-2.5 py-0.5 rounded font-bold uppercase">
+                PORTALE SUPREMO RISERVATO
+              </span>
+              <span class="text-xs text-stone-400">Accesso esclusivo Fondatore</span>
+            </div>
+            <h1 class="text-2xl sm:text-4xl font-heading uppercase tracking-wide">
+              Centro di Comando & Gestione Testata
+            </h1>
+            <p class="text-xs sm:text-sm text-stone-400 max-w-2xl mt-1">
+              Questo portale è visibile solo al Fondatore. Da qui decidi tu i ruoli degli iscritti, crei gli articoli e gestisci l'intera piattaforma.
+            </p>
+          </div>
+
+          <!-- Pulsante Esci dal Portale -->
+          <div>
+            <button onclick="navigate('home')" class="text-xs font-bold px-4 py-2 rounded-xl bg-stone-800 hover:bg-stone-700 text-stone-200 border border-stone-700 transition">
+              ← Torna al Giornale
+            </button>
+          </div>
+        </div>
+
+        <!-- TAB NAVIGAZIONE PORTALE -->
+        <div class="flex flex-wrap gap-2 mt-6 pt-6 border-t border-stone-800">
+          <button onclick="switchFounderTab('users')" id="tab-btn-users" class="px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-wider transition bg-amber-500 text-stone-950">
+            👥 Gestione Iscritti & Ruoli
+          </button>
+          <button onclick="switchFounderTab('editor')" id="tab-btn-editor" class="px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-wider transition bg-stone-800 text-stone-300 hover:text-white">
+            ✍️ Scrivi Nuovo Articolo
+          </button>
+          <button onclick="switchFounderTab('articles')" id="tab-btn-articles" class="px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-wider transition bg-stone-800 text-stone-300 hover:text-white">
+            📰 Gestione Articoli Pubblicati
+          </button>
+          <button onclick="switchFounderTab('overview')" id="tab-btn-overview" class="px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-wider transition bg-stone-800 text-stone-300 hover:text-white">
+            📊 Statistiche Generali
+          </button>
+        </div>
+      </div>
+
+      <!-- TAB 1: GESTIONE ISCRITTI & RUOLI -->
+      <div id="founder-tab-users" class="founder-subtab bg-white dark:bg-stone-900 rounded-3xl p-6 sm:p-8 border border-stone-200 dark:border-stone-800 shadow-sm space-y-6">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div>
+            <h2 class="font-heading text-xl uppercase tracking-wider text-stone-900 dark:text-white">
+              Registro Iscritti e Assegnazione Ruoli
+            </h2>
+            <p class="text-xs text-stone-500">
+              Tutti i nuovi registrati partono come <b>Utenti Normali</b> (possono solo leggere e commentare). Solo tu puoi decidere di promuoverli a Giornalista o Caporedattore.
+            </p>
+          </div>
+          <div class="text-xs bg-amber-50 dark:bg-amber-950/40 text-amber-800 dark:text-amber-300 px-3 py-1.5 rounded-xl border border-amber-200 dark:border-amber-800">
+            👑 Solo il Fondatore può modificare i ruoli
+          </div>
+        </div>
+
+        <!-- TABELLA UTENTI -->
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-xs">
+            <thead>
+              <tr class="border-b border-stone-200 dark:border-stone-800 text-stone-400 uppercase text-[10px] tracking-wider">
+                <th class="py-3 px-3">Iscritto</th>
+                <th class="py-3 px-3">Email</th>
+                <th class="py-3 px-3">Squadra Cuore</th>
+                <th class="py-3 px-3">Data Iscrizione</th>
+                <th class="py-3 px-3">Ruolo Attuale</th>
+                <th class="py-3 px-3 text-right">Comando Ruolo</th>
+              </tr>
+            </thead>
+            <tbody id="founder-users-table" class="divide-y divide-stone-100 dark:divide-stone-800">
+              <!-- Riempito dinamicamente -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- TAB 2: SCRIVI NUOVO ARTICOLO (REDATTORE SUPREMO) -->
+      <div id="founder-tab-editor" class="founder-subtab hidden bg-white dark:bg-stone-900 rounded-3xl p-6 sm:p-8 border border-stone-200 dark:border-stone-800 shadow-sm space-y-6">
+        <div class="flex items-center justify-between border-b border-stone-200 dark:border-stone-800 pb-4">
+          <div>
+            <h2 class="font-heading text-xl uppercase tracking-wider text-stone-900 dark:text-white">
+              Tavolo di Redazione Fondatore
+            </h2>
+            <p class="text-xs text-stone-500">Scrivi e manda direttamente in prima pagina una notizia, analisi o esclusiva.</p>
+          </div>
+          <span class="text-xs bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300 px-3 py-1 rounded-full font-bold">
+            Firma: Direttore Supremo
+          </span>
+        </div>
+
+        <form id="founder-article-form" onsubmit="handlePublishArticle(event)" class="space-y-5">
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div class="md:col-span-2">
+              <label class="block text-xs font-bold text-stone-700 dark:text-stone-300 mb-1 uppercase">Titolo da Prima Pagina *</label>
+              <input type="text" id="post-title" required placeholder="Es. Rivoluzione Tattica: perché la difesa a 3 sta cambiando il campionato" class="w-full text-sm font-heading tracking-wide p-3 rounded-xl bg-stone-50 dark:bg-stone-800 border border-stone-200 dark:border-stone-700 focus:outline-none focus:ring-2 focus:ring-emerald-500">
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-stone-700 dark:text-stone-300 mb-1 uppercase">Categoria *</label>
+              <select id="post-category" class="w-full text-xs p-3 rounded-xl bg-stone-50 dark:bg-stone-800 border border-stone-200 dark:border-stone-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 font-semibold">
+                <option value="Serie A">Serie A</option>
+                <option value="Calciomercato">Calciomercato</option>
+                <option value="Champions">Champions</option>
+                <option value="Tattica & Pagelle">Tattica & Pagelle</option>
+              </select>
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold text-stone-700 dark:text-stone-300 mb-1 uppercase">Sommario / Occhiello (Sottotitolo d'impatto) *</label>
+            <input type="text" id="post-summary" required placeholder="Breve sintesi che incuriosisce il lettore nella home..." class="w-full text-xs p-3 rounded-xl bg-stone-50 dark:bg-stone-800 border border-stone-200 dark:border-stone-700 focus:outline-none focus:ring-2 focus:ring-emerald-500">
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold text-stone-700 dark:text-stone-300 mb-1 uppercase">URL Immagine di Copertina</label>
+            <div class="flex gap-2">
+              <input type="url" id="post-image" placeholder="https://images.unsplash.com/..." class="flex-1 text-xs p-3 rounded-xl bg-stone-50 dark:bg-stone-800 border border-stone-200 dark:border-stone-700 focus:outline-none focus:ring-2 focus:ring-emerald-500">
+              <button type="button" onclick="randomCoverImage()" class="px-3 py-2 bg-stone-200 dark:bg-stone-700 text-stone-800 dark:text-white rounded-xl text-xs font-bold hover:bg-stone-300">
+                Immagine Casuale Calcio
+              </button>
+            </div>
+          </div>
+
+          <!-- TOOLBAR VELOCE -->
+          <div class="flex flex-wrap items-center gap-1.5 p-2 bg-stone-100 dark:bg-stone-800/80 rounded-xl text-xs">
+            <button type="button" onclick="insertFormat('**', '**')" class="px-2.5 py-1 bg-white dark:bg-stone-700 rounded shadow-xs font-bold hover:bg-emerald-500 hover:text-white">B</button>
+            <button type="button" onclick="insertFormat('*', '*')" class="px-2.5 py-1 bg-white dark:bg-stone-700 rounded shadow-xs italic hover:bg-emerald-500 hover:text-white">I</button>
+            <button type="button" onclick="insertFormat('\n\n## ', '\n')" class="px-2.5 py-1 bg-white dark:bg-stone-700 rounded shadow-xs font-heading font-bold hover:bg-emerald-500 hover:text-white">H2 Titolo Paragrafo</button>
+            <button type="button" onclick="insertFormat('\n> 🗣️ ', '\n')" class="px-2.5 py-1 bg-white dark:bg-stone-700 rounded shadow-xs hover:bg-emerald-500 hover:text-white">Citazione Mister</button>
+            <button type="button" onclick="insertFormat('\n- ⭐ ', '')" class="px-2.5 py-1 bg-white dark:bg-stone-700 rounded shadow-xs hover:bg-emerald-500 hover:text-white">Pagelle / Elenco</button>
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold text-stone-700 dark:text-stone-300 mb-1 uppercase">Corpo dell'Articolo *</label>
+            <textarea id="post-content" rows="10" required placeholder="Scrivi qui il tuo articolo completo..." class="w-full text-sm font-serif p-4 rounded-xl bg-stone-50 dark:bg-stone-800 border border-stone-200 dark:border-stone-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 leading-relaxed"></textarea>
+          </div>
+
+          <div class="flex items-center justify-between pt-2">
+            <span class="text-xs text-stone-500" id="editor-word-count">0 parole • ~1 min di lettura</span>
+            <button type="submit" class="bg-pitch-700 hover:bg-pitch-800 text-white font-heading tracking-wider uppercase px-6 py-3 rounded-xl shadow-lg font-bold text-sm transition flex items-center gap-2">
+              <span>🚀</span> MANDA IN STAMPA (PUBBLICA)
+            </button>
+          </div>
+        </form>
+      </div>
+
+      <!-- TAB 3: GESTIONE ARTICOLI PUBBLICATI -->
+      <div id="founder-tab-articles" class="founder-subtab hidden bg-white dark:bg-stone-900 rounded-3xl p-6 sm:p-8 border border-stone-200 dark:border-stone-800 shadow-sm space-y-6">
+        <div>
+          <h2 class="font-heading text-xl uppercase tracking-wider text-stone-900 dark:text-white">
+            Archivio Articoli del Blog
+          </h2>
+          <p class="text-xs text-stone-500">Visualizza, monitora le letture o elimina gli articoli dalla piattaforma.</p>
+        </div>
+
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-xs">
+            <thead>
+              <tr class="border-b border-stone-200 dark:border-stone-800 text-stone-400 uppercase text-[10px] tracking-wider">
+                <th class="py-3 px-3">Titolo</th>
+                <th class="py-3 px-3">Categoria</th>
+                <th class="py-3 px-3">Autore</th>
+                <th class="py-3 px-3">Data</th>
+                <th class="py-3 px-3">Olè / Commenti</th>
+                <th class="py-3 px-3 text-right">Azione</th>
+              </tr>
+            </thead>
+            <tbody id="founder-articles-table" class="divide-y divide-stone-100 dark:divide-stone-800">
+              <!-- Riempito dinamicamente -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- TAB 4: STATISTICHE GENERALI -->
+      <div id="founder-tab-overview" class="founder-subtab hidden bg-white dark:bg-stone-900 rounded-3xl p-6 sm:p-8 border border-stone-200 dark:border-stone-800 shadow-sm space-y-6">
+        <h2 class="font-heading text-xl uppercase tracking-wider text-stone-900 dark:text-white">
+          Metriche del Tuo Portale
+        </h2>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div class="bg-stone-50 dark:bg-stone-800 p-5 rounded-2xl border border-stone-200 dark:border-stone-700">
+            <span class="text-xs text-stone-400 uppercase font-bold">Tifosi / Iscritti</span>
+            <p class="text-3xl font-heading font-bold text-pitch-700 dark:text-emerald-400 mt-2" id="metric-users">0</p>
+          </div>
+          <div class="bg-stone-50 dark:bg-stone-800 p-5 rounded-2xl border border-stone-200 dark:border-stone-700">
+            <span class="text-xs text-stone-400 uppercase font-bold">Articoli Pubblicati</span>
+            <p class="text-3xl font-heading font-bold text-pitch-700 dark:text-emerald-400 mt-2" id="metric-articles">0</p>
+          </div>
+          <div class="bg-stone-50 dark:bg-stone-800 p-5 rounded-2xl border border-stone-200 dark:border-stone-700">
+            <span class="text-xs text-stone-400 uppercase font-bold">Commenti Totali</span>
+            <p class="text-3xl font-heading font-bold text-pitch-700 dark:text-emerald-400 mt-2" id="metric-comments">0</p>
+          </div>
+          <div class="bg-stone-50 dark:bg-stone-800 p-5 rounded-2xl border border-stone-200 dark:border-stone-700">
+            <span class="text-xs text-stone-400 uppercase font-bold">Applausi / Olè</span>
+            <p class="text-3xl font-heading font-bold text-amber-500 mt-2" id="metric-claps">0</p>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+  </main>
+
+  <!-- ============================================================== -->
+  <!-- MODALE AUTENTICAZIONE (LOGIN & REGISTRAZIONE RIGIDA) -->
+  <!-- ============================================================== -->
+  <div id="modal-auth" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4">
+    <div class="bg-white dark:bg-stone-900 w-full max-w-md rounded-3xl p-6 sm:p-8 border border-stone-200 dark:border-stone-800 shadow-2xl relative">
+      <button onclick="closeAuthModal()" class="absolute top-5 right-5 text-stone-400 hover:text-stone-700 dark:hover:text-stone-200 text-lg">✕</button>
+
+      <!-- TAB SELEZIONE LOGIN / REGISTRATI -->
+      <div class="flex border-b border-stone-200 dark:border-stone-800 mb-6">
+        <button onclick="switchAuthTab('login')" id="auth-tab-btn-login" class="flex-1 pb-3 text-sm font-heading uppercase tracking-wider font-bold border-b-2 border-pitch-600 text-pitch-700 dark:text-emerald-400">
+          Accedi
+        </button>
+        <button onclick="switchAuthTab('register')" id="auth-tab-btn-register" class="flex-1 pb-3 text-sm font-heading uppercase tracking-wider font-bold border-b-2 border-transparent text-stone-400 hover:text-stone-600">
+          Registrati
+        </button>
+      </div>
+
+      <!-- FORM ACCEDI -->
+      <form id="form-login" onsubmit="handleLogin(event)" class="space-y-4">
+        <div>
+          <label class="block text-xs font-bold uppercase text-stone-600 dark:text-stone-400 mb-1">Email</label>
+          <input type="email" id="login-email" required placeholder="tua@email.it" class="w-full text-xs p-3 rounded-xl bg-stone-50 dark:bg-stone-800 border border-stone-200 dark:border-stone-700 focus:ring-2 focus:ring-emerald-500">
+        </div>
+        <div>
+          <label class="block text-xs font-bold uppercase text-stone-600 dark:text-stone-400 mb-1">Password</label>
+          <input type="password" id="login-password" required placeholder="••••••••" class="w-full text-xs p-3 rounded-xl bg-stone-50 dark:bg-stone-800 border border-stone-200 dark:border-stone-700 focus:ring-2 focus:ring-emerald-500">
+        </div>
+
+        <button type="submit" class="w-full bg-pitch-700 hover:bg-pitch-800 text-white font-heading tracking-wider uppercase py-3 rounded-xl font-bold text-xs shadow-md transition">
+          Entra in Tribuna
+        </button>
+
+        <div class="pt-4 border-t border-stone-100 dark:border-stone-800 text-center">
+          <p class="text-[11px] text-stone-400">
+            Sei il Fondatore? Entra con <b>admin@calcio.it</b> (pass: <b>admin</b>)
+          </p>
+        </div>
+      </form>
+
+      <!-- FORM REGISTRAZIONE (SENZA SCELTA RUOLO - AUTOMATICO UTENTE NORMALE) -->
+      <form id="form-register" onsubmit="handleRegister(event)" class="hidden space-y-4">
+        <div>
+          <label class="block text-xs font-bold uppercase text-stone-600 dark:text-stone-400 mb-1">Nome e Cognome o Nickname *</label>
+          <input type="text" id="reg-name" required placeholder="Es. Marco Rossi" class="w-full text-xs p-3 rounded-xl bg-stone-50 dark:bg-stone-800 border border-stone-200 dark:border-stone-700 focus:ring-2 focus:ring-emerald-500">
+        </div>
+        <div>
+          <label class="block text-xs font-bold uppercase text-stone-600 dark:text-stone-400 mb-1">Email *</label>
+          <input type="email" id="reg-email" required placeholder="marco@email.it" class="w-full text-xs p-3 rounded-xl bg-stone-50 dark:bg-stone-800 border border-stone-200 dark:border-stone-700 focus:ring-2 focus:ring-emerald-500">
+        </div>
+        <div>
+          <label class="block text-xs font-bold uppercase text-stone-600 dark:text-stone-400 mb-1">Crea una Password *</label>
+          <input type="password" id="reg-password" required placeholder="Minimo 4 caratteri" class="w-full text-xs p-3 rounded-xl bg-stone-50 dark:bg-stone-800 border border-stone-200 dark:border-stone-700 focus:ring-2 focus:ring-emerald-500">
+        </div>
+        <div>
+          <label class="block text-xs font-bold uppercase text-stone-600 dark:text-stone-400 mb-1">Squadra del Cuore *</label>
+          <select id="reg-team" class="w-full text-xs p-3 rounded-xl bg-stone-50 dark:bg-stone-800 border border-stone-200 dark:border-stone-700 focus:ring-2 focus:ring-emerald-500 font-medium">
+            <option value="Inter">Inter</option>
+            <option value="Milan">Milan</option>
+            <option value="Juventus">Juventus</option>
+            <option value="Napoli">Napoli</option>
+            <option value="Roma">Roma</option>
+            <option value="Lazio">Lazio</option>
+            <option value="Fiorentina">Fiorentina</option>
+            <option value="Atalanta">Atalanta</option>
+            <option value="Bologna">Bologna</option>
+            <option value="Altro Club">Altro Club</option>
+          </select>
+        </div>
+
+        <div class="p-3 bg-stone-50 dark:bg-stone-800/50 rounded-xl border border-stone-200 dark:border-stone-700 text-[11px] text-stone-500">
+          ℹ️ <b>Regolamento di Tribuna:</b> Ogni iscritto viene registrato come <b>Utente / Tifoso Normale</b> abilitato a commentare gli articoli. Solo il Fondatore può assegnare ruoli redazionali.
+        </div>
+
+        <button type="submit" class="w-full bg-pitch-700 hover:bg-pitch-800 text-white font-heading tracking-wider uppercase py-3 rounded-xl font-bold text-xs shadow-md transition">
+          Completa Iscrizione
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- TOAST FEEDBACK NOTIFICHE -->
+  <div id="toast" class="fixed bottom-6 right-6 z-50 transform translate-y-20 opacity-0 transition-all duration-300 pointer-events-none bg-stone-900 text-white text-xs px-4 py-3 rounded-xl shadow-2xl flex items-center gap-2 border border-stone-700">
+    <span id="toast-icon">⚽</span>
+    <span id="toast-msg">Operazione completata</span>
+  </div>
+
+  <!-- FOOTER -->
+  <footer class="bg-white dark:bg-stone-900 border-t border-stone-200 dark:border-stone-800 py-6 mt-12 text-center text-xs text-stone-500">
+    <div class="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-3">
+      <div class="flex items-center space-x-2">
+        <span class="font-heading uppercase font-bold text-pitch-700 dark:text-emerald-400">Tribuna Calcio</span>
+        <span>• Fondato e Diretto dall'Admin Supremo</span>
+      </div>
+      <div>
+        <span>Tutti i diritti riservati • Riservato ai veri appassionati di campo</span>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ============================================================== -->
+  <!-- JAVASCRIPT: LOGICA RBAC RIGIDA, LOCALSTORAGE E VISIONI SEPARATE -->
+  <!-- ============================================================== -->
+  <script>
+    // RUOLI UFFICIALI DEL SISTEMA
+    // Solo il Fondatore è supremo. Chi si registra è sempre USER.
+    const ROLES = {
+      FOUNDER: 'founder',      // Tu (Admin Supremo / Fondatore)
+      JOURNALIST: 'journalist',// Giornalista promosso da te
+      USER: 'user'             // Utente Normale registrato (commenti e lettura)
+    };
+
+    // DATI INIZIALI PREDEFINITI (SE LOCALSTORAGE È VUOTO)
+    const DEFAULT_USERS = [
+      {
+        id: 'usr_founder',
+        name: 'Direttore Supremo (Tu)',
+        email: 'admin@calcio.it',
+        password: 'admin',
+        team: 'Nazionale',
+        role: ROLES.FOUNDER,
+        joinedDate: '01/01/2026'
+      },
+      {
+        id: 'usr_2',
+        name: 'Lorenzo Pellegrini (Tifoso)',
+        email: 'lorenzo@libero.it',
+        password: '123',
+        team: 'Roma',
+        role: ROLES.USER,
+        joinedDate: '10/02/2026'
+      },
+      {
+        id: 'usr_3',
+        name: 'Matteo Riva (Tifoso)',
+        email: 'matteo@gmail.com',
+        password: '123',
+        team: 'Milan',
+        role: ROLES.USER,
+        joinedDate: '15/02/2026'
+      }
+    ];
+
+    const DEFAULT_ARTICLES = [
+      {
+        id: 'art_1',
+        title: "L'Arte della Pressione Alta: perché il calcio moderno non ammette più pause",
+        category: "Tattica & Pagelle",
+        summary: "Dal recupero palla nei primi 5 secondi alle transizioni veloci: analisi minuziosa di come le big europee dominano il campo senza palla.",
+        image: "https://images.unsplash.com/photo-1508098682722-e99c43a406b2?auto=format&fit=crop&w=1200&q=80",
+        authorId: "usr_founder",
+        authorName: "Direttore Supremo",
+        date: "22 Set 2026",
+        claps: 84,
+        readTime: "4 min",
+        content: `Il calcio degli ultimi anni ha cancellato i tempi morti. La fase difensiva non comincia più arretrando il baricentro davanti alla propria area di rigore, ma aggredendo la prima linea di costruzione avversaria.
+
+## Il concetto di Gegenpressing applicato alla Serie A
+Analizzando i dati Opta delle prime 28 giornate di campionato, le squadre con il baricentro medio superiore a 54 metri sono le stesse che vantano il miglior differenziale di Expected Goals (xG). Recuperare palla negli ultimi trenta metri equivale ad avere una percentuale del 42% superiore di concludere a rete entro 8 secondi.
+
+> 🗣️ "Chi aspetta oggi è perduto. Il pallone va conquistato prima che l'avversario possa alzare la testa per vedere il movimento dell'attaccante."
+
+## Le Pagelle del week-end tattico
+- ⭐ **Il Migliore:** L'Inter nella gestione delle mezze ali e degli inserimenti senza palla (Voto: 8.5)
+- ⭐ **La Sorpresa:** Il baricentro ultra-offensivo del Bologna di Motta nei finali di gara (Voto: 8)
+- ⚠️ **Da Rivedere:** La transizione difensiva del Milan sui calci piazzati a sfavore (Voto: 5.5)`
+      },
+      {
+        id: 'art_2',
+        title: "Bomba di Mercato: Asse Milano-Londra per il centravanti da 90 milioni",
+        category: "Calciomercato",
+        summary: "Incontri segreti nella capitale britannica: tutti i dettagli dell'offerta con bonus e contropartite tecniche.",
+        image: "https://images.unsplash.com/photo-1522778119026-d647f0596c20?auto=format&fit=crop&w=1200&q=80",
+        authorId: "usr_founder",
+        authorName: "Direttore Supremo",
+        date: "21 Set 2026",
+        claps: 135,
+        readTime: "3 min",
+        content: `I dirigenti sono atterrati questa mattina a Londra per definire l'operazione dell'estate. La trattativa è entrata nella fase decisiva, con le parti che hanno limato l'accordo sui bonus legati alla qualificazione in Champions League.`
+      },
+      {
+        id: 'art_3',
+        title: "Sorteggi Champions League: Incroci da brividi verso la finale",
+        category: "Champions",
+        summary: "Tabellone teso: le squadre italiane studiano i piani tattici per superare il turno a eliminazione diretta.",
+        image: "https://images.unsplash.com/photo-1574629810360-7efbbe195018?auto=format&fit=crop&w=1200&q=80",
+        authorId: "usr_founder",
+        authorName: "Direttore Supremo",
+        date: "20 Set 2026",
+        claps: 52,
+        readTime: "3 min",
+        content: `La roulette di Nyon ha emesso i suoi verdetti. Due sfide proibitive ma ricche di fascino per le formazioni di Serie A pronte a giocarsi il tutto per tutto.`
+      }
+    ];
+
+    const DEFAULT_COMMENTS = [
+      {
+        id: 'com_1',
+        articleId: 'art_1',
+        userName: 'Lorenzo Pellegrini (Tifoso)',
+        userTeam: 'Roma',
+        date: '22 Set 2026, 14:15',
+        text: 'Analisi tattica perfetta Direttore! La pressione alta è ormai fondamentale anche per noi in campionato.'
+      },
+      {
+        id: 'com_2',
+        articleId: 'art_2',
+        userName: 'Matteo Riva (Tifoso)',
+        userTeam: 'Milan',
+        date: '21 Set 2026, 18:30',
+        text: 'Se arriva questo attaccante a Milano possiamo puntare dritti allo scudetto l\'anno prossimo!'
+      }
+    ];
+
+    // INIZIALIZZAZIONE STATO & LOCALSTORAGE
+    let users = JSON.parse(localStorage.getItem('tc_users')) || DEFAULT_USERS;
+    let articles = JSON.parse(localStorage.getItem('tc_articles')) || DEFAULT_ARTICLES;
+    let comments = JSON.parse(localStorage.getItem('tc_comments')) || DEFAULT_COMMENTS;
+    let bookmarks = JSON.parse(localStorage.getItem('tc_bookmarks')) || [];
+    let currentUser = JSON.parse(localStorage.getItem('tc_current_user')) || null;
+    let currentCategory = 'Tutti';
+    let searchQuery = '';
+    let currentArticleId = null;
+
+    function saveState() {
+      localStorage.setItem('tc_users', JSON.stringify(users));
+      localStorage.setItem('tc_articles', JSON.stringify(articles));
+      localStorage.setItem('tc_comments', JSON.stringify(comments));
+      localStorage.setItem('tc_bookmarks', JSON.stringify(bookmarks));
+      if (currentUser) {
+        localStorage.setItem('tc_current_user', JSON.stringify(currentUser));
+      } else {
+        localStorage.removeItem('tc_current_user');
+      }
+    }
+
+    // CARICAMENTO INIZIALE
+    window.addEventListener('DOMContentLoaded', () => {
+      initTheme();
+      updateAuthUI();
+      renderHomeArticles();
+      updateCockpitStats();
+    });
+
+    // ==============================================================
+    // GESTIONE AUTENTICAZIONE E VISIONI DIFFERENZIATE
+    // ==============================================================
+    function updateAuthUI() {
+      const founderCockpit = document.getElementById('founder-cockpit');
+      const headerFounderBadge = document.getElementById('header-founder-badge');
+      const guestActions = document.getElementById('guest-actions');
+      const userMenuWrap = document.getElementById('user-menu-wrap');
+      const founderDropdownOptions = document.getElementById('founder-dropdown-options');
+
+      if (!currentUser) {
+        // NON LOGGATO (OSPITE)
+        founderCockpit.classList.add('hidden');
+        headerFounderBadge.classList.add('hidden');
+        guestActions.classList.remove('hidden');
+        userMenuWrap.classList.add('hidden');
+        founderDropdownOptions.classList.add('hidden');
+      } else {
+        // LOGGATO
+        guestActions.classList.add('hidden');
+        userMenuWrap.classList.remove('hidden');
+
+        document.getElementById('user-name').innerText = currentUser.name.split(' ')[0];
+        document.getElementById('dropdown-name').innerText = currentUser.name;
+        document.getElementById('dropdown-email').innerText = currentUser.email;
+        document.getElementById('user-avatar').innerText = currentUser.name.charAt(0).toUpperCase();
+
+        const badgeContainer = document.getElementById('dropdown-badge-container');
+
+        if (currentUser.role === ROLES.FOUNDER) {
+          // ==============================
+          // 👑 VISIONE FONDATORE ATTIVA
+          // ==============================
+          founderCockpit.classList.remove('hidden');
+          headerFounderBadge.classList.remove('hidden');
+          founderDropdownOptions.classList.remove('hidden');
+          document.getElementById('user-role-label').innerText = '👑 FONDATORE';
+          document.getElementById('user-role-label').className = 'text-[10px] text-amber-500 font-bold uppercase';
+          badgeContainer.innerHTML = `<span class="inline-block text-[10px] font-bold px-2 py-0.5 rounded bg-amber-500 text-stone-950 uppercase">👑 FONDATORE SUPREMO</span>`;
+          document.getElementById('cockpit-founder-name').innerText = currentUser.name;
+        } else if (currentUser.role === ROLES.JOURNALIST) {
+          // VISIONE GIORNALISTA (PROMOSSO DA TE)
+          founderCockpit.classList.add('hidden');
+          headerFounderBadge.classList.add('hidden');
+          founderDropdownOptions.classList.add('hidden');
+          document.getElementById('user-role-label').innerText = '✍️ GIORNALISTA';
+          document.getElementById('user-role-label').className = 'text-[10px] text-emerald-600 font-bold uppercase';
+          badgeContainer.innerHTML = `<span class="inline-block text-[10px] font-bold px-2 py-0.5 rounded bg-emerald-600 text-white uppercase">✍️ GIORNALISTA TESSERATO</span>`;
+        } else {
+          // ==============================
+          // 👤 VISIONE UTENTE NORMALE
+          // ==============================
+          founderCockpit.classList.add('hidden');
+          headerFounderBadge.classList.add('hidden');
+          founderDropdownOptions.classList.add('hidden');
+          document.getElementById('user-role-label').innerText = `⚽ Tifoso (${currentUser.team || 'Calcio'})`;
+          document.getElementById('user-role-label').className = 'text-[10px] text-stone-500 font-medium';
+          badgeContainer.innerHTML = `<span class="inline-block text-[10px] font-semibold px-2 py-0.5 rounded bg-stone-100 dark:bg-stone-800 text-stone-600 dark:text-stone-300">Tifoso: ${currentUser.team || 'Serie A'}</span>`;
+        }
+      }
+
+      // Se eravamo dentro la pagina di lettura articolo, ricarichiamo il modulo commenti
+      if (currentArticleId) {
+        renderCommentBox(currentArticleId);
+      }
+    }
+
+    // LOGIN
+    function handleLogin(e) {
+      e.preventDefault();
+      const email = document.getElementById('login-email').value.trim().toLowerCase();
+      const pass = document.getElementById('login-password').value;
+
+      const user = users.find(u => u.email.toLowerCase() === email && u.password === pass);
+
+      if (!user) {
+        showToast('Credenziali errate o utente non trovato!', '⚠️');
+        return;
+      }
+
+      currentUser = user;
+      saveState();
+      closeAuthModal();
+      updateAuthUI();
+      renderHomeArticles();
+
+      if (user.role === ROLES.FOUNDER) {
+        showToast('Bentornato Fondatore! Visione Suprema attiva.', '👑');
+      } else {
+        showToast(`Bentornato ${user.name}!`, '⚽');
+      }
+    }
+
+    // REGISTRAZIONE RIGIDA (UTENTE NORMALE AUTOMATICO)
+    function handleRegister(e) {
+      e.preventDefault();
+      const name = document.getElementById('reg-name').value.trim();
+      const email = document.getElementById('reg-email').value.trim().toLowerCase();
+      const password = document.getElementById('reg-password').value;
+      const team = document.getElementById('reg-team').value;
+
+      // Verifica esistenza
+      if (users.find(u => u.email.toLowerCase() === email)) {
+        showToast('Questa email è già iscritta a Tribuna Calcio!', '⚠️');
+        return;
+      }
+
+      // CREAZIONE RIGIDA: NESSUN RUOLO A SCELTA, SEMPRE "USER"
+      const newUser = {
+        id: 'usr_' + Date.now(),
+        name: name,
+        email: email,
+        password: password,
+        team: team,
+        role: ROLES.USER, // <-- FORZATURA RIGIDA
+        joinedDate: new Date().toLocaleDateString('it-IT')
+      };
+
+      users.push(newUser);
+      currentUser = newUser;
+      saveState();
+      closeAuthModal();
+      updateAuthUI();
+      updateCockpitStats();
+
+      showToast(`Iscrizione completata! Benvenuto tifoso del ${team}.`, '🎉');
+    }
+
+    function logout() {
+      currentUser = null;
+      localStorage.removeItem('tc_current_user');
+      closeUserDropdown();
+      updateAuthUI();
+      navigate('home');
+      showToast('Disconnessione effettuata.', '👋');
+    }
+
+    // ==============================================================
+    // PORTALE RISERVATO FONDATORE
+    // ==============================================================
+    function openFounderPortal(tab = 'dashboard') {
+      if (!currentUser || currentUser.role !== ROLES.FOUNDER) {
+        showToast('ACCESSO NEGATO: Solo il Fondatore Supremo può entrare qui!', '🚫');
+        return;
+      }
+
+      closeUserDropdown();
+      document.getElementById('view-home').classList.add('hidden');
+      document.getElementById('view-article').classList.add('hidden');
+      document.getElementById('view-founder-portal').classList.remove('hidden');
+
+      if (tab === 'editor') {
+        switchFounderTab('editor');
+      } else if (tab === 'articles') {
+        switchFounderTab('articles');
+      } else {
+        switchFounderTab('users');
+      }
+
+      renderFounderTables();
+      updateCockpitStats();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function switchFounderTab(tabId) {
+      document.querySelectorAll('.founder-subtab').forEach(el => el.classList.add('hidden'));
+      document.querySelectorAll('[id^="tab-btn-"]').forEach(btn => {
+        btn.className = 'px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-wider transition bg-stone-800 text-stone-300 hover:text-white';
+      });
+
+      const targetTab = document.getElementById(`founder-tab-${tabId}`);
+      const targetBtn = document.getElementById(`tab-btn-${tabId}`);
+
+      if (targetTab) targetTab.classList.remove('hidden');
+      if (targetBtn) targetBtn.className = 'px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-wider transition bg-amber-500 text-stone-950';
+
+      if (tabId === 'users' || tabId === 'articles') {
+        renderFounderTables();
+      }
+    }
+
+    // TABELLA ISCRITTI & CAMBIO RUOLI DAL PORTALE
+    function renderFounderTables() {
+      // 1. Tabella Iscritti
+      const userTbody = document.getElementById('founder-users-table');
+      userTbody.innerHTML = '';
+
+      users.forEach(u => {
+        const isSupreme = u.role === ROLES.FOUNDER;
+        const tr = document.createElement('tr');
+        tr.className = isSupreme ? 'bg-amber-500/10' : 'hover:bg-stone-50 dark:hover:bg-stone-800/50';
+
+        tr.innerHTML = `
+          <td class="py-3 px-3">
+            <div class="font-bold text-stone-900 dark:text-stone-100 flex items-center gap-1.5">
+              ${isSupreme ? '👑 ' : ''}${u.name}
+              ${isSupreme ? '<span class="text-[9px] px-1 bg-amber-500 text-stone-950 font-bold rounded">TU</span>' : ''}
+            </div>
+            <div class="text-[10px] text-stone-400">ID: ${u.id}</div>
+          </td>
+          <td class="py-3 px-3 text-stone-600 dark:text-stone-400">${u.email}</td>
+          <td class="py-3 px-3">
+            <span class="inline-block px-2 py-0.5 rounded bg-stone-100 dark:bg-stone-800 font-semibold text-[10px]">
+              ⚽ ${u.team || 'Calcio'}
+            </span>
+          </td>
+          <td class="py-3 px-3 text-stone-500">${u.joinedDate || '2026'}</td>
+          <td class="py-3 px-3">
+            ${
+              isSupreme 
+              ? '<span class="font-bold text-amber-500 uppercase">FONDATORE SUPREMO</span>'
+              : u.role === ROLES.JOURNALIST
+              ? '<span class="font-bold text-emerald-600 uppercase">✍️ GIORNALISTA</span>'
+              : '<span class="text-stone-500">⚽ Utente Normale</span>'
+            }
+          </td>
+          <td class="py-3 px-3 text-right">
+            ${
+              isSupreme 
+              ? '<span class="text-[10px] text-stone-400 italic">Ruolo Intoccabile</span>'
+              : `
+                <select onchange="changeUserRoleByFounder('${u.id}', this.value)" class="text-[11px] p-1.5 rounded-lg bg-stone-100 dark:bg-stone-800 border border-stone-200 dark:border-stone-700 font-bold focus:ring-1 focus:ring-amber-500">
+                  <option value="${ROLES.USER}" ${u.role === ROLES.USER ? 'selected' : ''}>Utente Normale (Solo Commenti)</option>
+                  <option value="${ROLES.JOURNALIST}" ${u.role === ROLES.JOURNALIST ? 'selected' : ''}>Promuovi a Giornalista (Scrittura)</option>
+                </select>
+              `
+            }
+          </td>
+        `;
+        userTbody.appendChild(tr);
+      });
+
+      // 2. Tabella Articoli
+      const artTbody = document.getElementById('founder-articles-table');
+      artTbody.innerHTML = '';
+
+      articles.forEach(art => {
+        const commentCount = comments.filter(c => c.articleId === art.id).length;
+        const tr = document.createElement('tr');
+        tr.className = 'hover:bg-stone-50 dark:hover:bg-stone-800/50';
+        tr.innerHTML = `
+          <td class="py-3 px-3">
+            <div class="font-bold text-stone-900 dark:text-stone-100 max-w-xs truncate">${art.title}</div>
+          </td>
+          <td class="py-3 px-3">
+            <span class="px-2 py-0.5 rounded bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-400 font-bold text-[10px]">
+              ${art.category}
+            </span>
+          </td>
+          <td class="py-3 px-3 text-stone-600 dark:text-stone-300 font-medium">${art.authorName}</td>
+          <td class="py-3 px-3 text-stone-400">${art.date}</td>
+          <td class="py-3 px-3 text-stone-500">👏 ${art.claps || 0} • 💬 ${commentCount}</td>
+          <td class="py-3 px-3 text-right">
+            <button onclick="founderDeleteArticle('${art.id}')" class="px-2.5 py-1 rounded bg-red-100 hover:bg-red-200 dark:bg-red-950/40 text-red-600 text-[11px] font-bold transition">
+              Elimina
+            </button>
+          </td>
+        `;
+        artTbody.appendChild(tr);
+      });
+    }
+
+    // COMANDO FONDATORE: CAMBIO RUOLO ISCRITTO
+    function changeUserRoleByFounder(userId, newRole) {
+      if (!currentUser || currentUser.role !== ROLES.FOUNDER) return;
+
+      const target = users.find(u => u.id === userId);
+      if (!target) return;
+
+      if (target.role === ROLES.FOUNDER) {
+        showToast('Non puoi modificare il tuo account Fondatore!', '🛡️');
+        return;
+      }
+
+      target.role = newRole;
+      saveState();
+      renderFounderTables();
+      showToast(`Ruolo di ${target.name} aggiornato con successo a: ${newRole.toUpperCase()}`, '👑');
+    }
+
+    // COMANDO FONDATORE: CANCELLAZIONE ARTICOLO
+    function founderDeleteArticle(articleId) {
+      if (!currentUser || currentUser.role !== ROLES.FOUNDER) return;
+
+      if (confirm('Sei sicuro di voler eliminare questo articolo dal blog?')) {
+        articles = articles.filter(a => a.id !== articleId);
+        comments = comments.filter(c => c.articleId !== articleId);
+        saveState();
+        renderFounderTables();
+        renderHomeArticles();
+        updateCockpitStats();
+        showToast('Articolo rimosso definitivamente.', '🗑️');
+      }
+    }
+
+    // CREAZIONE ARTICOLO DAL PORTALE DEL FONDATORE
+    function handlePublishArticle(e) {
+      e.preventDefault();
+      if (!currentUser || currentUser.role !== ROLES.FOUNDER) {
+        showToast('Solo il Fondatore può mandare in stampa articoli!', '🚫');
+        return;
+      }
+
+      const title = document.getElementById('post-title').value.trim();
+      const category = document.getElementById('post-category').value;
+      const summary = document.getElementById('post-summary').value.trim();
+      const content = document.getElementById('post-content').value.trim();
+      let image = document.getElementById('post-image').value.trim();
+
+      if (!image) {
+        image = "https://images.unsplash.com/photo-1508098682722-e99c43a406b2?auto=format&fit=crop&w=1200&q=80";
+      }
+
+      const words = content.split(/\s+/).length;
+      const readMinutes = Math.max(1, Math.ceil(words / 180));
+
+      const newArticle = {
+        id: 'art_' + Date.now(),
+        title: title,
+        category: category,
+        summary: summary,
+        image: image,
+        authorId: currentUser.id,
+        authorName: "Direttore Supremo",
+        date: new Date().toLocaleDateString('it-IT', { day: '2-digit', month: 'short', year: 'numeric' }),
+        claps: 0,
+        readTime: `${readMinutes} min`,
+        content: content
+      };
+
+      articles.unshift(newArticle);
+      saveState();
+      
+      document.getElementById('founder-article-form').reset();
+      showToast('Articolo pubblicato e mandato in Prima Pagina!', '🚀');
+      
+      // Torna alla home per vederlo subito
+      navigate('home');
+    }
+
+    function insertFormat(start, end) {
+      const textarea = document.getElementById('post-content');
+      const startPos = textarea.selectionStart;
+      const endPos = textarea.selectionEnd;
+      const selText = textarea.value.substring(startPos, endPos) || 'testo';
+      
+      textarea.value = textarea.value.substring(0, startPos) + start + selText + end + textarea.value.substring(endPos);
+      textarea.focus();
+    }
+
+    function randomCoverImage() {
+      const photos = [
+        "https://images.unsplash.com/photo-1508098682722-e99c43a406b2?auto=format&fit=crop&w=1200&q=80",
+        "https://images.unsplash.com/photo-1522778119026-d647f0596c20?auto=format&fit=crop&w=1200&q=80",
+        "https://images.unsplash.com/photo-1574629810360-7efbbe195018?auto=format&fit=crop&w=1200&q=80",
+        "https://images.unsplash.com/photo-1518091043644-c1d4457512c6?auto=format&fit=crop&w=1200&q=80",
+        "https://images.unsplash.com/photo-1489944445391-11688663c2da?auto=format&fit=crop&w=1200&q=80"
+      ];
+      const pick = photos[Math.floor(Math.random() * photos.length)];
+      document.getElementById('post-image').value = pick;
+      showToast('Immagine calcistica inserita!', '📸');
+    }
+
+    // ==============================================================
+    // RENDERING ARTICOLI & VISIONE HOME
+    // ==============================================================
+    function renderHomeArticles() {
+      const heroContainer = document.getElementById('hero-article-container');
+      const gridContainer = document.getElementById('articles-grid');
+      const noFound = document.getElementById('no-articles-found');
+      const countLabel = document.getElementById('articles-count-label');
+
+      let filtered = articles.filter(a => {
+        const matchCat = currentCategory === 'Tutti' || a.category === currentCategory;
+        const matchSearch = searchQuery === '' || 
+          a.title.toLowerCase().includes(searchQuery) ||
+          a.summary.toLowerCase().includes(searchQuery) ||
+          a.category.toLowerCase().includes(searchQuery);
+        return matchCat && matchSearch;
+      });
+
+      countLabel.innerText = `${filtered.length} articoli`;
+
+      if (filtered.length === 0) {
+        heroContainer.innerHTML = '';
+        gridContainer.innerHTML = '';
+        noFound.classList.remove('hidden');
+        return;
+      }
+      noFound.classList.add('hidden');
+
+      const isFounder = currentUser && currentUser.role === ROLES.FOUNDER;
+
+      // ARTICOLO HERO (IL PRIMO)
+      const hero = filtered[0];
+      heroContainer.innerHTML = `
+        <div class="relative bg-white dark:bg-stone-900 rounded-3xl overflow-hidden border border-stone-200 dark:border-stone-800 shadow-sm group">
+          <div class="grid grid-cols-1 lg:grid-cols-12 gap-0">
+            <div class="lg:col-span-7 overflow-hidden relative">
+              <img src="${hero.image}" alt="${hero.title}" class="w-full h-72 sm:h-96 object-cover group-hover:scale-105 transition duration-500 cursor-pointer" onclick="openArticle('${hero.id}')">
+              <span class="absolute top-4 left-4 bg-amber-500 text-stone-950 font-heading text-xs uppercase px-3 py-1 rounded-full font-bold shadow-md">
+                In Primo Piano
+              </span>
+            </div>
+            <div class="lg:col-span-5 p-6 sm:p-8 flex flex-col justify-between">
+              <div class="space-y-3">
+                <div class="flex items-center gap-2 text-xs">
+                  <span class="font-heading uppercase text-pitch-700 dark:text-emerald-400 font-bold">${hero.category}</span>
+                  <span class="text-stone-400">•</span>
+                  <span class="text-stone-400">${hero.readTime}</span>
+                </div>
+                <h3 onclick="openArticle('${hero.id}')" class="font-heading text-2xl sm:text-3xl font-bold uppercase hover:text-pitch-700 dark:hover:text-emerald-400 cursor-pointer transition leading-tight">
+                  ${hero.title}
+                </h3>
+                <p class="text-xs sm:text-sm text-stone-600 dark:text-stone-300 font-serif line-clamp-3 leading-relaxed">
+                  ${hero.summary}
+                </p>
+              </div>
+
+              <div class="pt-6 border-t border-stone-100 dark:border-stone-800 flex items-center justify-between">
+                <div class="flex items-center space-x-2">
+                  <div class="w-8 h-8 rounded-full bg-pitch-700 text-white font-bold flex items-center justify-center text-xs">
+                    ${hero.authorName.charAt(0)}
+                  </div>
+                  <div>
+                    <div class="text-xs font-bold">${hero.authorName}</div>
+                    <div class="text-[10px] text-stone-400">${hero.date}</div>
+                  </div>
+                </div>
+
+                <div class="flex items-center gap-2">
+                  ${isFounder ? `
+                    <button onclick="founderDeleteArticle('${hero.id}')" class="text-red-500 hover:text-red-700 p-1.5 rounded text-xs" title="Elimina Articolo (Solo Fondatore)">
+                      🗑️
+                    </button>
+                  ` : ''}
+                  <button onclick="openArticle('${hero.id}')" class="bg-pitch-700 hover:bg-pitch-800 text-white font-heading text-xs uppercase px-4 py-2 rounded-xl font-bold transition">
+                    Leggi Articolo →
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+
+      // GRIGLIA ALTRI ARTICOLI
+      const others = filtered.slice(1);
+      gridContainer.innerHTML = '';
+
+      others.forEach(art => {
+        const card = document.createElement('div');
+        card.className = 'bg-white dark:bg-stone-900 rounded-2xl overflow-hidden border border-stone-200 dark:border-stone-800 shadow-sm flex flex-col justify-between hover:shadow-md transition';
+
+        card.innerHTML = `
+          <div>
+            <div class="relative overflow-hidden cursor-pointer" onclick="openArticle('${art.id}')">
+              <img src="${art.image}" alt="${art.title}" class="w-full h-44 object-cover hover:scale-105 transition duration-300">
+              <span class="absolute top-3 left-3 bg-stone-900/80 backdrop-blur-xs text-white text-[10px] font-heading uppercase px-2.5 py-0.5 rounded font-bold">
+                ${art.category}
+              </span>
+            </div>
+            <div class="p-5 space-y-2">
+              <div class="flex items-center justify-between text-[11px] text-stone-400">
+                <span>${art.readTime}</span>
+                <span>👏 ${art.claps || 0}</span>
+              </div>
+              <h4 onclick="openArticle('${art.id}')" class="font-heading text-lg font-bold uppercase hover:text-pitch-700 dark:hover:text-emerald-400 cursor-pointer line-clamp-2 transition leading-tight">
+                ${art.title}
+              </h4>
+              <p class="text-xs text-stone-500 font-serif line-clamp-2 leading-relaxed">
+                ${art.summary}
+              </p>
+            </div>
+          </div>
+
+          <div class="px-5 pb-5 pt-3 border-t border-stone-100 dark:border-stone-800 flex items-center justify-between">
+            <span class="text-[11px] font-bold text-stone-600 dark:text-stone-300 truncate max-w-[130px]">${art.authorName}</span>
+            <div class="flex items-center gap-2">
+              ${isFounder ? `
+                <button onclick="founderDeleteArticle('${art.id}')" class="text-red-500 hover:text-red-700 p-1 text-xs" title="Elimina da Fondatore">
+                  🗑️
+                </button>
+              ` : ''}
+              <button onclick="openArticle('${art.id}')" class="text-xs font-bold text-pitch-700 dark:text-emerald-400 hover:underline">
+                Leggi →
+              </button>
+            </div>
+          </div>
+        `;
+        gridContainer.appendChild(card);
+      });
+    }
+
+    // ==============================================================
+    // LETTURA ARTICOLO & COMMENTI RIGIDI (SOLO PER REGISTRATI)
+    // ==============================================================
+    function openArticle(id) {
+      const art = articles.find(a => a.id === id);
+      if (!art) return;
+
+      currentArticleId = id;
+
+      document.getElementById('view-home').classList.add('hidden');
+      document.getElementById('view-founder-portal').classList.add('hidden');
+      document.getElementById('view-article').classList.remove('hidden');
+
+      document.getElementById('detail-image').src = art.image;
+      document.getElementById('detail-title').innerText = art.title;
+      document.getElementById('detail-category').innerText = art.category;
+      document.getElementById('detail-readtime').innerText = `${art.readTime} di lettura`;
+      document.getElementById('detail-author').innerText = art.authorName;
+      document.getElementById('detail-author-avatar').innerText = art.authorName.charAt(0);
+      document.getElementById('detail-date').innerText = art.date;
+      document.getElementById('detail-summary').innerText = art.summary;
+      document.getElementById('detail-claps').innerText = art.claps || 0;
+
+      // Parsing formattazione semplice
+      let parsed = art.content
+        .replace(/\n\n## (.*?)\n/g, '<h3 class="font-heading text-2xl uppercase mt-6 mb-3 text-stone-900 dark:text-white">$1</h3>')
+        .replace(/\n> (.*?)\n/g, '<blockquote class="border-l-4 border-amber-500 pl-4 py-2 italic my-4 text-stone-600 dark:text-stone-300 bg-amber-50 dark:bg-amber-950/20 rounded-r-lg">$1</blockquote>')
+        .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+        .replace(/\*(.*?)\*/g, '<em>$1</em>')
+        .replace(/\n- (.*?)/g, '<li class="ml-4 list-disc">$1</li>')
+        .replace(/\n/g, '<br>');
+
+      document.getElementById('detail-content').innerHTML = parsed;
+
+      renderCommentBox(id);
+      renderCommentsList(id);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // BOX COMMENTI: SE NON LOGGATO BLOCCA, SE LOGGATO PERMETTE
+    function renderCommentBox(articleId) {
+      const box = document.getElementById('comment-form-container');
+
+      if (!currentUser) {
+        // NON REGISTRATO / NON LOGGATO -> NON PUÒ COMMENTARE
+        box.innerHTML = `
+          <div class="p-4 bg-stone-100 dark:bg-stone-800/60 rounded-2xl border border-stone-200 dark:border-stone-700 text-center space-y-2">
+            <p class="text-xs text-stone-600 dark:text-stone-300 font-medium">
+              🔒 <b>Dibattito riservato ai tifosi registrati:</b> Vuoi dire la tua su questo articolo?
+            </p>
+            <div class="flex items-center justify-center gap-3">
+              <button onclick="openAuthModal('login')" class="px-4 py-1.5 rounded-xl bg-stone-800 hover:bg-stone-700 text-white text-xs font-bold transition">
+                Accedi
+              </button>
+              <button onclick="openAuthModal('register')" class="px-4 py-1.5 rounded-xl bg-pitch-700 hover:bg-pitch-800 text-white text-xs font-bold transition">
+                Registrati per Commentare
+              </button>
+            </div>
+          </div>
+        `;
+      } else {
+        // UTENTE LOGGATO (NORMALE, GIORNALISTA O FONDATORE)
+        box.innerHTML = `
+          <form onsubmit="handleAddComment(event)" class="space-y-3 bg-stone-50 dark:bg-stone-800/40 p-4 rounded-2xl border border-stone-200 dark:border-stone-700">
+            <div class="flex items-center justify-between text-xs">
+              <span class="font-bold text-stone-700 dark:text-stone-200">
+                Commenta come: <span class="text-pitch-700 dark:text-emerald-400 font-bold">${currentUser.name}</span>
+                <span class="text-[10px] text-stone-400 ml-1">(${currentUser.team || 'Calcio'})</span>
+              </span>
+              <span class="text-[10px] text-emerald-600 font-semibold">Tesserato Verificato</span>
+            </div>
+            <textarea id="comment-text" required rows="3" placeholder="Scrivi la tua opinione tattica o sul match..." class="w-full text-xs p-3 rounded-xl bg-white dark:bg-stone-800 border border-stone-200 dark:border-stone-700 focus:outline-none focus:ring-2 focus:ring-emerald-500"></textarea>
+            <div class="flex justify-end">
+              <button type="submit" class="bg-pitch-700 hover:bg-pitch-800 text-white font-heading text-xs uppercase px-5 py-2 rounded-xl font-bold shadow transition">
+                Pubblica Commento
+              </button>
+            </div>
+          </form>
+        `;
+      }
+    }
+
+    function renderCommentsList(articleId) {
+      const list = document.getElementById('comments-list');
+      const countEl = document.getElementById('detail-comments-count');
+      const artComments = comments.filter(c => c.articleId === articleId);
+
+      countEl.innerText = `${artComments.length} commenti`;
+      list.innerHTML = '';
+
+      if (artComments.length === 0) {
+        list.innerHTML = `<p class="text-xs text-stone-400 italic">Ancora nessun commento. Sii il primo a commentare al Bar dello Sport!</p>`;
+        return;
+      }
+
+      artComments.forEach(c => {
+        const item = document.createElement('div');
+        item.className = 'p-4 rounded-2xl bg-stone-50 dark:bg-stone-800/40 border border-stone-200 dark:border-stone-800 space-y-1.5';
+        item.innerHTML = `
+          <div class="flex items-center justify-between text-xs">
+            <div class="flex items-center space-x-2">
+              <span class="font-bold text-stone-900 dark:text-stone-100">${c.userName}</span>
+              <span class="text-[10px] px-2 py-0.5 rounded bg-stone-200 dark:bg-stone-700 font-semibold text-stone-600 dark:text-stone-300">⚽ ${c.userTeam || 'Tifoso'}</span>
+            </div>
+            <span class="text-[10px] text-stone-400">${c.date}</span>
+          </div>
+          <p class="text-xs text-stone-700 dark:text-stone-300 leading-relaxed">${c.text}</p>
+        `;
+        list.appendChild(item);
+      });
+    }
+
+    function handleAddComment(e) {
+      e.preventDefault();
+      if (!currentUser) return;
+
+      const txt = document.getElementById('comment-text').value.trim();
+      if (!txt) return;
+
+      const newCom = {
+        id: 'com_' + Date.now(),
+        articleId: currentArticleId,
+        userName: currentUser.name,
+        userTeam: currentUser.team || 'Calcio',
+        date: new Date().toLocaleDateString('it-IT') + ', ' + new Date().toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' }),
+        text: txt
+      };
+
+      comments.unshift(newCom);
+      saveState();
+      document.getElementById('comment-text').value = '';
+      renderCommentsList(currentArticleId);
+      updateCockpitStats();
+      showToast('Commento inviato con successo!', '💬');
+    }
+
+    function clapCurrentArticle() {
+      const art = articles.find(a => a.id === currentArticleId);
+      if (!art) return;
+      art.claps = (art.claps || 0) + 1;
+      saveState();
+      document.getElementById('detail-claps').innerText = art.claps;
+      showToast('Hai applaudito questa analisi!', '👏');
+    }
+
+    // ==============================================================
+    // UTILITY: NAVIGAZIONE, TEMA, FILTRI
+    // ==============================================================
+    function navigate(view) {
+      if (view === 'home') {
+        document.getElementById('view-home').classList.remove('hidden');
+        document.getElementById('view-article').classList.add('hidden');
+        document.getElementById('view-founder-portal').classList.add('hidden');
+        currentArticleId = null;
+        renderHomeArticles();
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+    }
+
+    function filterCategory(cat) {
+      currentCategory = cat;
+      document.querySelectorAll('.category-pill').forEach(btn => {
+        if (btn.dataset.cat === cat) {
+          btn.className = 'category-pill active px-3 py-1 rounded-full text-xs font-bold uppercase transition bg-stone-200 dark:bg-stone-800 text-stone-900 dark:text-white';
+        } else {
+          btn.className = 'category-pill px-3 py-1 rounded-full text-xs font-bold uppercase transition text-stone-600 dark:text-stone-400 hover:text-emerald-600';
+        }
+      });
+      navigate('home');
+    }
+
+    function handleSearch() {
+      searchQuery = document.getElementById('search-input').value.trim().toLowerCase();
+      renderHomeArticles();
+    }
+
+    function updateCockpitStats() {
+      document.getElementById('stat-total-users').innerText = users.length;
+      document.getElementById('stat-total-articles').innerText = articles.length;
+      document.getElementById('stat-total-comments').innerText = comments.length;
+
+      // Metriche interne Portale
+      const mU = document.getElementById('metric-users');
+      const mA = document.getElementById('metric-articles');
+      const mC = document.getElementById('metric-comments');
+      const mCl = document.getElementById('metric-claps');
+
+      if (mU) mU.innerText = users.length;
+      if (mA) mA.innerText = articles.length;
+      if (mC) mC.innerText = comments.length;
+      if (mCl) {
+        const totalClaps = articles.reduce((acc, curr) => acc + (curr.claps || 0), 0);
+        mCl.innerText = totalClaps;
+      }
+    }
+
+    function votePoll(idx) {
+      showToast('Grazie per aver votato al sondaggio del Bar dello Sport!', '⚽');
+    }
+
+    function toggleTheme() {
+      const html = document.documentElement;
+      const icon = document.getElementById('theme-icon');
+      if (html.classList.contains('dark')) {
+        html.classList.remove('dark');
+        localStorage.setItem('tc_theme', 'light');
+        icon.innerText = '🌙';
+      } else {
+        html.classList.add('dark');
+        localStorage.setItem('tc_theme', 'dark');
+        icon.innerText = '☀️';
+      }
+    }
+
+    function initTheme() {
+      const saved = localStorage.getItem('tc_theme');
+      if (saved === 'dark' || (!saved && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+        document.documentElement.classList.add('dark');
+        document.getElementById('theme-icon').innerText = '☀️';
+      }
+    }
+
+    function openAuthModal(tab = 'login') {
+      document.getElementById('modal-auth').classList.remove('hidden');
+      switchAuthTab(tab);
+    }
+
+    function closeAuthModal() {
+      document.getElementById('modal-auth').classList.add('hidden');
+    }
+
+    function switchAuthTab(tab) {
+      const btnLog = document.getElementById('auth-tab-btn-login');
+      const btnReg = document.getElementById('auth-tab-btn-register');
+      const formLog = document.getElementById('form-login');
+      const formReg = document.getElementById('form-register');
+
+      if (tab === 'login') {
+        btnLog.className = 'flex-1 pb-3 text-sm font-heading uppercase tracking-wider font-bold border-b-2 border-pitch-600 text-pitch-700 dark:text-emerald-400';
+        btnReg.className = 'flex-1 pb-3 text-sm font-heading uppercase tracking-wider font-bold border-b-2 border-transparent text-stone-400 hover:text-stone-600';
+        formLog.classList.remove('hidden');
+        formReg.classList.add('hidden');
+      } else {
+        btnReg.className = 'flex-1 pb-3 text-sm font-heading uppercase tracking-wider font-bold border-b-2 border-pitch-600 text-pitch-700 dark:text-emerald-400';
+        btnLog.className = 'flex-1 pb-3 text-sm font-heading uppercase tracking-wider font-bold border-b-2 border-transparent text-stone-400 hover:text-stone-600';
+        formReg.classList.remove('hidden');
+        formLog.classList.add('hidden');
+      }
+    }
+
+    function toggleUserDropdown() {
+      document.getElementById('user-dropdown').classList.toggle('hidden');
+    }
+
+    function closeUserDropdown() {
+      document.getElementById('user-dropdown').classList.add('hidden');
+    }
+
+    function showToast(msg, icon = '⚽') {
+      const toast = document.getElementById('toast');
+      document.getElementById('toast-msg').innerText = msg;
+      document.getElementById('toast-icon').innerText = icon;
+      toast.classList.remove('translate-y-20', 'opacity-0');
+      setTimeout(() => {
+        toast.classList.add('translate-y-20', 'opacity-0');
+      }, 3500);
+    }
+
+    function shareCurrentArticle() {
+      navigator.clipboard.writeText(window.location.href);
+      showToast('Link copiato negli appunti!', '🔗');
+    }
+
+    function toggleBookmarkCurrent() {
+      showToast('Articolo salvato nei tuoi segnalibri!', '🔖');
+    }
+
+    function openBookmarks() {
+      closeUserDropdown();
+      showToast('Sezione segnalibri salvati.', '🔖');
+    }
+  </script>
+</body>
+</html>
