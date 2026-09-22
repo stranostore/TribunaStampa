@@ -1,1632 +1,1453 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Tribuna Calcio | Quotidiano Sportivo Indipendente</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Habbo Survival: Post-Apocalyptic RPG</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Oswald:wght@500;600;700&family=Merriweather:ital,wght@0,300;0,400;0,700;1,300&display=swap" rel="stylesheet">
-
-  <script>
-    tailwind.config = {
-      darkMode: 'class',
-      theme: {
-        extend: {
-          fontFamily: {
-            sans: ['Inter', 'sans-serif'],
-            heading: ['Oswald', 'sans-serif'],
-            serif: ['Merriweather', 'serif']
-          },
-          colors: {
-            pitch: {
-              50: '#f0fdf4',
-              100: '#dcfce7',
-              500: '#22c55e',
-              600: '#16a34a',
-              700: '#15803d',
-              800: '#166534',
-              900: '#14532d',
-              950: '#052e16'
-            },
-            gold: {
-              400: '#fbbf24',
-              500: '#f59e0b',
-              600: '#d97706'
-            }
-          }
-        }
-      }
-    }
-  </script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js"></script>
   <style>
-    .gold-gradient {
-      background: linear-gradient(135deg, #18181b 0%, #27272a 50%, #1c1917 100%);
-      border-bottom: 2px solid #f59e0b;
+    @import url('https://fonts.googleapis.com/css2?family=VT323&family=Press+Start+2P&family=Ubuntu:wght@400;500;700&display=swap');
+    
+    * {
+      box-sizing: border-box;
+      user-select: none;
+      -webkit-user-select: none;
     }
-    .custom-scroll::-webkit-scrollbar {
-      height: 6px;
-      width: 6px;
-    }
-    .custom-scroll::-webkit-scrollbar-thumb {
-      background: #16a34a;
-      border-radius: 4px;
-    }
-    .ticker-wrap {
+    
+    body {
+      margin: 0;
       overflow: hidden;
+      background-color: #121517;
+      font-family: 'Ubuntu', sans-serif;
+      color: #fff;
+    }
+
+    .pixel-text {
+      font-family: 'Press Start 2P', monospace;
+    }
+    
+    .retro-font {
+      font-family: 'VT323', monospace;
+    }
+
+    /* Habbo Bubble */
+    .speech-bubble {
+      position: absolute;
+      background: #ffffff;
+      color: #111;
+      padding: 5px 10px;
+      border-radius: 6px;
+      font-weight: 700;
+      font-size: 12px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+      pointer-events: none;
       white-space: nowrap;
+      transform: translate(-50%, -100%);
+      border: 2px solid #000;
+      transition: opacity 0.3s, transform 0.3s;
+      z-index: 100;
     }
-    .ticker-move {
-      display: inline-block;
-      white-space: nowrap;
-      animation: ticker 35s linear infinite;
+
+    .speech-bubble::after {
+      content: '';
+      position: absolute;
+      bottom: -8px;
+      left: 50%;
+      transform: translateX(-50%);
+      border-width: 8px 6px 0;
+      border-style: solid;
+      border-color: #ffffff transparent;
+      display: block;
+      width: 0;
     }
-    .ticker-move:hover {
-      animation-play-state: paused;
+
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
     }
-    @keyframes ticker {
-      0% { transform: translate3d(0, 0, 0); }
-      100% { transform: translate3d(-50%, 0, 0); }
+    ::-webkit-scrollbar-track {
+      background: #1e2429;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #4a5568;
+      border-radius: 3px;
+    }
+
+    /* Modal Backdrop */
+    .modal-backdrop {
+      background: rgba(10, 15, 20, 0.85);
+      backdrop-filter: blur(4px);
     }
   </style>
 </head>
-<body class="bg-stone-100 text-stone-900 dark:bg-stone-950 dark:text-stone-100 min-h-screen flex flex-col font-sans transition-colors duration-200">
+<body class="w-screen h-screen relative select-none">
 
-  <!-- ========================================== -->
-  <!-- BARRA ESCLUSIVA FONDATORE (VISIBILE SOLO AL FONDATORE) -->
-  <!-- ========================================== -->
-  <div id="founder-cockpit" class="hidden gold-gradient text-stone-200 px-4 py-2.5 text-xs shadow-xl sticky top-0 z-50">
-    <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-3">
-      <div class="flex items-center space-x-3">
-        <span class="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-bold bg-amber-500 text-stone-950 tracking-wider">
-          ★ VISIONE FONDATORE
-        </span>
-        <span class="font-medium text-stone-300">
-          Benvenuto nel tuo centro di controllo, <strong class="text-amber-400" id="cockpit-founder-name">Direttore Supremo</strong>
-        </span>
+  <!-- ================= CANVAS PRINCIPALE GIOCO ================= -->
+  <div id="game-view" class="w-full h-full relative hidden">
+    <canvas id="survivalCanvas" class="w-full h-full block cursor-crosshair"></canvas>
+
+    <!-- Top Left HUD: Stato del Sopravvissuto -->
+    <div class="absolute top-4 left-4 flex flex-col gap-2 z-20">
+      <div class="bg-gray-900/90 border-2 border-gray-700 p-3 rounded-lg shadow-xl flex items-center gap-3 backdrop-blur-sm">
+        <div id="hud-avatar-box" class="w-12 h-12 bg-amber-600 rounded-md border-2 border-amber-400 flex items-center justify-center text-xl font-bold shadow-inner">
+          🤠
+        </div>
+        <div class="flex flex-col gap-1 w-44">
+          <div class="flex justify-between items-center text-xs font-bold">
+            <span id="hud-nickname" class="text-amber-300">Player</span>
+            <span id="hud-lvl" class="text-xs bg-red-800 text-white px-1.5 py-0.5 rounded">LV 1</span>
+          </div>
+          <!-- Barra Vita -->
+          <div class="w-full bg-gray-800 rounded-full h-3 border border-gray-600 overflow-hidden relative">
+            <div id="bar-hp" class="bg-red-600 h-full transition-all duration-200" style="width: 100%;"></div>
+            <span id="text-hp" class="absolute inset-0 text-[9px] flex items-center justify-center font-bold">100/100 HP</span>
+          </div>
+          <!-- Barra Fame -->
+          <div class="w-full bg-gray-800 rounded-full h-2.5 border border-gray-600 overflow-hidden relative">
+            <div id="bar-hunger" class="bg-amber-500 h-full transition-all duration-200" style="width: 100%;"></div>
+            <span id="text-hunger" class="absolute inset-0 text-[8px] flex items-center justify-center font-bold">Fame: 100%</span>
+          </div>
+          <!-- Barra Sete -->
+          <div class="w-full bg-gray-800 rounded-full h-2.5 border border-gray-600 overflow-hidden relative">
+            <div id="bar-thirst" class="bg-blue-500 h-full transition-all duration-200" style="width: 100%;"></div>
+            <span id="text-thirst" class="absolute inset-0 text-[8px] flex items-center justify-center font-bold">Sete: 100%</span>
+          </div>
+        </div>
       </div>
 
-      <div class="flex items-center gap-4">
-        <div class="hidden md:flex items-center space-x-4 text-stone-300 text-[11px] border-r border-stone-700 pr-4">
-          <span>👥 Iscritti Totali: <b class="text-white" id="stat-total-users">0</b></span>
-          <span>📰 Articoli: <b class="text-white" id="stat-total-articles">0</b></span>
-          <span>💬 Commenti: <b class="text-white" id="stat-total-comments">0</b></span>
+      <!-- Ciclo Giorno / Notte & Mini Orologio -->
+      <div class="bg-gray-900/90 border border-gray-700 px-3 py-1.5 rounded-lg flex items-center justify-between text-xs w-48 shadow">
+        <span id="time-icon">☀️ Giorno</span>
+        <span id="time-text" class="text-amber-400 font-mono">12:00</span>
+        <span id="day-counter" class="text-gray-400 text-[10px]">Giorno 1</span>
+      </div>
+    </div>
+
+    <!-- Top Right: Risorse Raccolte & Tasto Fondatore -->
+    <div class="absolute top-4 right-4 flex flex-col gap-2 z-20 items-end">
+      <div class="bg-gray-900/90 border-2 border-gray-700 p-2.5 rounded-lg flex items-center gap-3 text-xs shadow-xl font-bold">
+        <div class="flex items-center gap-1.5 bg-gray-800 px-2 py-1 rounded border border-gray-700">
+          <span>🪵 Legno:</span>
+          <span id="res-wood" class="text-amber-400">0</span>
         </div>
-        <button onclick="openFounderPortal('dashboard')" class="bg-amber-500 hover:bg-amber-400 text-stone-950 font-bold px-3 py-1 rounded shadow flex items-center gap-1.5 transition">
-          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
-          IL MIO PORTALE FONDATORE
+        <div class="flex items-center gap-1.5 bg-gray-800 px-2 py-1 rounded border border-gray-700">
+          <span>🪨 Pietra:</span>
+          <span id="res-stone" class="text-gray-300">0</span>
+        </div>
+        <div class="flex items-center gap-1.5 bg-gray-800 px-2 py-1 rounded border border-gray-700">
+          <span>🫐 Cibo:</span>
+          <span id="res-food" class="text-red-400">0</span>
+        </div>
+      </div>
+
+      <div class="flex gap-2">
+        <button onclick="toggleCraftingModal()" class="bg-emerald-700 hover:bg-emerald-600 border-2 border-emerald-500 px-3 py-1.5 rounded text-xs font-bold flex items-center gap-1 shadow-lg transition">
+          🔨 Crafting & Basi
         </button>
-        <button onclick="openFounderPortal('editor')" class="bg-emerald-600 hover:bg-emerald-500 text-white font-bold px-3 py-1 rounded shadow flex items-center gap-1.5 transition">
-          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
-          Scrivi Articolo
+        <button id="founder-btn" onclick="openFounderModal()" class="hidden bg-yellow-600 hover:bg-yellow-500 border-2 border-yellow-400 px-3 py-1.5 rounded text-xs font-bold flex items-center gap-1 shadow-lg text-black transition">
+          👑 Pannello Fondatore
+        </button>
+        <button onclick="logout()" class="bg-red-800 hover:bg-red-700 border border-red-600 px-2.5 py-1.5 rounded text-xs font-bold transition">
+          Esci
         </button>
       </div>
     </div>
-  </div>
 
-  <!-- CALCIOMERCATO TICKER -->
-  <div class="bg-stone-900 text-stone-300 border-b border-stone-800 text-xs py-1.5 px-4 flex items-center">
-    <div class="flex items-center gap-2 font-heading tracking-wider uppercase text-amber-400 font-bold bg-stone-950 px-2.5 py-0.5 rounded mr-3 shrink-0">
-      <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-      DIRETTA CAMPO
+    <!-- Finestra Notifiche di Gioco -->
+    <div id="game-toast" class="absolute top-20 left-1/2 -translate-x-1/2 bg-black/85 border border-amber-500/80 px-4 py-1.5 rounded-full text-xs font-bold text-amber-300 pointer-events-none transition-all duration-300 opacity-0 z-30 shadow-lg">
+      Notifica
     </div>
-    <div class="ticker-wrap flex-1">
-      <div class="ticker-move flex gap-8">
-        <span>⚡ <b>SERIE A:</b> Posticipo di fuoco a San Siro domenica sera, arbitra designato Rocchi.</span>
-        <span>🔥 <b>MERCATO:</b> Accordo totale per il rinnovo del bomber: clausola da 130 milioni.</span>
-        <span>🏆 <b>CHAMPIONS LEAGUE:</b> Sorteggi quarti: italiane evitano il Clasico.</span>
-        <span>📋 <b>INFORTUNI:</b> Risonanza magnetica negativa per il capitano, torna in gruppo.</span>
-        <span>⚡ <b>SERIE A:</b> Posticipo di fuoco a San Siro domenica sera, arbitra designato Rocchi.</span>
+
+    <!-- Controlli Rapidi & Pet Control Bottom Left -->
+    <div class="absolute bottom-20 left-4 flex flex-col gap-2 z-20">
+      <div class="bg-gray-900/90 border border-gray-700 p-2 rounded-lg flex items-center gap-2 text-xs">
+        <button onclick="petAction('care')" class="bg-gray-800 hover:bg-gray-700 px-2.5 py-1 rounded border border-gray-600 flex items-center gap-1">
+          🐕 Accarezza Lupo
+        </button>
+        <button onclick="petAction('feed')" class="bg-gray-800 hover:bg-gray-700 px-2.5 py-1 rounded border border-gray-600 flex items-center gap-1">
+          🥩 Dai Carne (-1 Cibo)
+        </button>
       </div>
-    </div>
-  </div>
-
-  <!-- TESTATA PRINCIPALE (HEADER) -->
-  <header class="bg-white dark:bg-stone-900 border-b border-stone-200 dark:border-stone-800 sticky top-0 z-40 shadow-sm">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <div class="flex items-center justify-between h-16">
-        
-        <!-- LOGO TESTATA -->
-        <div class="flex items-center space-x-3 cursor-pointer" onclick="navigate('home')">
-          <div class="w-10 h-10 rounded-lg bg-pitch-700 flex items-center justify-center text-white font-heading text-2xl shadow-md border-2 border-emerald-400">
-            ⚽
-          </div>
-          <div>
-            <div class="flex items-center gap-2">
-              <span class="font-heading text-2xl tracking-wider text-pitch-800 dark:text-emerald-400 font-bold leading-none">TRIBUNA CALCIO</span>
-              <span id="header-founder-badge" class="hidden text-[10px] font-bold px-1.5 py-0.5 rounded bg-amber-500 text-stone-950 uppercase tracking-widest">
-                FONDATORE
-              </span>
-            </div>
-            <p class="text-[11px] text-stone-500 font-medium tracking-tight">IL QUOTIDIANO DEI TIFOSI E DEL CAMPO</p>
-          </div>
-        </div>
-
-        <!-- CATEGORIE NAV -->
-        <nav class="hidden md:flex space-x-1 lg:space-x-4">
-          <button onclick="filterCategory('Tutti')" class="category-pill active px-3 py-1 rounded-full text-xs font-bold uppercase transition bg-stone-200 dark:bg-stone-800 text-stone-900 dark:text-white" data-cat="Tutti">Tutti</button>
-          <button onclick="filterCategory('Serie A')" class="category-pill px-3 py-1 rounded-full text-xs font-bold uppercase transition text-stone-600 dark:text-stone-400 hover:text-emerald-600" data-cat="Serie A">Serie A</button>
-          <button onclick="filterCategory('Calciomercato')" class="category-pill px-3 py-1 rounded-full text-xs font-bold uppercase transition text-stone-600 dark:text-stone-400 hover:text-emerald-600" data-cat="Calciomercato">Calciomercato</button>
-          <button onclick="filterCategory('Champions')" class="category-pill px-3 py-1 rounded-full text-xs font-bold uppercase transition text-stone-600 dark:text-stone-400 hover:text-emerald-600" data-cat="Champions">Champions</button>
-          <button onclick="filterCategory('Tattica & Pagelle')" class="category-pill px-3 py-1 rounded-full text-xs font-bold uppercase transition text-stone-600 dark:text-stone-400 hover:text-emerald-600" data-cat="Tattica & Pagelle">Tattica & Pagelle</button>
-        </nav>
-
-        <!-- SEZIONE UTENTE & AZIONI -->
-        <div class="flex items-center space-x-3">
-          <!-- Toggle Tema -->
-          <button onclick="toggleTheme()" class="p-2 rounded-lg text-stone-500 hover:bg-stone-100 dark:hover:bg-stone-800 transition" title="Cambia tema">
-            <span id="theme-icon">🌙</span>
-          </button>
-
-          <!-- SE NON LOGGATO -->
-          <div id="guest-actions" class="flex items-center space-x-2">
-            <button onclick="openAuthModal('login')" class="text-xs font-semibold px-3 py-1.5 rounded-lg border border-stone-300 dark:border-stone-700 hover:bg-stone-100 dark:hover:bg-stone-800 transition">
-              Accedi
-            </button>
-            <button onclick="openAuthModal('register')" class="text-xs font-bold px-3 py-1.5 rounded-lg bg-pitch-700 hover:bg-pitch-800 text-white shadow transition">
-              Registrati
-            </button>
-          </div>
-
-          <!-- SE LOGGATO -->
-          <div id="user-menu-wrap" class="hidden relative">
-            <button onclick="toggleUserDropdown()" class="flex items-center space-x-2 p-1 rounded-lg hover:bg-stone-100 dark:hover:bg-stone-800 transition">
-              <div id="user-avatar" class="w-8 h-8 rounded-full bg-pitch-700 text-white font-bold flex items-center justify-center text-xs border border-emerald-500">
-                U
-              </div>
-              <div class="text-left hidden sm:block">
-                <div class="text-xs font-bold leading-tight" id="user-name">Utente</div>
-                <div class="text-[10px] text-stone-500 leading-tight" id="user-role-label">Tifoso</div>
-              </div>
-              <svg class="w-3.5 h-3.5 text-stone-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
-            </button>
-
-            <!-- Dropdown Profilo -->
-            <div id="user-dropdown" class="hidden absolute right-0 mt-2 w-56 bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 rounded-xl shadow-2xl py-2 z-50">
-              <div class="px-4 py-2 border-b border-stone-100 dark:border-stone-800">
-                <p class="text-[11px] text-stone-400 uppercase tracking-wider font-semibold">Tesserato</p>
-                <p class="text-sm font-bold text-stone-900 dark:text-stone-100 truncate" id="dropdown-name">Nome</p>
-                <p class="text-xs text-stone-500 truncate" id="dropdown-email">email@test.it</p>
-                <div id="dropdown-badge-container" class="mt-1"></div>
-              </div>
-
-              <!-- Tasto speciale solo per Fondatore nel menu -->
-              <div id="founder-dropdown-options" class="hidden">
-                <a href="#" onclick="openFounderPortal('dashboard'); return false;" class="flex items-center gap-2 px-4 py-2 text-xs font-bold text-amber-600 dark:text-amber-400 hover:bg-amber-50 dark:hover:bg-stone-800">
-                  <span>👑</span> Apri Portale Fondatore
-                </a>
-                <a href="#" onclick="openFounderPortal('editor'); return false;" class="flex items-center gap-2 px-4 py-2 text-xs font-bold text-emerald-600 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-stone-800">
-                  <span>✍️</span> Scrivi Nuovo Articolo
-                </a>
-                <div class="border-t border-stone-100 dark:border-stone-800 my-1"></div>
-              </div>
-
-              <a href="#" onclick="openBookmarks(); return false;" class="flex items-center gap-2 px-4 py-2 text-xs text-stone-700 dark:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-800">
-                <span>🔖</span> I Miei Articoli Salvati
-              </a>
-              <div class="border-t border-stone-100 dark:border-stone-800 my-1"></div>
-              <button onclick="logout()" class="w-full text-left px-4 py-2 text-xs text-red-600 hover:bg-red-50 dark:hover:bg-red-950/30 transition flex items-center gap-2">
-                <span>🚪</span> Disconnetti
-              </button>
-            </div>
-          </div>
-
-        </div>
-      </div>
-    </div>
-  </header>
-
-  <!-- CONTENITORE VISTE -->
-  <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
-
-    <!-- ============================================================== -->
-    <!-- 1. VISTA HOME (NOTIZIE, PRIMA PAGINA & SIDEBAR) -->
-    <!-- ============================================================== -->
-    <div id="view-home" class="space-y-8">
-      
-      <!-- RICERCA E INTRO -->
-      <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white dark:bg-stone-900 p-4 rounded-2xl border border-stone-200 dark:border-stone-800 shadow-sm">
-        <div>
-          <h1 class="text-xl font-heading tracking-wide uppercase text-stone-900 dark:text-white flex items-center gap-2">
-            <span>🏟️</span> Prima Pagina & Notizie dal Campo
-          </h1>
-          <p class="text-xs text-stone-500">Analisi, calciomercato e approfondimenti calcistici senza filtri.</p>
-        </div>
-        <div class="relative w-full md:w-80">
-          <input type="text" id="search-input" oninput="handleSearch()" placeholder="Cerca squadra, giocatore, tema..." class="w-full pl-9 pr-4 py-2 text-xs rounded-xl bg-stone-100 dark:bg-stone-800 border border-stone-200 dark:border-stone-700 focus:outline-none focus:ring-2 focus:ring-emerald-500">
-          <svg class="w-4 h-4 text-stone-400 absolute left-3 top-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
-        </div>
-      </div>
-
-      <!-- PRIMA PAGINA / ARTICOLO IN PRIMO PIANO -->
-      <div id="hero-article-container"></div>
-
-      <!-- LAYOUT A DUE COLONNE: GRIGLIA ARTICOLI + BARRA LATERALE SPORTIVA -->
-      <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        
-        <!-- COLONNA PRINCIPALE (ARTICOLI) -->
-        <div class="lg:col-span-2 space-y-6">
-          <div class="flex items-center justify-between border-b-2 border-pitch-700 pb-2">
-            <h2 class="font-heading text-xl uppercase tracking-wider text-stone-900 dark:text-white">
-              Ultimi Articoli & Notizie
-            </h2>
-            <span class="text-xs text-stone-500 font-semibold" id="articles-count-label">Caricamento...</span>
-          </div>
-
-          <div id="articles-grid" class="grid grid-cols-1 sm:grid-cols-2 gap-6"></div>
-          <div id="no-articles-found" class="hidden text-center py-12 bg-white dark:bg-stone-900 rounded-2xl border border-dashed border-stone-300 dark:border-stone-800">
-            <p class="text-stone-400 text-sm">Nessun articolo trovato per questa ricerca o categoria.</p>
-          </div>
-        </div>
-
-        <!-- SIDEBAR SPORTIVA -->
-        <aside class="space-y-6">
-          
-          <!-- CLASSIFICA SERIE A LIVE WIDGET -->
-          <div class="bg-white dark:bg-stone-900 rounded-2xl p-5 border border-stone-200 dark:border-stone-800 shadow-sm">
-            <div class="flex items-center justify-between mb-4 border-b border-stone-100 dark:border-stone-800 pb-2">
-              <h3 class="font-heading text-base uppercase tracking-wider text-pitch-800 dark:text-emerald-400 flex items-center gap-2">
-                <span>🏆</span> Serie A - Vertice
-              </h3>
-              <span class="text-[10px] bg-stone-100 dark:bg-stone-800 px-2 py-0.5 rounded text-stone-500">Giornata 29</span>
-            </div>
-            <table class="w-full text-xs">
-              <thead>
-                <tr class="text-stone-400 border-b border-stone-100 dark:border-stone-800 text-[10px]">
-                  <th class="text-left pb-2 font-semibold">POS</th>
-                  <th class="text-left pb-2 font-semibold">CLUB</th>
-                  <th class="text-center pb-2 font-semibold">G</th>
-                  <th class="text-right pb-2 font-semibold">PT</th>
-                </tr>
-              </thead>
-              <tbody class="divide-y divide-stone-100 dark:divide-stone-800">
-                <tr class="font-semibold"><td class="py-2 text-emerald-600 font-bold">1</td><td class="py-2">Inter</td><td class="text-center text-stone-500">29</td><td class="text-right font-bold text-pitch-700">76</td></tr>
-                <tr><td class="py-2 text-blue-600 font-bold">2</td><td class="py-2">Milan</td><td class="text-center text-stone-500">29</td><td class="text-right font-bold">62</td></tr>
-                <tr><td class="py-2 text-blue-600 font-bold">3</td><td class="py-2">Juventus</td><td class="text-center text-stone-500">29</td><td class="text-right font-bold">59</td></tr>
-                <tr><td class="py-2 text-blue-600 font-bold">4</td><td class="py-2">Bologna</td><td class="text-center text-stone-500">29</td><td class="text-right font-bold">54</td></tr>
-                <tr><td class="py-2 text-amber-600 font-bold">5</td><td class="py-2">Roma</td><td class="text-center text-stone-500">29</td><td class="text-right font-bold">51</td></tr>
-                <tr><td class="py-2 text-stone-400">6</td><td class="py-2">Atalanta</td><td class="text-center text-stone-500">29</td><td class="text-right font-bold">47</td></tr>
-              </tbody>
-            </table>
-          </div>
-
-          <!-- SONDAGGIO DEL TIFOSO -->
-          <div class="bg-gradient-to-br from-pitch-900 to-stone-900 text-white rounded-2xl p-5 shadow-lg border border-pitch-700">
-            <span class="text-[10px] font-bold bg-amber-500 text-stone-950 px-2 py-0.5 rounded uppercase tracking-wider">Sondaggio del Bar dello Sport</span>
-            <h4 class="font-heading text-lg mt-2 mb-3">Chi merita il premio di Miglior Allenatore dell'Anno?</h4>
-            <div class="space-y-2 text-xs" id="poll-options">
-              <button onclick="votePoll(0)" class="w-full text-left p-2.5 rounded-xl bg-white/10 hover:bg-white/20 transition flex justify-between items-center border border-white/5">
-                <span>Simone Inzaghi</span>
-                <span class="font-bold text-emerald-400" id="poll-0">61%</span>
-              </button>
-              <button onclick="votePoll(1)" class="w-full text-left p-2.5 rounded-xl bg-white/10 hover:bg-white/20 transition flex justify-between items-center border border-white/5">
-                <span>Thiago Motta</span>
-                <span class="font-bold text-emerald-400" id="poll-1">29%</span>
-              </button>
-              <button onclick="votePoll(2)" class="w-full text-left p-2.5 rounded-xl bg-white/10 hover:bg-white/20 transition flex justify-between items-center border border-white/5">
-                <span>Daniele De Rossi</span>
-                <span class="font-bold text-emerald-400" id="poll-2">10%</span>
-              </button>
-            </div>
-            <p class="text-[10px] text-stone-400 mt-3 text-center">Voto anonimo dei tesserati del blog</p>
-          </div>
-
-          <!-- BANNER TRIBUNA CALCIO INFO -->
-          <div class="bg-white dark:bg-stone-900 rounded-2xl p-5 border border-stone-200 dark:border-stone-800 text-xs space-y-2">
-            <h4 class="font-heading uppercase text-sm tracking-wide text-stone-900 dark:text-white">Chi siamo</h4>
-            <p class="text-stone-500 dark:text-stone-400 leading-relaxed">
-              Testata e community indipendente fondata per raccontare il calcio giocato, la lavagna tattica e il mercato senza sensazionalismi.
-            </p>
-            <div class="pt-2 border-t border-stone-100 dark:border-stone-800 flex items-center justify-between text-[11px] text-stone-400">
-              <span>Fondatore: <b>Direttore Supremo</b></span>
-              <span class="text-emerald-600 font-bold">100% Calcio</span>
-            </div>
-          </div>
-
-        </aside>
-
+      <div class="text-[10px] text-gray-400 bg-black/60 px-2 py-1 rounded max-w-xs">
+        💡 <b>Click sinistro</b>: Cammina / Taglia alberi / Piccona / Attacca Zombie. <br>
+        💡 <b>Spazio</b>: Attacco a corto raggio.
       </div>
     </div>
 
-    <!-- ============================================================== -->
-    <!-- 2. VISTA LETTURA COMPLETA ARTICOLO + COMMENTI -->
-    <!-- ============================================================== -->
-    <div id="view-article" class="hidden max-w-4xl mx-auto space-y-8">
-      <button onclick="navigate('home')" class="inline-flex items-center text-xs font-bold text-pitch-700 dark:text-emerald-400 hover:underline">
-        ← Torna alla Prima Pagina
+    <!-- Barra di Chat in basso in puro Stile Habbo -->
+    <div class="absolute bottom-4 left-1/2 -translate-x-1/2 w-11/12 max-w-xl z-20 flex gap-2">
+      <div class="flex-1 bg-white text-gray-900 rounded-full px-4 py-1.5 flex items-center shadow-2xl border-2 border-gray-300 focus-within:border-amber-500 transition">
+        <input id="chat-input" type="text" placeholder="Scrivi un messaggio di soccorso o chatta..." class="w-full bg-transparent outline-none text-xs text-gray-900 font-medium placeholder-gray-500" onkeydown="handleChatKey(event)">
+      </div>
+      <button onclick="sendChatMessage()" class="bg-amber-600 hover:bg-amber-500 text-black font-bold px-4 py-1.5 rounded-full text-xs shadow-md transition">
+        Invia
       </button>
+    </div>
 
-      <article class="bg-white dark:bg-stone-900 rounded-3xl overflow-hidden border border-stone-200 dark:border-stone-800 shadow-sm">
-        <img id="detail-image" src="" alt="Copertina" class="w-full h-80 sm:h-96 object-cover">
+    <!-- Contenitore Fumetti Fluttuanti -->
+    <div id="bubble-container" class="absolute inset-0 pointer-events-none z-30 overflow-hidden"></div>
+  </div>
+
+
+  <!-- ================= SCHERMATA LOGIN & REGISTRAZIONE ================= -->
+  <div id="auth-view" class="w-full h-full flex items-center justify-center relative p-4 bg-gradient-to-br from-slate-900 via-gray-900 to-black">
+    <!-- Effetto sfondo particelle o griglia -->
+    <div class="absolute inset-0 opacity-10 bg-[radial-gradient(#ffffff_1px,transparent_1px)] [background-size:16px_16px]"></div>
+
+    <div class="bg-gray-900 border-2 border-gray-700 w-full max-w-md rounded-2xl shadow-2xl overflow-hidden relative z-10">
+      <!-- Header -->
+      <div class="bg-gradient-to-r from-amber-700 via-red-800 to-amber-900 p-5 text-center border-b-2 border-amber-600/50">
+        <div class="text-3xl mb-1">🏕️ 🧟</div>
+        <h1 class="text-xl font-bold tracking-wider text-amber-200 pixel-text">HABBO SURVIVAL</h1>
+        <p class="text-xs text-amber-100/80 mt-1">Post-Apocalyptic Multiplayer RPG</p>
+      </div>
+
+      <!-- Tab Selettore -->
+      <div class="flex border-b border-gray-800 bg-gray-950/50 text-xs font-bold">
+        <button id="tab-login" onclick="switchAuthTab('login')" class="flex-1 py-3 text-amber-400 border-b-2 border-amber-500">ACCEDI</button>
+        <button id="tab-reg" onclick="switchAuthTab('reg')" class="flex-1 py-3 text-gray-400 hover:text-white">NUOVO SOPRAVVISSUTO</button>
+      </div>
+
+      <!-- Form Login -->
+      <form id="form-login" onsubmit="handleLogin(event)" class="p-6 flex flex-col gap-4">
+        <div>
+          <label class="block text-xs font-semibold text-gray-400 mb-1">Email</label>
+          <input id="login-email" type="email" required placeholder="tua@email.com" class="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-xs text-white focus:border-amber-500 outline-none">
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-gray-400 mb-1">Password</label>
+          <input id="login-pass" type="password" required placeholder="••••••••" class="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-xs text-white focus:border-amber-500 outline-none">
+        </div>
         
-        <div class="p-6 sm:p-10 space-y-6">
-          <div class="flex flex-wrap items-center justify-between gap-3 text-xs">
-            <div class="flex items-center gap-2">
-              <span id="detail-category" class="font-heading uppercase px-3 py-1 rounded-full bg-pitch-100 text-pitch-800 dark:bg-emerald-950 dark:text-emerald-400 font-bold"></span>
-              <span class="text-stone-400">•</span>
-              <span id="detail-readtime" class="text-stone-500"></span>
-            </div>
-            <div class="flex items-center gap-3">
-              <button onclick="toggleBookmarkCurrent()" id="btn-detail-bookmark" class="p-2 rounded-full border border-stone-200 dark:border-stone-700 hover:bg-stone-100 dark:hover:bg-stone-800 transition" title="Salva">
-                🔖
-              </button>
-              <button onclick="shareCurrentArticle()" class="p-2 rounded-full border border-stone-200 dark:border-stone-700 hover:bg-stone-100 dark:hover:bg-stone-800 transition" title="Condividi">
-                📤
-              </button>
-            </div>
-          </div>
+        <button type="submit" class="bg-gradient-to-r from-amber-600 to-amber-700 hover:from-amber-500 hover:to-amber-600 text-black font-bold py-2.5 rounded-lg text-xs tracking-wider transition shadow-lg mt-2">
+          ENTRA NEL MONDO
+        </button>
 
-          <h1 id="detail-title" class="font-heading text-3xl sm:text-5xl font-bold uppercase leading-tight text-stone-900 dark:text-white"></h1>
-
-          <div class="flex items-center justify-between py-4 border-y border-stone-100 dark:border-stone-800">
-            <div class="flex items-center space-x-3">
-              <div id="detail-author-avatar" class="w-11 h-11 rounded-full bg-pitch-700 text-white font-bold flex items-center justify-center text-sm"></div>
-              <div>
-                <p id="detail-author" class="text-sm font-bold text-stone-900 dark:text-stone-100"></p>
-                <p id="detail-date" class="text-xs text-stone-400"></p>
-              </div>
-            </div>
-            <div class="flex items-center gap-2">
-              <button onclick="clapCurrentArticle()" class="flex items-center gap-2 px-4 py-2 rounded-full bg-stone-100 dark:bg-stone-800 hover:bg-pitch-50 dark:hover:bg-pitch-950/40 text-stone-800 dark:text-stone-200 border border-stone-200 dark:border-stone-700 transition">
-                <span>👏 Olè</span>
-                <b id="detail-claps" class="text-emerald-600 dark:text-emerald-400">0</b>
-              </button>
-            </div>
-          </div>
-
-          <p id="detail-summary" class="text-lg font-serif italic text-stone-600 dark:text-stone-300 leading-relaxed bg-stone-50 dark:bg-stone-800/40 p-4 rounded-xl border-l-4 border-pitch-600"></p>
-
-          <div id="detail-content" class="font-serif text-base sm:text-lg leading-relaxed text-stone-800 dark:text-stone-200 space-y-4"></div>
-        </div>
-      </article>
-
-      <!-- SEZIONE COMMENTI / BAR DELLO SPORT -->
-      <section class="bg-white dark:bg-stone-900 rounded-3xl p-6 sm:p-10 border border-stone-200 dark:border-stone-800 shadow-sm space-y-6">
-        <div class="flex items-center justify-between border-b border-stone-200 dark:border-stone-800 pb-4">
-          <h3 class="font-heading text-xl uppercase tracking-wider text-stone-900 dark:text-white flex items-center gap-2">
-            <span>🗣️</span> Bar dello Sport — Dibattito dei Tifosi
-          </h3>
-          <span id="detail-comments-count" class="text-xs font-bold text-stone-400">0 commenti</span>
-        </div>
-
-        <!-- FORM COMMENTO (SOLO PER UTENTI REGISTRATI / LOGGATI) -->
-        <div id="comment-form-container">
-          <!-- Questo contenitore cambia dinamicamente se loggato o no -->
-        </div>
-
-        <!-- LISTA COMMENTI -->
-        <div id="comments-list" class="space-y-4"></div>
-      </section>
-    </div>
-
-    <!-- ============================================================== -->
-    <!-- 3. IL PORTALE ESCLUSIVO DEL FONDATORE (ACCESSO SOLO SUPREMO) -->
-    <!-- ============================================================== -->
-    <div id="view-founder-portal" class="hidden space-y-6">
-      
-      <!-- INTESTAZIONE PORTALE DEL FONDATORE -->
-      <div class="bg-stone-900 text-white rounded-3xl p-6 sm:p-8 border-2 border-amber-500 shadow-2xl relative overflow-hidden">
-        <div class="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-4">
-          <div>
-            <div class="flex items-center gap-2 mb-2">
-              <span class="bg-amber-500 text-stone-950 font-heading tracking-widest text-xs px-2.5 py-0.5 rounded font-bold uppercase">
-                PORTALE SUPREMO RISERVATO
-              </span>
-              <span class="text-xs text-stone-400">Accesso esclusivo Fondatore</span>
-            </div>
-            <h1 class="text-2xl sm:text-4xl font-heading uppercase tracking-wide">
-              Centro di Comando & Gestione Testata
-            </h1>
-            <p class="text-xs sm:text-sm text-stone-400 max-w-2xl mt-1">
-              Questo portale è visibile solo al Fondatore. Da qui decidi tu i ruoli degli iscritti, crei gli articoli e gestisci l'intera piattaforma.
-            </p>
-          </div>
-
-          <!-- Pulsante Esci dal Portale -->
-          <div>
-            <button onclick="navigate('home')" class="text-xs font-bold px-4 py-2 rounded-xl bg-stone-800 hover:bg-stone-700 text-stone-200 border border-stone-700 transition">
-              ← Torna al Giornale
-            </button>
-          </div>
-        </div>
-
-        <!-- TAB NAVIGAZIONE PORTALE -->
-        <div class="flex flex-wrap gap-2 mt-6 pt-6 border-t border-stone-800">
-          <button onclick="switchFounderTab('users')" id="tab-btn-users" class="px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-wider transition bg-amber-500 text-stone-950">
-            👥 Gestione Iscritti & Ruoli
-          </button>
-          <button onclick="switchFounderTab('editor')" id="tab-btn-editor" class="px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-wider transition bg-stone-800 text-stone-300 hover:text-white">
-            ✍️ Scrivi Nuovo Articolo
-          </button>
-          <button onclick="switchFounderTab('articles')" id="tab-btn-articles" class="px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-wider transition bg-stone-800 text-stone-300 hover:text-white">
-            📰 Gestione Articoli Pubblicati
-          </button>
-          <button onclick="switchFounderTab('overview')" id="tab-btn-overview" class="px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-wider transition bg-stone-800 text-stone-300 hover:text-white">
-            📊 Statistiche Generali
+        <div class="pt-2 border-t border-gray-800 text-center">
+          <p class="text-[11px] text-gray-400">Account Fondatore Predefinito:</p>
+          <button type="button" onclick="fillFounderDemo()" class="text-xs text-amber-400 hover:underline mt-0.5">
+            🔑 Accesso Rapido Fondatore (admin@habbo.it)
           </button>
         </div>
-      </div>
+      </form>
 
-      <!-- TAB 1: GESTIONE ISCRITTI & RUOLI -->
-      <div id="founder-tab-users" class="founder-subtab bg-white dark:bg-stone-900 rounded-3xl p-6 sm:p-8 border border-stone-200 dark:border-stone-800 shadow-sm space-y-6">
-        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-          <div>
-            <h2 class="font-heading text-xl uppercase tracking-wider text-stone-900 dark:text-white">
-              Registro Iscritti e Assegnazione Ruoli
-            </h2>
-            <p class="text-xs text-stone-500">
-              Tutti i nuovi registrati partono come <b>Utenti Normali</b> (possono solo leggere e commentare). Solo tu puoi decidere di promuoverli a Giornalista o Caporedattore.
-            </p>
-          </div>
-          <div class="text-xs bg-amber-50 dark:bg-amber-950/40 text-amber-800 dark:text-amber-300 px-3 py-1.5 rounded-xl border border-amber-200 dark:border-amber-800">
-            👑 Solo il Fondatore può modificare i ruoli
-          </div>
-        </div>
-
-        <!-- TABELLA UTENTI -->
-        <div class="overflow-x-auto">
-          <table class="w-full text-left text-xs">
-            <thead>
-              <tr class="border-b border-stone-200 dark:border-stone-800 text-stone-400 uppercase text-[10px] tracking-wider">
-                <th class="py-3 px-3">Iscritto</th>
-                <th class="py-3 px-3">Email</th>
-                <th class="py-3 px-3">Squadra Cuore</th>
-                <th class="py-3 px-3">Data Iscrizione</th>
-                <th class="py-3 px-3">Ruolo Attuale</th>
-                <th class="py-3 px-3 text-right">Comando Ruolo</th>
-              </tr>
-            </thead>
-            <tbody id="founder-users-table" class="divide-y divide-stone-100 dark:divide-stone-800">
-              <!-- Riempito dinamicamente -->
-            </tbody>
-          </table>
-        </div>
-      </div>
-
-      <!-- TAB 2: SCRIVI NUOVO ARTICOLO (REDATTORE SUPREMO) -->
-      <div id="founder-tab-editor" class="founder-subtab hidden bg-white dark:bg-stone-900 rounded-3xl p-6 sm:p-8 border border-stone-200 dark:border-stone-800 shadow-sm space-y-6">
-        <div class="flex items-center justify-between border-b border-stone-200 dark:border-stone-800 pb-4">
-          <div>
-            <h2 class="font-heading text-xl uppercase tracking-wider text-stone-900 dark:text-white">
-              Tavolo di Redazione Fondatore
-            </h2>
-            <p class="text-xs text-stone-500">Scrivi e manda direttamente in prima pagina una notizia, analisi o esclusiva.</p>
-          </div>
-          <span class="text-xs bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300 px-3 py-1 rounded-full font-bold">
-            Firma: Direttore Supremo
-          </span>
-        </div>
-
-        <form id="founder-article-form" onsubmit="handlePublishArticle(event)" class="space-y-5">
-          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div class="md:col-span-2">
-              <label class="block text-xs font-bold text-stone-700 dark:text-stone-300 mb-1 uppercase">Titolo da Prima Pagina *</label>
-              <input type="text" id="post-title" required placeholder="Es. Rivoluzione Tattica: perché la difesa a 3 sta cambiando il campionato" class="w-full text-sm font-heading tracking-wide p-3 rounded-xl bg-stone-50 dark:bg-stone-800 border border-stone-200 dark:border-stone-700 focus:outline-none focus:ring-2 focus:ring-emerald-500">
-            </div>
-            <div>
-              <label class="block text-xs font-bold text-stone-700 dark:text-stone-300 mb-1 uppercase">Categoria *</label>
-              <select id="post-category" class="w-full text-xs p-3 rounded-xl bg-stone-50 dark:bg-stone-800 border border-stone-200 dark:border-stone-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 font-semibold">
-                <option value="Serie A">Serie A</option>
-                <option value="Calciomercato">Calciomercato</option>
-                <option value="Champions">Champions</option>
-                <option value="Tattica & Pagelle">Tattica & Pagelle</option>
-              </select>
-            </div>
-          </div>
-
-          <div>
-            <label class="block text-xs font-bold text-stone-700 dark:text-stone-300 mb-1 uppercase">Sommario / Occhiello (Sottotitolo d'impatto) *</label>
-            <input type="text" id="post-summary" required placeholder="Breve sintesi che incuriosisce il lettore nella home..." class="w-full text-xs p-3 rounded-xl bg-stone-50 dark:bg-stone-800 border border-stone-200 dark:border-stone-700 focus:outline-none focus:ring-2 focus:ring-emerald-500">
-          </div>
-
-          <div>
-            <label class="block text-xs font-bold text-stone-700 dark:text-stone-300 mb-1 uppercase">URL Immagine di Copertina</label>
-            <div class="flex gap-2">
-              <input type="url" id="post-image" placeholder="https://images.unsplash.com/..." class="flex-1 text-xs p-3 rounded-xl bg-stone-50 dark:bg-stone-800 border border-stone-200 dark:border-stone-700 focus:outline-none focus:ring-2 focus:ring-emerald-500">
-              <button type="button" onclick="randomCoverImage()" class="px-3 py-2 bg-stone-200 dark:bg-stone-700 text-stone-800 dark:text-white rounded-xl text-xs font-bold hover:bg-stone-300">
-                Immagine Casuale Calcio
-              </button>
-            </div>
-          </div>
-
-          <!-- TOOLBAR VELOCE -->
-          <div class="flex flex-wrap items-center gap-1.5 p-2 bg-stone-100 dark:bg-stone-800/80 rounded-xl text-xs">
-            <button type="button" onclick="insertFormat('**', '**')" class="px-2.5 py-1 bg-white dark:bg-stone-700 rounded shadow-xs font-bold hover:bg-emerald-500 hover:text-white">B</button>
-            <button type="button" onclick="insertFormat('*', '*')" class="px-2.5 py-1 bg-white dark:bg-stone-700 rounded shadow-xs italic hover:bg-emerald-500 hover:text-white">I</button>
-            <button type="button" onclick="insertFormat('\n\n## ', '\n')" class="px-2.5 py-1 bg-white dark:bg-stone-700 rounded shadow-xs font-heading font-bold hover:bg-emerald-500 hover:text-white">H2 Titolo Paragrafo</button>
-            <button type="button" onclick="insertFormat('\n> 🗣️ ', '\n')" class="px-2.5 py-1 bg-white dark:bg-stone-700 rounded shadow-xs hover:bg-emerald-500 hover:text-white">Citazione Mister</button>
-            <button type="button" onclick="insertFormat('\n- ⭐ ', '')" class="px-2.5 py-1 bg-white dark:bg-stone-700 rounded shadow-xs hover:bg-emerald-500 hover:text-white">Pagelle / Elenco</button>
-          </div>
-
-          <div>
-            <label class="block text-xs font-bold text-stone-700 dark:text-stone-300 mb-1 uppercase">Corpo dell'Articolo *</label>
-            <textarea id="post-content" rows="10" required placeholder="Scrivi qui il tuo articolo completo..." class="w-full text-sm font-serif p-4 rounded-xl bg-stone-50 dark:bg-stone-800 border border-stone-200 dark:border-stone-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 leading-relaxed"></textarea>
-          </div>
-
-          <div class="flex items-center justify-between pt-2">
-            <span class="text-xs text-stone-500" id="editor-word-count">0 parole • ~1 min di lettura</span>
-            <button type="submit" class="bg-pitch-700 hover:bg-pitch-800 text-white font-heading tracking-wider uppercase px-6 py-3 rounded-xl shadow-lg font-bold text-sm transition flex items-center gap-2">
-              <span>🚀</span> MANDA IN STAMPA (PUBBLICA)
-            </button>
-          </div>
-        </form>
-      </div>
-
-      <!-- TAB 3: GESTIONE ARTICOLI PUBBLICATI -->
-      <div id="founder-tab-articles" class="founder-subtab hidden bg-white dark:bg-stone-900 rounded-3xl p-6 sm:p-8 border border-stone-200 dark:border-stone-800 shadow-sm space-y-6">
+      <!-- Form Registrazione -->
+      <form id="form-reg" onsubmit="handleRegister(event)" class="p-6 flex flex-col gap-3.5 hidden">
         <div>
-          <h2 class="font-heading text-xl uppercase tracking-wider text-stone-900 dark:text-white">
-            Archivio Articoli del Blog
-          </h2>
-          <p class="text-xs text-stone-500">Visualizza, monitora le letture o elimina gli articoli dalla piattaforma.</p>
+          <label class="block text-xs font-semibold text-gray-400 mb-1">Nickname del Sopravvissuto</label>
+          <input id="reg-nick" type="text" required maxlength="14" placeholder="Es. Rick_Grimes" class="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-xs text-white focus:border-amber-500 outline-none">
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-gray-400 mb-1">Email</label>
+          <input id="reg-email" type="email" required placeholder="tua@email.com" class="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-xs text-white focus:border-amber-500 outline-none">
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-gray-400 mb-1">Password</label>
+          <input id="reg-pass" type="password" required placeholder="Crea una password" class="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-xs text-white focus:border-amber-500 outline-none">
         </div>
 
-        <div class="overflow-x-auto">
-          <table class="w-full text-left text-xs">
-            <thead>
-              <tr class="border-b border-stone-200 dark:border-stone-800 text-stone-400 uppercase text-[10px] tracking-wider">
-                <th class="py-3 px-3">Titolo</th>
-                <th class="py-3 px-3">Categoria</th>
-                <th class="py-3 px-3">Autore</th>
-                <th class="py-3 px-3">Data</th>
-                <th class="py-3 px-3">Olè / Commenti</th>
-                <th class="py-3 px-3 text-right">Azione</th>
-              </tr>
-            </thead>
-            <tbody id="founder-articles-table" class="divide-y divide-stone-100 dark:divide-stone-800">
-              <!-- Riempito dinamicamente -->
-            </tbody>
-          </table>
+        <div>
+          <label class="block text-xs font-semibold text-gray-400 mb-1">Aspetto Iniziale</label>
+          <div class="flex gap-2">
+            <button type="button" onclick="selectSkin('🤠')" class="flex-1 py-1.5 bg-gray-800 rounded border border-amber-500/50 hover:bg-gray-700 text-base">🤠</button>
+            <button type="button" onclick="selectSkin('🥷')" class="flex-1 py-1.5 bg-gray-800 rounded border border-gray-700 hover:bg-gray-700 text-base">🥷</button>
+            <button type="button" onclick="selectSkin('👩‍🎤')" class="flex-1 py-1.5 bg-gray-800 rounded border border-gray-700 hover:bg-gray-700 text-base">👩‍🎤</button>
+            <button type="button" onclick="selectSkin('👨‍🚀')" class="flex-1 py-1.5 bg-gray-800 rounded border border-gray-700 hover:bg-gray-700 text-base">👨‍🚀</button>
+          </div>
         </div>
-      </div>
 
-      <!-- TAB 4: STATISTICHE GENERALI -->
-      <div id="founder-tab-overview" class="founder-subtab hidden bg-white dark:bg-stone-900 rounded-3xl p-6 sm:p-8 border border-stone-200 dark:border-stone-800 shadow-sm space-y-6">
-        <h2 class="font-heading text-xl uppercase tracking-wider text-stone-900 dark:text-white">
-          Metriche del Tuo Portale
+        <button type="submit" class="bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-2.5 rounded-lg text-xs tracking-wider transition shadow-lg mt-2">
+          CREA PERSONAGGIO & SALVA
+        </button>
+      </form>
+    </div>
+  </div>
+
+
+  <!-- ================= MODALE CRAFTING & COSTRUZIONI ================= -->
+  <div id="crafting-modal" class="fixed inset-0 modal-backdrop z-50 flex items-center justify-center p-4 hidden">
+    <div class="bg-gray-900 border-2 border-emerald-500/80 rounded-xl w-full max-w-lg shadow-2xl overflow-hidden flex flex-col max-h-[85vh]">
+      <div class="bg-gray-950 p-4 border-b border-gray-800 flex justify-between items-center">
+        <h2 class="text-sm font-bold text-emerald-400 flex items-center gap-2">
+          🔨 Banco di Lavoro & Costruzioni
         </h2>
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          <div class="bg-stone-50 dark:bg-stone-800 p-5 rounded-2xl border border-stone-200 dark:border-stone-700">
-            <span class="text-xs text-stone-400 uppercase font-bold">Tifosi / Iscritti</span>
-            <p class="text-3xl font-heading font-bold text-pitch-700 dark:text-emerald-400 mt-2" id="metric-users">0</p>
-          </div>
-          <div class="bg-stone-50 dark:bg-stone-800 p-5 rounded-2xl border border-stone-200 dark:border-stone-700">
-            <span class="text-xs text-stone-400 uppercase font-bold">Articoli Pubblicati</span>
-            <p class="text-3xl font-heading font-bold text-pitch-700 dark:text-emerald-400 mt-2" id="metric-articles">0</p>
-          </div>
-          <div class="bg-stone-50 dark:bg-stone-800 p-5 rounded-2xl border border-stone-200 dark:border-stone-700">
-            <span class="text-xs text-stone-400 uppercase font-bold">Commenti Totali</span>
-            <p class="text-3xl font-heading font-bold text-pitch-700 dark:text-emerald-400 mt-2" id="metric-comments">0</p>
-          </div>
-          <div class="bg-stone-50 dark:bg-stone-800 p-5 rounded-2xl border border-stone-200 dark:border-stone-700">
-            <span class="text-xs text-stone-400 uppercase font-bold">Applausi / Olè</span>
-            <p class="text-3xl font-heading font-bold text-amber-500 mt-2" id="metric-claps">0</p>
-          </div>
-        </div>
+        <button onclick="toggleCraftingModal()" class="text-gray-400 hover:text-white text-lg font-bold">&times;</button>
       </div>
 
-    </div>
+      <div class="p-4 overflow-y-auto flex flex-col gap-3">
+        <!-- Ricetta 1: Barricata di Legno -->
+        <div class="bg-gray-800/80 border border-gray-700 rounded-lg p-3 flex items-center justify-between">
+          <div class="flex items-center gap-3">
+            <span class="text-2xl">🪵</span>
+            <div>
+              <div class="text-xs font-bold text-white">Barricata di Legno</div>
+              <div class="text-[10px] text-gray-400">Blocca il passaggio dei mostri</div>
+              <div class="text-[11px] text-amber-400 font-bold mt-0.5">Costo: 4 Legno</div>
+            </div>
+          </div>
+          <button onclick="craftItem('wall_wood')" class="bg-emerald-700 hover:bg-emerald-600 px-3 py-1.5 rounded text-xs font-bold">Costruisci</button>
+        </div>
 
-  </main>
+        <!-- Ricetta 2: Falò da Campo -->
+        <div class="bg-gray-800/80 border border-gray-700 rounded-lg p-3 flex items-center justify-between">
+          <div class="flex items-center gap-3">
+            <span class="text-2xl">🔥</span>
+            <div>
+              <div class="text-xs font-bold text-white">Falò Protettivo</div>
+              <div class="text-[10px] text-gray-400">Illumina la notte e allontana le creature</div>
+              <div class="text-[11px] text-amber-400 font-bold mt-0.5">Costo: 6 Legno + 2 Pietre</div>
+            </div>
+          </div>
+          <button onclick="craftItem('campfire')" class="bg-emerald-700 hover:bg-emerald-600 px-3 py-1.5 rounded text-xs font-bold">Costruisci</button>
+        </div>
 
-  <!-- ============================================================== -->
-  <!-- MODALE AUTENTICAZIONE (LOGIN & REGISTRAZIONE RIGIDA) -->
-  <!-- ============================================================== -->
-  <div id="modal-auth" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4">
-    <div class="bg-white dark:bg-stone-900 w-full max-w-md rounded-3xl p-6 sm:p-8 border border-stone-200 dark:border-stone-800 shadow-2xl relative">
-      <button onclick="closeAuthModal()" class="absolute top-5 right-5 text-stone-400 hover:text-stone-700 dark:hover:text-stone-200 text-lg">✕</button>
+        <!-- Ricetta 3: Benda Medica -->
+        <div class="bg-gray-800/80 border border-gray-700 rounded-lg p-3 flex items-center justify-between">
+          <div class="flex items-center gap-3">
+            <span class="text-2xl">🩹</span>
+            <div>
+              <div class="text-xs font-bold text-white">Benda Curativa</div>
+              <div class="text-[10px] text-gray-400">Ripristina +40 HP</div>
+              <div class="text-[11px] text-amber-400 font-bold mt-0.5">Costo: 2 Bacche + 2 Legno</div>
+            </div>
+          </div>
+          <button onclick="craftItem('bandage')" class="bg-emerald-700 hover:bg-emerald-600 px-3 py-1.5 rounded text-xs font-bold">Crea</button>
+        </div>
 
-      <!-- TAB SELEZIONE LOGIN / REGISTRATI -->
-      <div class="flex border-b border-stone-200 dark:border-stone-800 mb-6">
-        <button onclick="switchAuthTab('login')" id="auth-tab-btn-login" class="flex-1 pb-3 text-sm font-heading uppercase tracking-wider font-bold border-b-2 border-pitch-600 text-pitch-700 dark:text-emerald-400">
-          Accedi
-        </button>
-        <button onclick="switchAuthTab('register')" id="auth-tab-btn-register" class="flex-1 pb-3 text-sm font-heading uppercase tracking-wider font-bold border-b-2 border-transparent text-stone-400 hover:text-stone-600">
-          Registrati
-        </button>
+        <!-- Ricetta 4: Muro Fortificato di Pietra -->
+        <div class="bg-gray-800/80 border border-gray-700 rounded-lg p-3 flex items-center justify-between">
+          <div class="flex items-center gap-3">
+            <span class="text-2xl">🧱</span>
+            <div>
+              <div class="text-xs font-bold text-white">Muro di Pietra</div>
+              <div class="text-[10px] text-gray-400">Massima difesa per la tua roccaforte</div>
+              <div class="text-[11px] text-amber-400 font-bold mt-0.5">Costo: 5 Pietre</div>
+            </div>
+          </div>
+          <button onclick="craftItem('wall_stone')" class="bg-emerald-700 hover:bg-emerald-600 px-3 py-1.5 rounded text-xs font-bold">Costruisci</button>
+        </div>
       </div>
-
-      <!-- FORM ACCEDI -->
-      <form id="form-login" onsubmit="handleLogin(event)" class="space-y-4">
-        <div>
-          <label class="block text-xs font-bold uppercase text-stone-600 dark:text-stone-400 mb-1">Email</label>
-          <input type="email" id="login-email" required placeholder="tua@email.it" class="w-full text-xs p-3 rounded-xl bg-stone-50 dark:bg-stone-800 border border-stone-200 dark:border-stone-700 focus:ring-2 focus:ring-emerald-500">
-        </div>
-        <div>
-          <label class="block text-xs font-bold uppercase text-stone-600 dark:text-stone-400 mb-1">Password</label>
-          <input type="password" id="login-password" required placeholder="••••••••" class="w-full text-xs p-3 rounded-xl bg-stone-50 dark:bg-stone-800 border border-stone-200 dark:border-stone-700 focus:ring-2 focus:ring-emerald-500">
-        </div>
-
-        <button type="submit" class="w-full bg-pitch-700 hover:bg-pitch-800 text-white font-heading tracking-wider uppercase py-3 rounded-xl font-bold text-xs shadow-md transition">
-          Entra in Tribuna
-        </button>
-
-        <div class="pt-4 border-t border-stone-100 dark:border-stone-800 text-center">
-          <p class="text-[11px] text-stone-400">
-            Sei il Fondatore? Entra con <b>admin@calcio.it</b> (pass: <b>admin</b>)
-          </p>
-        </div>
-      </form>
-
-      <!-- FORM REGISTRAZIONE (SENZA SCELTA RUOLO - AUTOMATICO UTENTE NORMALE) -->
-      <form id="form-register" onsubmit="handleRegister(event)" class="hidden space-y-4">
-        <div>
-          <label class="block text-xs font-bold uppercase text-stone-600 dark:text-stone-400 mb-1">Nome e Cognome o Nickname *</label>
-          <input type="text" id="reg-name" required placeholder="Es. Marco Rossi" class="w-full text-xs p-3 rounded-xl bg-stone-50 dark:bg-stone-800 border border-stone-200 dark:border-stone-700 focus:ring-2 focus:ring-emerald-500">
-        </div>
-        <div>
-          <label class="block text-xs font-bold uppercase text-stone-600 dark:text-stone-400 mb-1">Email *</label>
-          <input type="email" id="reg-email" required placeholder="marco@email.it" class="w-full text-xs p-3 rounded-xl bg-stone-50 dark:bg-stone-800 border border-stone-200 dark:border-stone-700 focus:ring-2 focus:ring-emerald-500">
-        </div>
-        <div>
-          <label class="block text-xs font-bold uppercase text-stone-600 dark:text-stone-400 mb-1">Crea una Password *</label>
-          <input type="password" id="reg-password" required placeholder="Minimo 4 caratteri" class="w-full text-xs p-3 rounded-xl bg-stone-50 dark:bg-stone-800 border border-stone-200 dark:border-stone-700 focus:ring-2 focus:ring-emerald-500">
-        </div>
-        <div>
-          <label class="block text-xs font-bold uppercase text-stone-600 dark:text-stone-400 mb-1">Squadra del Cuore *</label>
-          <select id="reg-team" class="w-full text-xs p-3 rounded-xl bg-stone-50 dark:bg-stone-800 border border-stone-200 dark:border-stone-700 focus:ring-2 focus:ring-emerald-500 font-medium">
-            <option value="Inter">Inter</option>
-            <option value="Milan">Milan</option>
-            <option value="Juventus">Juventus</option>
-            <option value="Napoli">Napoli</option>
-            <option value="Roma">Roma</option>
-            <option value="Lazio">Lazio</option>
-            <option value="Fiorentina">Fiorentina</option>
-            <option value="Atalanta">Atalanta</option>
-            <option value="Bologna">Bologna</option>
-            <option value="Altro Club">Altro Club</option>
-          </select>
-        </div>
-
-        <div class="p-3 bg-stone-50 dark:bg-stone-800/50 rounded-xl border border-stone-200 dark:border-stone-700 text-[11px] text-stone-500">
-          ℹ️ <b>Regolamento di Tribuna:</b> Ogni iscritto viene registrato come <b>Utente / Tifoso Normale</b> abilitato a commentare gli articoli. Solo il Fondatore può assegnare ruoli redazionali.
-        </div>
-
-        <button type="submit" class="w-full bg-pitch-700 hover:bg-pitch-800 text-white font-heading tracking-wider uppercase py-3 rounded-xl font-bold text-xs shadow-md transition">
-          Completa Iscrizione
-        </button>
-      </form>
     </div>
   </div>
 
-  <!-- TOAST FEEDBACK NOTIFICHE -->
-  <div id="toast" class="fixed bottom-6 right-6 z-50 transform translate-y-20 opacity-0 transition-all duration-300 pointer-events-none bg-stone-900 text-white text-xs px-4 py-3 rounded-xl shadow-2xl flex items-center gap-2 border border-stone-700">
-    <span id="toast-icon">⚽</span>
-    <span id="toast-msg">Operazione completata</span>
-  </div>
 
-  <!-- FOOTER -->
-  <footer class="bg-white dark:bg-stone-900 border-t border-stone-200 dark:border-stone-800 py-6 mt-12 text-center text-xs text-stone-500">
-    <div class="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-3">
-      <div class="flex items-center space-x-2">
-        <span class="font-heading uppercase font-bold text-pitch-700 dark:text-emerald-400">Tribuna Calcio</span>
-        <span>• Fondato e Diretto dall'Admin Supremo</span>
+  <!-- ================= PANNELLO FONDATORE (ADMIN / REGISTRO) ================= -->
+  <div id="founder-modal" class="fixed inset-0 modal-backdrop z-50 flex items-center justify-center p-4 hidden">
+    <div class="bg-gray-900 border-2 border-yellow-500 rounded-xl w-full max-w-3xl shadow-2xl flex flex-col max-h-[90vh] overflow-hidden">
+      <!-- Header -->
+      <div class="bg-yellow-600/20 p-4 border-b border-yellow-500/40 flex justify-between items-center">
+        <div>
+          <h2 class="text-base font-bold text-yellow-400 flex items-center gap-2">
+            👑 Pannello del Fondatore (Controllo Globale)
+          </h2>
+          <p class="text-xs text-gray-400">Visualizza tutte le email, password registrate, ruoli e attiva il God Mode</p>
+        </div>
+        <button onclick="closeFounderModal()" class="text-gray-400 hover:text-white text-xl font-bold">&times;</button>
       </div>
-      <div>
-        <span>Tutti i diritti riservati • Riservato ai veri appassionati di campo</span>
+
+      <!-- Quick God Tools -->
+      <div class="p-4 bg-gray-950/60 border-b border-gray-800 flex flex-wrap gap-2 items-center text-xs">
+        <span class="font-bold text-gray-400">Cheat Fondatore:</span>
+        <button onclick="founderCheat('heal')" class="bg-green-700 hover:bg-green-600 px-3 py-1 rounded font-bold">💚 Cura Completa</button>
+        <button onclick="founderCheat('resources')" class="bg-amber-600 hover:bg-amber-500 px-3 py-1 rounded font-bold text-black">🪵 +100 Risorse</button>
+        <button onclick="founderCheat('spawnboss')" class="bg-purple-700 hover:bg-purple-600 px-3 py-1 rounded font-bold">🧟 Genera Mega Boss</button>
+        <button onclick="founderCheat('killall')" class="bg-red-800 hover:bg-red-700 px-3 py-1 rounded font-bold">⚡ Uccidi Tutti i Mostri</button>
+      </div>
+
+      <!-- Tabella Utenti Registrati -->
+      <div class="p-4 overflow-y-auto flex-1">
+        <h3 class="text-xs font-bold text-gray-300 uppercase mb-2">Database Credenziali Utenti Registrati</h3>
+        <div class="border border-gray-700 rounded-lg overflow-hidden">
+          <table class="w-full text-left text-xs">
+            <thead class="bg-gray-800 text-gray-400 border-b border-gray-700 text-[10px] uppercase font-bold">
+              <tr>
+                <th class="p-2.5">Nickname</th>
+                <th class="p-2.5">Email Registrata</th>
+                <th class="p-2.5 text-amber-300">Password in Chiaro</th>
+                <th class="p-2.5">Ruolo</th>
+                <th class="p-2.5 text-right">Azioni</th>
+              </tr>
+            </thead>
+            <tbody id="founder-users-table" class="divide-y divide-gray-800 text-gray-200">
+              <!-- Riempito via JS -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="p-4 bg-gray-950 border-t border-gray-800 flex justify-between items-center text-xs">
+        <span class="text-gray-400">I dati sono sincronizzati e persistenti.</span>
+        <button onclick="exportDatabaseJSON()" class="bg-blue-600 hover:bg-blue-500 px-3 py-1.5 rounded font-bold">
+          📥 Esporta Database (JSON)
+        </button>
       </div>
     </div>
-  </footer>
+  </div>
 
-  <!-- ============================================================== -->
-  <!-- JAVASCRIPT: LOGICA RBAC RIGIDA, LOCALSTORAGE E VISIONI SEPARATE -->
-  <!-- ============================================================== -->
+  <!-- SCRIPT DI GIOCO COMPLETO -->
   <script>
-    // RUOLI UFFICIALI DEL SISTEMA
-    // Solo il Fondatore è supremo. Chi si registra è sempre USER.
-    const ROLES = {
-      FOUNDER: 'founder',      // Tu (Admin Supremo / Fondatore)
-      JOURNALIST: 'journalist',// Giornalista promosso da te
-      USER: 'user'             // Utente Normale registrato (commenti e lettura)
-    };
-
-    // DATI INIZIALI PREDEFINITI (SE LOCALSTORAGE È VUOTO)
-    const DEFAULT_USERS = [
-      {
-        id: 'usr_founder',
-        name: 'Direttore Supremo (Tu)',
-        email: 'admin@calcio.it',
-        password: 'admin',
-        team: 'Nazionale',
-        role: ROLES.FOUNDER,
-        joinedDate: '01/01/2026'
-      },
-      {
-        id: 'usr_2',
-        name: 'Lorenzo Pellegrini (Tifoso)',
-        email: 'lorenzo@libero.it',
-        password: '123',
-        team: 'Roma',
-        role: ROLES.USER,
-        joinedDate: '10/02/2026'
-      },
-      {
-        id: 'usr_3',
-        name: 'Matteo Riva (Tifoso)',
-        email: 'matteo@gmail.com',
-        password: '123',
-        team: 'Milan',
-        role: ROLES.USER,
-        joinedDate: '15/02/2026'
+    /* =========================================================================
+       1. DATABASE LOCALE & SISTEMA RUOLI
+       ========================================================================= */
+    const DB_KEY = 'habbo_survival_db_v1';
+    
+    function initDB() {
+      const existing = localStorage.getItem(DB_KEY);
+      if (!existing) {
+        const defaultDB = {
+          users: [
+            {
+              id: 'founder_1',
+              nickname: 'Fondatore_X',
+              email: 'admin@habbo.it',
+              password: 'admin',
+              role: 'founder', // 'founder' o 'player'
+              skin: '🤠',
+              level: 10,
+              hp: 100,
+              maxHp: 100,
+              wood: 50,
+              stone: 50,
+              food: 20
+            },
+            {
+              id: 'player_2',
+              nickname: 'Sopravvissuto_99',
+              email: 'player@habbo.it',
+              password: '123',
+              role: 'player',
+              skin: '🥷',
+              level: 1,
+              hp: 100,
+              maxHp: 100,
+              wood: 5,
+              stone: 2,
+              food: 4
+            }
+          ]
+        };
+        localStorage.setItem(DB_KEY, JSON.stringify(defaultDB));
+        return defaultDB;
       }
-    ];
+      return JSON.parse(existing);
+    }
 
-    const DEFAULT_ARTICLES = [
-      {
-        id: 'art_1',
-        title: "L'Arte della Pressione Alta: perché il calcio moderno non ammette più pause",
-        category: "Tattica & Pagelle",
-        summary: "Dal recupero palla nei primi 5 secondi alle transizioni veloci: analisi minuziosa di come le big europee dominano il campo senza palla.",
-        image: "https://images.unsplash.com/photo-1508098682722-e99c43a406b2?auto=format&fit=crop&w=1200&q=80",
-        authorId: "usr_founder",
-        authorName: "Direttore Supremo",
-        date: "22 Set 2026",
-        claps: 84,
-        readTime: "4 min",
-        content: `Il calcio degli ultimi anni ha cancellato i tempi morti. La fase difensiva non comincia più arretrando il baricentro davanti alla propria area di rigore, ma aggredendo la prima linea di costruzione avversaria.
+    let db = initDB();
+    let currentUser = null;
+    let selectedSkinIcon = '🤠';
 
-## Il concetto di Gegenpressing applicato alla Serie A
-Analizzando i dati Opta delle prime 28 giornate di campionato, le squadre con il baricentro medio superiore a 54 metri sono le stesse che vantano il miglior differenziale di Expected Goals (xG). Recuperare palla negli ultimi trenta metri equivale ad avere una percentuale del 42% superiore di concludere a rete entro 8 secondi.
+    function saveDB() {
+      localStorage.setItem(DB_KEY, JSON.stringify(db));
+    }
 
-> 🗣️ "Chi aspetta oggi è perduto. Il pallone va conquistato prima che l'avversario possa alzare la testa per vedere il movimento dell'attaccante."
+    /* =========================================================================
+       2. GESTIONE AUTENTICAZIONE (LOGIN / REGISTRAZIONE)
+       ========================================================================= */
+    function switchAuthTab(tab) {
+      const loginForm = document.getElementById('form-login');
+      const regForm = document.getElementById('form-reg');
+      const tabLogin = document.getElementById('tab-login');
+      const tabReg = document.getElementById('tab-reg');
 
-## Le Pagelle del week-end tattico
-- ⭐ **Il Migliore:** L'Inter nella gestione delle mezze ali e degli inserimenti senza palla (Voto: 8.5)
-- ⭐ **La Sorpresa:** Il baricentro ultra-offensivo del Bologna di Motta nei finali di gara (Voto: 8)
-- ⚠️ **Da Rivedere:** La transizione difensiva del Milan sui calci piazzati a sfavore (Voto: 5.5)`
-      },
-      {
-        id: 'art_2',
-        title: "Bomba di Mercato: Asse Milano-Londra per il centravanti da 90 milioni",
-        category: "Calciomercato",
-        summary: "Incontri segreti nella capitale britannica: tutti i dettagli dell'offerta con bonus e contropartite tecniche.",
-        image: "https://images.unsplash.com/photo-1522778119026-d647f0596c20?auto=format&fit=crop&w=1200&q=80",
-        authorId: "usr_founder",
-        authorName: "Direttore Supremo",
-        date: "21 Set 2026",
-        claps: 135,
-        readTime: "3 min",
-        content: `I dirigenti sono atterrati questa mattina a Londra per definire l'operazione dell'estate. La trattativa è entrata nella fase decisiva, con le parti che hanno limato l'accordo sui bonus legati alla qualificazione in Champions League.`
-      },
-      {
-        id: 'art_3',
-        title: "Sorteggi Champions League: Incroci da brividi verso la finale",
-        category: "Champions",
-        summary: "Tabellone teso: le squadre italiane studiano i piani tattici per superare il turno a eliminazione diretta.",
-        image: "https://images.unsplash.com/photo-1574629810360-7efbbe195018?auto=format&fit=crop&w=1200&q=80",
-        authorId: "usr_founder",
-        authorName: "Direttore Supremo",
-        date: "20 Set 2026",
-        claps: 52,
-        readTime: "3 min",
-        content: `La roulette di Nyon ha emesso i suoi verdetti. Due sfide proibitive ma ricche di fascino per le formazioni di Serie A pronte a giocarsi il tutto per tutto.`
-      }
-    ];
-
-    const DEFAULT_COMMENTS = [
-      {
-        id: 'com_1',
-        articleId: 'art_1',
-        userName: 'Lorenzo Pellegrini (Tifoso)',
-        userTeam: 'Roma',
-        date: '22 Set 2026, 14:15',
-        text: 'Analisi tattica perfetta Direttore! La pressione alta è ormai fondamentale anche per noi in campionato.'
-      },
-      {
-        id: 'com_2',
-        articleId: 'art_2',
-        userName: 'Matteo Riva (Tifoso)',
-        userTeam: 'Milan',
-        date: '21 Set 2026, 18:30',
-        text: 'Se arriva questo attaccante a Milano possiamo puntare dritti allo scudetto l\'anno prossimo!'
-      }
-    ];
-
-    // INIZIALIZZAZIONE STATO & LOCALSTORAGE
-    let users = JSON.parse(localStorage.getItem('tc_users')) || DEFAULT_USERS;
-    let articles = JSON.parse(localStorage.getItem('tc_articles')) || DEFAULT_ARTICLES;
-    let comments = JSON.parse(localStorage.getItem('tc_comments')) || DEFAULT_COMMENTS;
-    let bookmarks = JSON.parse(localStorage.getItem('tc_bookmarks')) || [];
-    let currentUser = JSON.parse(localStorage.getItem('tc_current_user')) || null;
-    let currentCategory = 'Tutti';
-    let searchQuery = '';
-    let currentArticleId = null;
-
-    function saveState() {
-      localStorage.setItem('tc_users', JSON.stringify(users));
-      localStorage.setItem('tc_articles', JSON.stringify(articles));
-      localStorage.setItem('tc_comments', JSON.stringify(comments));
-      localStorage.setItem('tc_bookmarks', JSON.stringify(bookmarks));
-      if (currentUser) {
-        localStorage.setItem('tc_current_user', JSON.stringify(currentUser));
+      if (tab === 'login') {
+        loginForm.classList.remove('hidden');
+        regForm.classList.add('hidden');
+        tabLogin.className = "flex-1 py-3 text-amber-400 border-b-2 border-amber-500 font-bold";
+        tabReg.className = "flex-1 py-3 text-gray-400 hover:text-white font-bold";
       } else {
-        localStorage.removeItem('tc_current_user');
+        loginForm.classList.add('hidden');
+        regForm.classList.remove('hidden');
+        tabReg.className = "flex-1 py-3 text-amber-400 border-b-2 border-amber-500 font-bold";
+        tabLogin.className = "flex-1 py-3 text-gray-400 hover:text-white font-bold";
       }
     }
 
-    // CARICAMENTO INIZIALE
-    window.addEventListener('DOMContentLoaded', () => {
-      initTheme();
-      updateAuthUI();
-      renderHomeArticles();
-      updateCockpitStats();
-    });
-
-    // ==============================================================
-    // GESTIONE AUTENTICAZIONE E VISIONI DIFFERENZIATE
-    // ==============================================================
-    function updateAuthUI() {
-      const founderCockpit = document.getElementById('founder-cockpit');
-      const headerFounderBadge = document.getElementById('header-founder-badge');
-      const guestActions = document.getElementById('guest-actions');
-      const userMenuWrap = document.getElementById('user-menu-wrap');
-      const founderDropdownOptions = document.getElementById('founder-dropdown-options');
-
-      if (!currentUser) {
-        // NON LOGGATO (OSPITE)
-        founderCockpit.classList.add('hidden');
-        headerFounderBadge.classList.add('hidden');
-        guestActions.classList.remove('hidden');
-        userMenuWrap.classList.add('hidden');
-        founderDropdownOptions.classList.add('hidden');
-      } else {
-        // LOGGATO
-        guestActions.classList.add('hidden');
-        userMenuWrap.classList.remove('hidden');
-
-        document.getElementById('user-name').innerText = currentUser.name.split(' ')[0];
-        document.getElementById('dropdown-name').innerText = currentUser.name;
-        document.getElementById('dropdown-email').innerText = currentUser.email;
-        document.getElementById('user-avatar').innerText = currentUser.name.charAt(0).toUpperCase();
-
-        const badgeContainer = document.getElementById('dropdown-badge-container');
-
-        if (currentUser.role === ROLES.FOUNDER) {
-          // ==============================
-          // 👑 VISIONE FONDATORE ATTIVA
-          // ==============================
-          founderCockpit.classList.remove('hidden');
-          headerFounderBadge.classList.remove('hidden');
-          founderDropdownOptions.classList.remove('hidden');
-          document.getElementById('user-role-label').innerText = '👑 FONDATORE';
-          document.getElementById('user-role-label').className = 'text-[10px] text-amber-500 font-bold uppercase';
-          badgeContainer.innerHTML = `<span class="inline-block text-[10px] font-bold px-2 py-0.5 rounded bg-amber-500 text-stone-950 uppercase">👑 FONDATORE SUPREMO</span>`;
-          document.getElementById('cockpit-founder-name').innerText = currentUser.name;
-        } else if (currentUser.role === ROLES.JOURNALIST) {
-          // VISIONE GIORNALISTA (PROMOSSO DA TE)
-          founderCockpit.classList.add('hidden');
-          headerFounderBadge.classList.add('hidden');
-          founderDropdownOptions.classList.add('hidden');
-          document.getElementById('user-role-label').innerText = '✍️ GIORNALISTA';
-          document.getElementById('user-role-label').className = 'text-[10px] text-emerald-600 font-bold uppercase';
-          badgeContainer.innerHTML = `<span class="inline-block text-[10px] font-bold px-2 py-0.5 rounded bg-emerald-600 text-white uppercase">✍️ GIORNALISTA TESSERATO</span>`;
-        } else {
-          // ==============================
-          // 👤 VISIONE UTENTE NORMALE
-          // ==============================
-          founderCockpit.classList.add('hidden');
-          headerFounderBadge.classList.add('hidden');
-          founderDropdownOptions.classList.add('hidden');
-          document.getElementById('user-role-label').innerText = `⚽ Tifoso (${currentUser.team || 'Calcio'})`;
-          document.getElementById('user-role-label').className = 'text-[10px] text-stone-500 font-medium';
-          badgeContainer.innerHTML = `<span class="inline-block text-[10px] font-semibold px-2 py-0.5 rounded bg-stone-100 dark:bg-stone-800 text-stone-600 dark:text-stone-300">Tifoso: ${currentUser.team || 'Serie A'}</span>`;
-        }
-      }
-
-      // Se eravamo dentro la pagina di lettura articolo, ricarichiamo il modulo commenti
-      if (currentArticleId) {
-        renderCommentBox(currentArticleId);
-      }
+    function selectSkin(emoji) {
+      selectedSkinIcon = emoji;
+      showToast("Aspetto selezionato: " + emoji);
     }
 
-    // LOGIN
+    function fillFounderDemo() {
+      document.getElementById('login-email').value = 'admin@habbo.it';
+      document.getElementById('login-pass').value = 'admin';
+      showToast("Credenziali Fondatore inserite!");
+    }
+
     function handleLogin(e) {
       e.preventDefault();
-      const email = document.getElementById('login-email').value.trim().toLowerCase();
-      const pass = document.getElementById('login-password').value;
+      const email = document.getElementById('login-email').value.trim();
+      const pass = document.getElementById('login-pass').value;
 
-      const user = users.find(u => u.email.toLowerCase() === email && u.password === pass);
-
+      const user = db.users.find(u => u.email.toLowerCase() === email.toLowerCase() && u.password === pass);
       if (!user) {
-        showToast('Credenziali errate o utente non trovato!', '⚠️');
+        alert("Credenziali non valide! Verifica email e password o registrati.");
         return;
       }
 
-      currentUser = user;
-      saveState();
-      closeAuthModal();
-      updateAuthUI();
-      renderHomeArticles();
-
-      if (user.role === ROLES.FOUNDER) {
-        showToast('Bentornato Fondatore! Visione Suprema attiva.', '👑');
-      } else {
-        showToast(`Bentornato ${user.name}!`, '⚽');
-      }
+      startSession(user);
     }
 
-    // REGISTRAZIONE RIGIDA (UTENTE NORMALE AUTOMATICO)
     function handleRegister(e) {
       e.preventDefault();
-      const name = document.getElementById('reg-name').value.trim();
-      const email = document.getElementById('reg-email').value.trim().toLowerCase();
-      const password = document.getElementById('reg-password').value;
-      const team = document.getElementById('reg-team').value;
+      const nick = document.getElementById('reg-nick').value.trim();
+      const email = document.getElementById('reg-email').value.trim();
+      const pass = document.getElementById('reg-pass').value;
 
-      // Verifica esistenza
-      if (users.find(u => u.email.toLowerCase() === email)) {
-        showToast('Questa email è già iscritta a Tribuna Calcio!', '⚠️');
+      if (db.users.some(u => u.email.toLowerCase() === email.toLowerCase())) {
+        alert("Questa email è già registrata!");
         return;
       }
 
-      // CREAZIONE RIGIDA: NESSUN RUOLO A SCELTA, SEMPRE "USER"
       const newUser = {
-        id: 'usr_' + Date.now(),
-        name: name,
+        id: 'user_' + Date.now(),
+        nickname: nick,
         email: email,
-        password: password,
-        team: team,
-        role: ROLES.USER, // <-- FORZATURA RIGIDA
-        joinedDate: new Date().toLocaleDateString('it-IT')
+        password: pass,
+        role: 'player',
+        skin: selectedSkinIcon,
+        level: 1,
+        hp: 100,
+        maxHp: 100,
+        wood: 10,
+        stone: 5,
+        food: 5
       };
 
-      users.push(newUser);
-      currentUser = newUser;
-      saveState();
-      closeAuthModal();
-      updateAuthUI();
-      updateCockpitStats();
+      db.users.push(newUser);
+      saveDB();
+      showToast("Registrazione completata! Benvenuto, " + nick);
+      startSession(newUser);
+    }
 
-      showToast(`Iscrizione completata! Benvenuto tifoso del ${team}.`, '🎉');
+    function startSession(user) {
+      currentUser = user;
+      document.getElementById('auth-view').classList.add('hidden');
+      document.getElementById('game-view').classList.remove('hidden');
+
+      // Setup HUD
+      document.getElementById('hud-nickname').textContent = user.nickname;
+      document.getElementById('hud-avatar-box').textContent = user.skin || '🤠';
+      document.getElementById('hud-lvl').textContent = 'LV ' + user.level;
+
+      if (user.role === 'founder') {
+        document.getElementById('founder-btn').classList.remove('hidden');
+        showToast("Benvenuto Fondatore! God Mode e pannello sbloccati 👑");
+      } else {
+        document.getElementById('founder-btn').classList.add('hidden');
+      }
+
+      // Sync stats
+      updateInventoryHUD();
+      initAudio();
+      initGameWorld();
     }
 
     function logout() {
       currentUser = null;
-      localStorage.removeItem('tc_current_user');
-      closeUserDropdown();
-      updateAuthUI();
-      navigate('home');
-      showToast('Disconnessione effettuata.', '👋');
+      document.getElementById('game-view').classList.add('hidden');
+      document.getElementById('auth-view').classList.remove('hidden');
     }
 
-    // ==============================================================
-    // PORTALE RISERVATO FONDATORE
-    // ==============================================================
-    function openFounderPortal(tab = 'dashboard') {
-      if (!currentUser || currentUser.role !== ROLES.FOUNDER) {
-        showToast('ACCESSO NEGATO: Solo il Fondatore Supremo può entrare qui!', '🚫');
-        return;
+    /* =========================================================================
+       3. ENGINE ISOMETRICO SURVIVAL RPG
+       ========================================================================= */
+    const canvas = document.getElementById('survivalCanvas');
+    const ctx = canvas.getContext('2d');
+
+    // Dimensioni Piastrelle Isometriche
+    const TILE_W = 64;
+    const TILE_H = 32;
+    const MAP_SIZE = 30; // 30x30 tiles
+
+    let camera = { x: 0, y: 0 };
+    let dayTime = 720; // Minuti del giorno (12:00 = 720)
+    let dayCount = 1;
+
+    // Entità giocatore locale
+    let player = {
+      gx: 15,
+      gy: 15,
+      x: 0,
+      y: 0,
+      targetGx: 15,
+      targetGy: 15,
+      speed: 0.08,
+      hunger: 100,
+      thirst: 100,
+      isAttacking: false,
+      attackCooldown: 0
+    };
+
+    // Cucciolo
+    let pet = {
+      gx: 14,
+      gy: 15,
+      x: 0,
+      y: 0,
+      name: "Fenrir (Lupo)",
+      love: 50
+    };
+
+    // Array oggetti del mondo
+    let worldObjects = [];
+    let enemies = [];
+    let structures = []; // muri, fuochi costruiti dal giocatore
+
+    function initGameWorld() {
+      resizeCanvas();
+      window.addEventListener('resize', resizeCanvas);
+
+      worldObjects = [];
+      enemies = [];
+      structures = [];
+
+      // Popola alberi, rocce, cespugli
+      for (let x = 0; x < MAP_SIZE; x++) {
+        for (let y = 0; y < MAP_SIZE; y++) {
+          if (x === 15 && y === 15) continue; // Spawn vuoto
+          const rand = Math.random();
+          if (rand < 0.08) {
+            worldObjects.push({ gx: x, gy: y, type: 'tree', hp: 3, maxHp: 3, res: 'wood' });
+          } else if (rand < 0.13) {
+            worldObjects.push({ gx: x, gy: y, type: 'rock', hp: 4, maxHp: 4, res: 'stone' });
+          } else if (rand < 0.17) {
+            worldObjects.push({ gx: x, gy: y, type: 'bush', hp: 1, maxHp: 1, res: 'food' });
+          }
+        }
       }
 
-      closeUserDropdown();
-      document.getElementById('view-home').classList.add('hidden');
-      document.getElementById('view-article').classList.add('hidden');
-      document.getElementById('view-founder-portal').classList.remove('hidden');
-
-      if (tab === 'editor') {
-        switchFounderTab('editor');
-      } else if (tab === 'articles') {
-        switchFounderTab('articles');
-      } else {
-        switchFounderTab('users');
+      // Popola Zombie Iniziali
+      for (let i = 0; i < 6; i++) {
+        spawnZombie();
       }
 
-      renderFounderTables();
-      updateCockpitStats();
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+      // Posiziona Player e Camera
+      player.gx = 15;
+      player.gy = 15;
+      player.targetGx = 15;
+      player.targetGy = 15;
+      const screenPos = gridToScreen(player.gx, player.gy);
+      player.x = screenPos.x;
+      player.y = screenPos.y;
+      pet.gx = 14;
+      pet.gy = 15;
+
+      centerCameraOnPlayer();
+      requestAnimationFrame(gameLoop);
     }
 
-    function switchFounderTab(tabId) {
-      document.querySelectorAll('.founder-subtab').forEach(el => el.classList.add('hidden'));
-      document.querySelectorAll('[id^="tab-btn-"]').forEach(btn => {
-        btn.className = 'px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-wider transition bg-stone-800 text-stone-300 hover:text-white';
-      });
-
-      const targetTab = document.getElementById(`founder-tab-${tabId}`);
-      const targetBtn = document.getElementById(`tab-btn-${tabId}`);
-
-      if (targetTab) targetTab.classList.remove('hidden');
-      if (targetBtn) targetBtn.className = 'px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-wider transition bg-amber-500 text-stone-950';
-
-      if (tabId === 'users' || tabId === 'articles') {
-        renderFounderTables();
-      }
+    function resizeCanvas() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
     }
 
-    // TABELLA ISCRITTI & CAMBIO RUOLI DAL PORTALE
-    function renderFounderTables() {
-      // 1. Tabella Iscritti
-      const userTbody = document.getElementById('founder-users-table');
-      userTbody.innerHTML = '';
-
-      users.forEach(u => {
-        const isSupreme = u.role === ROLES.FOUNDER;
-        const tr = document.createElement('tr');
-        tr.className = isSupreme ? 'bg-amber-500/10' : 'hover:bg-stone-50 dark:hover:bg-stone-800/50';
-
-        tr.innerHTML = `
-          <td class="py-3 px-3">
-            <div class="font-bold text-stone-900 dark:text-stone-100 flex items-center gap-1.5">
-              ${isSupreme ? '👑 ' : ''}${u.name}
-              ${isSupreme ? '<span class="text-[9px] px-1 bg-amber-500 text-stone-950 font-bold rounded">TU</span>' : ''}
-            </div>
-            <div class="text-[10px] text-stone-400">ID: ${u.id}</div>
-          </td>
-          <td class="py-3 px-3 text-stone-600 dark:text-stone-400">${u.email}</td>
-          <td class="py-3 px-3">
-            <span class="inline-block px-2 py-0.5 rounded bg-stone-100 dark:bg-stone-800 font-semibold text-[10px]">
-              ⚽ ${u.team || 'Calcio'}
-            </span>
-          </td>
-          <td class="py-3 px-3 text-stone-500">${u.joinedDate || '2026'}</td>
-          <td class="py-3 px-3">
-            ${
-              isSupreme 
-              ? '<span class="font-bold text-amber-500 uppercase">FONDATORE SUPREMO</span>'
-              : u.role === ROLES.JOURNALIST
-              ? '<span class="font-bold text-emerald-600 uppercase">✍️ GIORNALISTA</span>'
-              : '<span class="text-stone-500">⚽ Utente Normale</span>'
-            }
-          </td>
-          <td class="py-3 px-3 text-right">
-            ${
-              isSupreme 
-              ? '<span class="text-[10px] text-stone-400 italic">Ruolo Intoccabile</span>'
-              : `
-                <select onchange="changeUserRoleByFounder('${u.id}', this.value)" class="text-[11px] p-1.5 rounded-lg bg-stone-100 dark:bg-stone-800 border border-stone-200 dark:border-stone-700 font-bold focus:ring-1 focus:ring-amber-500">
-                  <option value="${ROLES.USER}" ${u.role === ROLES.USER ? 'selected' : ''}>Utente Normale (Solo Commenti)</option>
-                  <option value="${ROLES.JOURNALIST}" ${u.role === ROLES.JOURNALIST ? 'selected' : ''}>Promuovi a Giornalista (Scrittura)</option>
-                </select>
-              `
-            }
-          </td>
-        `;
-        userTbody.appendChild(tr);
-      });
-
-      // 2. Tabella Articoli
-      const artTbody = document.getElementById('founder-articles-table');
-      artTbody.innerHTML = '';
-
-      articles.forEach(art => {
-        const commentCount = comments.filter(c => c.articleId === art.id).length;
-        const tr = document.createElement('tr');
-        tr.className = 'hover:bg-stone-50 dark:hover:bg-stone-800/50';
-        tr.innerHTML = `
-          <td class="py-3 px-3">
-            <div class="font-bold text-stone-900 dark:text-stone-100 max-w-xs truncate">${art.title}</div>
-          </td>
-          <td class="py-3 px-3">
-            <span class="px-2 py-0.5 rounded bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-400 font-bold text-[10px]">
-              ${art.category}
-            </span>
-          </td>
-          <td class="py-3 px-3 text-stone-600 dark:text-stone-300 font-medium">${art.authorName}</td>
-          <td class="py-3 px-3 text-stone-400">${art.date}</td>
-          <td class="py-3 px-3 text-stone-500">👏 ${art.claps || 0} • 💬 ${commentCount}</td>
-          <td class="py-3 px-3 text-right">
-            <button onclick="founderDeleteArticle('${art.id}')" class="px-2.5 py-1 rounded bg-red-100 hover:bg-red-200 dark:bg-red-950/40 text-red-600 text-[11px] font-bold transition">
-              Elimina
-            </button>
-          </td>
-        `;
-        artTbody.appendChild(tr);
+    function spawnZombie(gx, gy) {
+      const zx = gx !== undefined ? gx : Math.floor(Math.random() * (MAP_SIZE - 4)) + 2;
+      const zy = gy !== undefined ? gy : Math.floor(Math.random() * (MAP_SIZE - 4)) + 2;
+      enemies.push({
+        id: 'z_' + Math.random(),
+        gx: zx,
+        gy: zy,
+        hp: 40,
+        maxHp: 40,
+        speed: 0.03,
+        attackTimer: 0,
+        type: 'zombie'
       });
     }
 
-    // COMANDO FONDATORE: CAMBIO RUOLO ISCRITTO
-    function changeUserRoleByFounder(userId, newRole) {
-      if (!currentUser || currentUser.role !== ROLES.FOUNDER) return;
-
-      const target = users.find(u => u.id === userId);
-      if (!target) return;
-
-      if (target.role === ROLES.FOUNDER) {
-        showToast('Non puoi modificare il tuo account Fondatore!', '🛡️');
-        return;
-      }
-
-      target.role = newRole;
-      saveState();
-      renderFounderTables();
-      showToast(`Ruolo di ${target.name} aggiornato con successo a: ${newRole.toUpperCase()}`, '👑');
-    }
-
-    // COMANDO FONDATORE: CANCELLAZIONE ARTICOLO
-    function founderDeleteArticle(articleId) {
-      if (!currentUser || currentUser.role !== ROLES.FOUNDER) return;
-
-      if (confirm('Sei sicuro di voler eliminare questo articolo dal blog?')) {
-        articles = articles.filter(a => a.id !== articleId);
-        comments = comments.filter(c => c.articleId !== articleId);
-        saveState();
-        renderFounderTables();
-        renderHomeArticles();
-        updateCockpitStats();
-        showToast('Articolo rimosso definitivamente.', '🗑️');
-      }
-    }
-
-    // CREAZIONE ARTICOLO DAL PORTALE DEL FONDATORE
-    function handlePublishArticle(e) {
-      e.preventDefault();
-      if (!currentUser || currentUser.role !== ROLES.FOUNDER) {
-        showToast('Solo il Fondatore può mandare in stampa articoli!', '🚫');
-        return;
-      }
-
-      const title = document.getElementById('post-title').value.trim();
-      const category = document.getElementById('post-category').value;
-      const summary = document.getElementById('post-summary').value.trim();
-      const content = document.getElementById('post-content').value.trim();
-      let image = document.getElementById('post-image').value.trim();
-
-      if (!image) {
-        image = "https://images.unsplash.com/photo-1508098682722-e99c43a406b2?auto=format&fit=crop&w=1200&q=80";
-      }
-
-      const words = content.split(/\s+/).length;
-      const readMinutes = Math.max(1, Math.ceil(words / 180));
-
-      const newArticle = {
-        id: 'art_' + Date.now(),
-        title: title,
-        category: category,
-        summary: summary,
-        image: image,
-        authorId: currentUser.id,
-        authorName: "Direttore Supremo",
-        date: new Date().toLocaleDateString('it-IT', { day: '2-digit', month: 'short', year: 'numeric' }),
-        claps: 0,
-        readTime: `${readMinutes} min`,
-        content: content
+    // Conversione Griglia Isometrica <-> Schermo
+    function gridToScreen(gx, gy) {
+      return {
+        x: (gx - gy) * (TILE_W / 2),
+        y: (gx + gy) * (TILE_H / 2)
       };
-
-      articles.unshift(newArticle);
-      saveState();
-      
-      document.getElementById('founder-article-form').reset();
-      showToast('Articolo pubblicato e mandato in Prima Pagina!', '🚀');
-      
-      // Torna alla home per vederlo subito
-      navigate('home');
     }
 
-    function insertFormat(start, end) {
-      const textarea = document.getElementById('post-content');
-      const startPos = textarea.selectionStart;
-      const endPos = textarea.selectionEnd;
-      const selText = textarea.value.substring(startPos, endPos) || 'testo';
-      
-      textarea.value = textarea.value.substring(0, startPos) + start + selText + end + textarea.value.substring(endPos);
-      textarea.focus();
+    function screenToGrid(sx, sy) {
+      const adjX = sx - camera.x;
+      const adjY = sy - camera.y;
+      const gx = (adjX / (TILE_W / 2) + adjY / (TILE_H / 2)) / 2;
+      const gy = (adjY / (TILE_H / 2) - adjX / (TILE_W / 2)) / 2;
+      return {
+        gx: Math.round(gx),
+        gy: Math.round(gy)
+      };
     }
 
-    function randomCoverImage() {
-      const photos = [
-        "https://images.unsplash.com/photo-1508098682722-e99c43a406b2?auto=format&fit=crop&w=1200&q=80",
-        "https://images.unsplash.com/photo-1522778119026-d647f0596c20?auto=format&fit=crop&w=1200&q=80",
-        "https://images.unsplash.com/photo-1574629810360-7efbbe195018?auto=format&fit=crop&w=1200&q=80",
-        "https://images.unsplash.com/photo-1518091043644-c1d4457512c6?auto=format&fit=crop&w=1200&q=80",
-        "https://images.unsplash.com/photo-1489944445391-11688663c2da?auto=format&fit=crop&w=1200&q=80"
-      ];
-      const pick = photos[Math.floor(Math.random() * photos.length)];
-      document.getElementById('post-image').value = pick;
-      showToast('Immagine calcistica inserita!', '📸');
+    function centerCameraOnPlayer() {
+      const pos = gridToScreen(player.gx, player.gy);
+      camera.x = canvas.width / 2 - pos.x;
+      camera.y = canvas.height / 2 - pos.y;
     }
 
-    // ==============================================================
-    // RENDERING ARTICOLI & VISIONE HOME
-    // ==============================================================
-    function renderHomeArticles() {
-      const heroContainer = document.getElementById('hero-article-container');
-      const gridContainer = document.getElementById('articles-grid');
-      const noFound = document.getElementById('no-articles-found');
-      const countLabel = document.getElementById('articles-count-label');
+    /* =========================================================================
+       4. LOOP PRINCIPALE & AGGIORNAMENTO LOGICA
+       ========================================================================= */
+    let lastTime = performance.now();
 
-      let filtered = articles.filter(a => {
-        const matchCat = currentCategory === 'Tutti' || a.category === currentCategory;
-        const matchSearch = searchQuery === '' || 
-          a.title.toLowerCase().includes(searchQuery) ||
-          a.summary.toLowerCase().includes(searchQuery) ||
-          a.category.toLowerCase().includes(searchQuery);
-        return matchCat && matchSearch;
-      });
+    function gameLoop(now) {
+      const dt = (now - lastTime) / 1000;
+      lastTime = now;
 
-      countLabel.innerText = `${filtered.length} articoli`;
+      update(dt);
+      render();
 
-      if (filtered.length === 0) {
-        heroContainer.innerHTML = '';
-        gridContainer.innerHTML = '';
-        noFound.classList.remove('hidden');
-        return;
-      }
-      noFound.classList.add('hidden');
-
-      const isFounder = currentUser && currentUser.role === ROLES.FOUNDER;
-
-      // ARTICOLO HERO (IL PRIMO)
-      const hero = filtered[0];
-      heroContainer.innerHTML = `
-        <div class="relative bg-white dark:bg-stone-900 rounded-3xl overflow-hidden border border-stone-200 dark:border-stone-800 shadow-sm group">
-          <div class="grid grid-cols-1 lg:grid-cols-12 gap-0">
-            <div class="lg:col-span-7 overflow-hidden relative">
-              <img src="${hero.image}" alt="${hero.title}" class="w-full h-72 sm:h-96 object-cover group-hover:scale-105 transition duration-500 cursor-pointer" onclick="openArticle('${hero.id}')">
-              <span class="absolute top-4 left-4 bg-amber-500 text-stone-950 font-heading text-xs uppercase px-3 py-1 rounded-full font-bold shadow-md">
-                In Primo Piano
-              </span>
-            </div>
-            <div class="lg:col-span-5 p-6 sm:p-8 flex flex-col justify-between">
-              <div class="space-y-3">
-                <div class="flex items-center gap-2 text-xs">
-                  <span class="font-heading uppercase text-pitch-700 dark:text-emerald-400 font-bold">${hero.category}</span>
-                  <span class="text-stone-400">•</span>
-                  <span class="text-stone-400">${hero.readTime}</span>
-                </div>
-                <h3 onclick="openArticle('${hero.id}')" class="font-heading text-2xl sm:text-3xl font-bold uppercase hover:text-pitch-700 dark:hover:text-emerald-400 cursor-pointer transition leading-tight">
-                  ${hero.title}
-                </h3>
-                <p class="text-xs sm:text-sm text-stone-600 dark:text-stone-300 font-serif line-clamp-3 leading-relaxed">
-                  ${hero.summary}
-                </p>
-              </div>
-
-              <div class="pt-6 border-t border-stone-100 dark:border-stone-800 flex items-center justify-between">
-                <div class="flex items-center space-x-2">
-                  <div class="w-8 h-8 rounded-full bg-pitch-700 text-white font-bold flex items-center justify-center text-xs">
-                    ${hero.authorName.charAt(0)}
-                  </div>
-                  <div>
-                    <div class="text-xs font-bold">${hero.authorName}</div>
-                    <div class="text-[10px] text-stone-400">${hero.date}</div>
-                  </div>
-                </div>
-
-                <div class="flex items-center gap-2">
-                  ${isFounder ? `
-                    <button onclick="founderDeleteArticle('${hero.id}')" class="text-red-500 hover:text-red-700 p-1.5 rounded text-xs" title="Elimina Articolo (Solo Fondatore)">
-                      🗑️
-                    </button>
-                  ` : ''}
-                  <button onclick="openArticle('${hero.id}')" class="bg-pitch-700 hover:bg-pitch-800 text-white font-heading text-xs uppercase px-4 py-2 rounded-xl font-bold transition">
-                    Leggi Articolo →
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      `;
-
-      // GRIGLIA ALTRI ARTICOLI
-      const others = filtered.slice(1);
-      gridContainer.innerHTML = '';
-
-      others.forEach(art => {
-        const card = document.createElement('div');
-        card.className = 'bg-white dark:bg-stone-900 rounded-2xl overflow-hidden border border-stone-200 dark:border-stone-800 shadow-sm flex flex-col justify-between hover:shadow-md transition';
-
-        card.innerHTML = `
-          <div>
-            <div class="relative overflow-hidden cursor-pointer" onclick="openArticle('${art.id}')">
-              <img src="${art.image}" alt="${art.title}" class="w-full h-44 object-cover hover:scale-105 transition duration-300">
-              <span class="absolute top-3 left-3 bg-stone-900/80 backdrop-blur-xs text-white text-[10px] font-heading uppercase px-2.5 py-0.5 rounded font-bold">
-                ${art.category}
-              </span>
-            </div>
-            <div class="p-5 space-y-2">
-              <div class="flex items-center justify-between text-[11px] text-stone-400">
-                <span>${art.readTime}</span>
-                <span>👏 ${art.claps || 0}</span>
-              </div>
-              <h4 onclick="openArticle('${art.id}')" class="font-heading text-lg font-bold uppercase hover:text-pitch-700 dark:hover:text-emerald-400 cursor-pointer line-clamp-2 transition leading-tight">
-                ${art.title}
-              </h4>
-              <p class="text-xs text-stone-500 font-serif line-clamp-2 leading-relaxed">
-                ${art.summary}
-              </p>
-            </div>
-          </div>
-
-          <div class="px-5 pb-5 pt-3 border-t border-stone-100 dark:border-stone-800 flex items-center justify-between">
-            <span class="text-[11px] font-bold text-stone-600 dark:text-stone-300 truncate max-w-[130px]">${art.authorName}</span>
-            <div class="flex items-center gap-2">
-              ${isFounder ? `
-                <button onclick="founderDeleteArticle('${art.id}')" class="text-red-500 hover:text-red-700 p-1 text-xs" title="Elimina da Fondatore">
-                  🗑️
-                </button>
-              ` : ''}
-              <button onclick="openArticle('${art.id}')" class="text-xs font-bold text-pitch-700 dark:text-emerald-400 hover:underline">
-                Leggi →
-              </button>
-            </div>
-          </div>
-        `;
-        gridContainer.appendChild(card);
-      });
+      requestAnimationFrame(gameLoop);
     }
 
-    // ==============================================================
-    // LETTURA ARTICOLO & COMMENTI RIGIDI (SOLO PER REGISTRATI)
-    // ==============================================================
-    function openArticle(id) {
-      const art = articles.find(a => a.id === id);
-      if (!art) return;
-
-      currentArticleId = id;
-
-      document.getElementById('view-home').classList.add('hidden');
-      document.getElementById('view-founder-portal').classList.add('hidden');
-      document.getElementById('view-article').classList.remove('hidden');
-
-      document.getElementById('detail-image').src = art.image;
-      document.getElementById('detail-title').innerText = art.title;
-      document.getElementById('detail-category').innerText = art.category;
-      document.getElementById('detail-readtime').innerText = `${art.readTime} di lettura`;
-      document.getElementById('detail-author').innerText = art.authorName;
-      document.getElementById('detail-author-avatar').innerText = art.authorName.charAt(0);
-      document.getElementById('detail-date').innerText = art.date;
-      document.getElementById('detail-summary').innerText = art.summary;
-      document.getElementById('detail-claps').innerText = art.claps || 0;
-
-      // Parsing formattazione semplice
-      let parsed = art.content
-        .replace(/\n\n## (.*?)\n/g, '<h3 class="font-heading text-2xl uppercase mt-6 mb-3 text-stone-900 dark:text-white">$1</h3>')
-        .replace(/\n> (.*?)\n/g, '<blockquote class="border-l-4 border-amber-500 pl-4 py-2 italic my-4 text-stone-600 dark:text-stone-300 bg-amber-50 dark:bg-amber-950/20 rounded-r-lg">$1</blockquote>')
-        .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-        .replace(/\*(.*?)\*/g, '<em>$1</em>')
-        .replace(/\n- (.*?)/g, '<li class="ml-4 list-disc">$1</li>')
-        .replace(/\n/g, '<br>');
-
-      document.getElementById('detail-content').innerHTML = parsed;
-
-      renderCommentBox(id);
-      renderCommentsList(id);
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
-
-    // BOX COMMENTI: SE NON LOGGATO BLOCCA, SE LOGGATO PERMETTE
-    function renderCommentBox(articleId) {
-      const box = document.getElementById('comment-form-container');
-
-      if (!currentUser) {
-        // NON REGISTRATO / NON LOGGATO -> NON PUÒ COMMENTARE
-        box.innerHTML = `
-          <div class="p-4 bg-stone-100 dark:bg-stone-800/60 rounded-2xl border border-stone-200 dark:border-stone-700 text-center space-y-2">
-            <p class="text-xs text-stone-600 dark:text-stone-300 font-medium">
-              🔒 <b>Dibattito riservato ai tifosi registrati:</b> Vuoi dire la tua su questo articolo?
-            </p>
-            <div class="flex items-center justify-center gap-3">
-              <button onclick="openAuthModal('login')" class="px-4 py-1.5 rounded-xl bg-stone-800 hover:bg-stone-700 text-white text-xs font-bold transition">
-                Accedi
-              </button>
-              <button onclick="openAuthModal('register')" class="px-4 py-1.5 rounded-xl bg-pitch-700 hover:bg-pitch-800 text-white text-xs font-bold transition">
-                Registrati per Commentare
-              </button>
-            </div>
-          </div>
-        `;
-      } else {
-        // UTENTE LOGGATO (NORMALE, GIORNALISTA O FONDATORE)
-        box.innerHTML = `
-          <form onsubmit="handleAddComment(event)" class="space-y-3 bg-stone-50 dark:bg-stone-800/40 p-4 rounded-2xl border border-stone-200 dark:border-stone-700">
-            <div class="flex items-center justify-between text-xs">
-              <span class="font-bold text-stone-700 dark:text-stone-200">
-                Commenta come: <span class="text-pitch-700 dark:text-emerald-400 font-bold">${currentUser.name}</span>
-                <span class="text-[10px] text-stone-400 ml-1">(${currentUser.team || 'Calcio'})</span>
-              </span>
-              <span class="text-[10px] text-emerald-600 font-semibold">Tesserato Verificato</span>
-            </div>
-            <textarea id="comment-text" required rows="3" placeholder="Scrivi la tua opinione tattica o sul match..." class="w-full text-xs p-3 rounded-xl bg-white dark:bg-stone-800 border border-stone-200 dark:border-stone-700 focus:outline-none focus:ring-2 focus:ring-emerald-500"></textarea>
-            <div class="flex justify-end">
-              <button type="submit" class="bg-pitch-700 hover:bg-pitch-800 text-white font-heading text-xs uppercase px-5 py-2 rounded-xl font-bold shadow transition">
-                Pubblica Commento
-              </button>
-            </div>
-          </form>
-        `;
-      }
-    }
-
-    function renderCommentsList(articleId) {
-      const list = document.getElementById('comments-list');
-      const countEl = document.getElementById('detail-comments-count');
-      const artComments = comments.filter(c => c.articleId === articleId);
-
-      countEl.innerText = `${artComments.length} commenti`;
-      list.innerHTML = '';
-
-      if (artComments.length === 0) {
-        list.innerHTML = `<p class="text-xs text-stone-400 italic">Ancora nessun commento. Sii il primo a commentare al Bar dello Sport!</p>`;
-        return;
-      }
-
-      artComments.forEach(c => {
-        const item = document.createElement('div');
-        item.className = 'p-4 rounded-2xl bg-stone-50 dark:bg-stone-800/40 border border-stone-200 dark:border-stone-800 space-y-1.5';
-        item.innerHTML = `
-          <div class="flex items-center justify-between text-xs">
-            <div class="flex items-center space-x-2">
-              <span class="font-bold text-stone-900 dark:text-stone-100">${c.userName}</span>
-              <span class="text-[10px] px-2 py-0.5 rounded bg-stone-200 dark:bg-stone-700 font-semibold text-stone-600 dark:text-stone-300">⚽ ${c.userTeam || 'Tifoso'}</span>
-            </div>
-            <span class="text-[10px] text-stone-400">${c.date}</span>
-          </div>
-          <p class="text-xs text-stone-700 dark:text-stone-300 leading-relaxed">${c.text}</p>
-        `;
-        list.appendChild(item);
-      });
-    }
-
-    function handleAddComment(e) {
-      e.preventDefault();
+    function update(dt) {
       if (!currentUser) return;
 
-      const txt = document.getElementById('comment-text').value.trim();
-      if (!txt) return;
-
-      const newCom = {
-        id: 'com_' + Date.now(),
-        articleId: currentArticleId,
-        userName: currentUser.name,
-        userTeam: currentUser.team || 'Calcio',
-        date: new Date().toLocaleDateString('it-IT') + ', ' + new Date().toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' }),
-        text: txt
-      };
-
-      comments.unshift(newCom);
-      saveState();
-      document.getElementById('comment-text').value = '';
-      renderCommentsList(currentArticleId);
-      updateCockpitStats();
-      showToast('Commento inviato con successo!', '💬');
-    }
-
-    function clapCurrentArticle() {
-      const art = articles.find(a => a.id === currentArticleId);
-      if (!art) return;
-      art.claps = (art.claps || 0) + 1;
-      saveState();
-      document.getElementById('detail-claps').innerText = art.claps;
-      showToast('Hai applaudito questa analisi!', '👏');
-    }
-
-    // ==============================================================
-    // UTILITY: NAVIGAZIONE, TEMA, FILTRI
-    // ==============================================================
-    function navigate(view) {
-      if (view === 'home') {
-        document.getElementById('view-home').classList.remove('hidden');
-        document.getElementById('view-article').classList.add('hidden');
-        document.getElementById('view-founder-portal').classList.add('hidden');
-        currentArticleId = null;
-        renderHomeArticles();
-        window.scrollTo({ top: 0, behavior: 'smooth' });
+      // Orologio Giorno/Notte (1 minuto reale = ~20 min di gioco)
+      dayTime += dt * 8;
+      if (dayTime >= 1440) {
+        dayTime = 0;
+        dayCount++;
+        showToast("🌅 È iniziato il Giorno " + dayCount + "!");
       }
-    }
+      updateTimeHUD();
 
-    function filterCategory(cat) {
-      currentCategory = cat;
-      document.querySelectorAll('.category-pill').forEach(btn => {
-        if (btn.dataset.cat === cat) {
-          btn.className = 'category-pill active px-3 py-1 rounded-full text-xs font-bold uppercase transition bg-stone-200 dark:bg-stone-800 text-stone-900 dark:text-white';
-        } else {
-          btn.className = 'category-pill px-3 py-1 rounded-full text-xs font-bold uppercase transition text-stone-600 dark:text-stone-400 hover:text-emerald-600';
+      // Fame e Sete calano col tempo
+      player.hunger = Math.max(0, player.hunger - dt * 0.4);
+      player.thirst = Math.max(0, player.thirst - dt * 0.6);
+
+      // Penalità se hai fame o sete a 0
+      if (player.hunger <= 0 || player.thirst <= 0) {
+        damagePlayer(dt * 2, "Disidratazione / Denutrizione");
+      }
+
+      updateSurvivalHUD();
+
+      // Movimento fluido verso il tile target
+      const distGx = player.targetGx - player.gx;
+      const distGy = player.targetGy - player.gy;
+      const dist = Math.hypot(distGx, distGy);
+
+      if (dist > 0.05) {
+        player.gx += (distGx / dist) * player.speed;
+        player.gy += (distGy / dist) * player.speed;
+      } else {
+        player.gx = player.targetGx;
+        player.gy = player.targetGy;
+      }
+
+      // Smooth camera lerp
+      const playerScr = gridToScreen(player.gx, player.gy);
+      camera.x += (canvas.width / 2 - playerScr.x - camera.x) * 0.1;
+      camera.y += (canvas.height / 2 - playerScr.y - camera.y) * 0.1;
+
+      // IA Cucciolo che segue il giocatore
+      const petDistX = player.gx - pet.gx;
+      const petDistY = player.gy - pet.gy;
+      const pDist = Math.hypot(petDistX, petDistY);
+      if (pDist > 1.8) {
+        pet.gx += (petDistX / pDist) * 0.06;
+        pet.gy += (petDistY / pDist) * 0.06;
+      }
+
+      // IA Mostri / Zombie
+      enemies.forEach((enemy, idx) => {
+        const dx = player.gx - enemy.gx;
+        const dy = player.gy - enemy.gy;
+        const distance = Math.hypot(dx, dy);
+
+        // Se è vicino, insegue il giocatore
+        if (distance < 7) {
+          enemy.gx += (dx / distance) * enemy.speed;
+          enemy.gy += (dy / distance) * enemy.speed;
+
+          // Se è a contatto, infligge danno
+          if (distance < 0.8) {
+            enemy.attackTimer = (enemy.attackTimer || 0) + dt;
+            if (enemy.attackTimer > 1.2) {
+              enemy.attackTimer = 0;
+              damagePlayer(15, "Zombie ti ha morso!");
+              playHitSound();
+            }
+          }
         }
       });
-      navigate('home');
     }
 
-    function handleSearch() {
-      searchQuery = document.getElementById('search-input').value.trim().toLowerCase();
-      renderHomeArticles();
-    }
+    function damagePlayer(amount, reason) {
+      if (currentUser.role === 'founder' && currentUser.godMode) return; // Godmode
 
-    function updateCockpitStats() {
-      document.getElementById('stat-total-users').innerText = users.length;
-      document.getElementById('stat-total-articles').innerText = articles.length;
-      document.getElementById('stat-total-comments').innerText = comments.length;
-
-      // Metriche interne Portale
-      const mU = document.getElementById('metric-users');
-      const mA = document.getElementById('metric-articles');
-      const mC = document.getElementById('metric-comments');
-      const mCl = document.getElementById('metric-claps');
-
-      if (mU) mU.innerText = users.length;
-      if (mA) mA.innerText = articles.length;
-      if (mC) mC.innerText = comments.length;
-      if (mCl) {
-        const totalClaps = articles.reduce((acc, curr) => acc + (curr.claps || 0), 0);
-        mCl.innerText = totalClaps;
+      currentUser.hp = Math.max(0, currentUser.hp - amount);
+      if (currentUser.hp <= 0) {
+        alert("SEI MORTO! Causa: " + reason + "\nRiparti dal rifugio!");
+        currentUser.hp = currentUser.maxHp;
+        player.gx = 15;
+        player.gy = 15;
+        player.targetGx = 15;
+        player.targetGy = 15;
+        player.hunger = 100;
+        player.thirst = 100;
       }
     }
 
-    function votePoll(idx) {
-      showToast('Grazie per aver votato al sondaggio del Bar dello Sport!', '⚽');
+    function updateTimeHUD() {
+      const hours = Math.floor(dayTime / 60).toString().padStart(2, '0');
+      const mins = Math.floor(dayTime % 60).toString().padStart(2, '0');
+      document.getElementById('time-text').textContent = `${hours}:${mins}`;
+      document.getElementById('day-counter').textContent = `Giorno ${dayCount}`;
+
+      const icon = (dayTime >= 360 && dayTime <= 1200) ? '☀️ Giorno' : '🌙 Notte';
+      document.getElementById('time-icon').textContent = icon;
     }
 
-    function toggleTheme() {
-      const html = document.documentElement;
-      const icon = document.getElementById('theme-icon');
-      if (html.classList.contains('dark')) {
-        html.classList.remove('dark');
-        localStorage.setItem('tc_theme', 'light');
-        icon.innerText = '🌙';
-      } else {
-        html.classList.add('dark');
-        localStorage.setItem('tc_theme', 'dark');
-        icon.innerText = '☀️';
+    function updateSurvivalHUD() {
+      document.getElementById('bar-hp').style.width = `${(currentUser.hp / currentUser.maxHp) * 100}%`;
+      document.getElementById('text-hp').textContent = `${Math.round(currentUser.hp)}/${currentUser.maxHp} HP`;
+
+      document.getElementById('bar-hunger').style.width = `${player.hunger}%`;
+      document.getElementById('text-hunger').textContent = `Fame: ${Math.round(player.hunger)}%`;
+
+      document.getElementById('bar-thirst').style.width = `${player.thirst}%`;
+      document.getElementById('text-thirst').textContent = `Sete: ${Math.round(player.thirst)}%`;
+    }
+
+    function updateInventoryHUD() {
+      document.getElementById('res-wood').textContent = currentUser.wood;
+      document.getElementById('res-stone').textContent = currentUser.stone;
+      document.getElementById('res-food').textContent = currentUser.food;
+    }
+
+    /* =========================================================================
+       5. RENDERING GRAFICO ISOMETRICO (RETRO HABBO / SURVIVAL)
+       ========================================================================= */
+    function render() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.save();
+      ctx.translate(camera.x, camera.y);
+
+      // Disegna Terreno Isometrico
+      for (let x = 0; x < MAP_SIZE; x++) {
+        for (let y = 0; y < MAP_SIZE; y++) {
+          const pt = gridToScreen(x, y);
+          drawIsometricTile(pt.x, pt.y, (x + y) % 2 === 0 ? '#384d26' : '#2f4220');
+        }
+      }
+
+      // Raccoglie tutte le entità per disegnarle in ordine di profondità (Y-Sorting)
+      const renderQueue = [];
+
+      // 1. Risorse naturali
+      worldObjects.forEach((obj, index) => {
+        const pt = gridToScreen(obj.gx, obj.gy);
+        renderQueue.push({ yOrder: pt.y, type: 'object', data: obj, index });
+      });
+
+      // 2. Strutture costruite
+      structures.forEach(st => {
+        const pt = gridToScreen(st.gx, st.gy);
+        renderQueue.push({ yOrder: pt.y, type: 'structure', data: st });
+      });
+
+      // 3. Cucciolo
+      const petPt = gridToScreen(pet.gx, pet.gy);
+      renderQueue.push({ yOrder: petPt.y, type: 'pet', pt: petPt });
+
+      // 4. Mostri
+      enemies.forEach((enemy) => {
+        const pt = gridToScreen(enemy.gx, enemy.gy);
+        renderQueue.push({ yOrder: pt.y, type: 'enemy', data: enemy, pt });
+      });
+
+      // 5. Giocatore Locale
+      const playerPt = gridToScreen(player.gx, player.gy);
+      renderQueue.push({ yOrder: playerPt.y, type: 'player', pt: playerPt });
+
+      // Ordina per profondità per dare vero 3D isometrico
+      renderQueue.sort((a, b) => a.yOrder - b.yOrder);
+
+      // Renderizza ogni elemento ordinato
+      renderQueue.forEach(item => {
+        if (item.type === 'object') drawWorldObject(item.data);
+        if (item.type === 'structure') drawStructure(item.data);
+        if (item.type === 'pet') drawPet(item.pt.x, item.pt.y);
+        if (item.type === 'enemy') drawEnemy(item.data, item.pt.x, item.pt.y);
+        if (item.type === 'player') drawHabboSurvivor(item.pt.x, item.pt.y);
+      });
+
+      ctx.restore();
+
+      // Maschera di Illuminazione Notturna (Ciclo Notturno)
+      drawDayNightFilter();
+    }
+
+    function drawIsometricTile(x, y, color) {
+      ctx.beginPath();
+      ctx.moveTo(x, y);
+      ctx.lineTo(x + TILE_W / 2, y + TILE_H / 2);
+      ctx.lineTo(x, y + TILE_H);
+      ctx.lineTo(x - TILE_W / 2, y + TILE_H / 2);
+      ctx.closePath();
+      ctx.fillStyle = color;
+      ctx.fill();
+      ctx.strokeStyle = '#223017';
+      ctx.lineWidth = 0.5;
+      ctx.stroke();
+    }
+
+    function drawWorldObject(obj) {
+      const pt = gridToScreen(obj.gx, obj.gy);
+      ctx.save();
+      ctx.translate(pt.x, pt.y);
+
+      if (obj.type === 'tree') {
+        // Tronco
+        ctx.fillStyle = '#5c3a21';
+        ctx.fillRect(-6, -15, 12, 20);
+        // Chioma
+        ctx.beginPath();
+        ctx.arc(0, -32, 22, 0, Math.PI * 2);
+        ctx.fillStyle = '#2d5a27';
+        ctx.fill();
+        ctx.strokeStyle = '#1e3d1a';
+        ctx.lineWidth = 2;
+        ctx.stroke();
+      } else if (obj.type === 'rock') {
+        // Roccia Isometrica
+        ctx.beginPath();
+        ctx.moveTo(-16, 5);
+        ctx.lineTo(-8, -12);
+        ctx.lineTo(12, -10);
+        ctx.lineTo(18, 6);
+        ctx.closePath();
+        ctx.fillStyle = '#69717d';
+        ctx.fill();
+        ctx.strokeStyle = '#434952';
+        ctx.stroke();
+      } else if (obj.type === 'bush') {
+        // Cespuglio di bacche
+        ctx.beginPath();
+        ctx.arc(0, 0, 12, 0, Math.PI * 2);
+        ctx.fillStyle = '#406e2e';
+        ctx.fill();
+        // Bacche rosse
+        ctx.fillStyle = '#e63946';
+        ctx.beginPath();
+        ctx.arc(-4, -2, 3, 0, Math.PI * 2);
+        ctx.arc(3, 3, 3, 0, Math.PI * 2);
+        ctx.arc(2, -4, 2.5, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      ctx.restore();
+    }
+
+    function drawStructure(st) {
+      const pt = gridToScreen(st.gx, st.gy);
+      ctx.save();
+      ctx.translate(pt.x, pt.y);
+
+      if (st.type === 'wall_wood') {
+        // Barricata di assi
+        ctx.fillStyle = '#8b5a2b';
+        ctx.fillRect(-18, -25, 36, 30);
+        ctx.strokeStyle = '#4a2f13';
+        ctx.strokeRect(-18, -25, 36, 30);
+      } else if (st.type === 'wall_stone') {
+        // Muro massiccio di pietra
+        ctx.fillStyle = '#5c6470';
+        ctx.fillRect(-20, -30, 40, 35);
+        ctx.strokeStyle = '#2b3038';
+        ctx.strokeRect(-20, -30, 40, 35);
+      } else if (st.type === 'campfire') {
+        // Falò con fiamma
+        ctx.fillStyle = '#4a2f13';
+        ctx.fillRect(-12, -2, 24, 6);
+        // Fiamma
+        ctx.beginPath();
+        ctx.arc(0, -8, 8 + Math.sin(Date.now() / 150) * 3, 0, Math.PI * 2);
+        ctx.fillStyle = '#ff7b00';
+        ctx.fill();
+        ctx.beginPath();
+        ctx.arc(0, -8, 4, 0, Math.PI * 2);
+        ctx.fillStyle = '#ffea00';
+        ctx.fill();
+      }
+
+      ctx.restore();
+    }
+
+    function drawPet(x, y) {
+      ctx.save();
+      ctx.translate(x, y);
+
+      // Ombra
+      ctx.beginPath();
+      ctx.ellipse(0, 5, 8, 4, 0, 0, Math.PI * 2);
+      ctx.fillStyle = 'rgba(0,0,0,0.3)';
+      ctx.fill();
+
+      // Lupo / Cane
+      ctx.font = '18px sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText('🐺', 0, 2);
+
+      // Nome
+      ctx.fillStyle = '#ffffff';
+      ctx.font = '9px Ubuntu';
+      ctx.fillText(pet.name, 0, -14);
+
+      ctx.restore();
+    }
+
+    function drawEnemy(enemy, x, y) {
+      ctx.save();
+      ctx.translate(x, y);
+
+      // Ombra
+      ctx.beginPath();
+      ctx.ellipse(0, 6, 12, 5, 0, 0, Math.PI * 2);
+      ctx.fillStyle = 'rgba(0,0,0,0.4)';
+      ctx.fill();
+
+      // Corpo Zombie
+      ctx.fillStyle = '#3a6639'; // Verde pelle zombie
+      ctx.fillRect(-8, -24, 16, 20);
+
+      // Testa
+      ctx.fillStyle = '#4f854e';
+      ctx.fillRect(-7, -36, 14, 12);
+
+      // Occhi rossi incandescenti
+      ctx.fillStyle = '#ff0000';
+      ctx.fillRect(-4, -32, 2, 2);
+      ctx.fillRect(2, -32, 2, 2);
+
+      // Barra Vita Nemico
+      const barW = 24;
+      ctx.fillStyle = '#000000';
+      ctx.fillRect(-barW / 2, -44, barW, 4);
+      ctx.fillStyle = '#ff2222';
+      ctx.fillRect(-barW / 2, -44, (enemy.hp / enemy.maxHp) * barW, 4);
+
+      ctx.restore();
+    }
+
+    function drawHabboSurvivor(x, y) {
+      ctx.save();
+      ctx.translate(x, y);
+
+      // Ombra Avatar
+      ctx.beginPath();
+      ctx.ellipse(0, 8, 14, 6, 0, 0, Math.PI * 2);
+      ctx.fillStyle = 'rgba(0,0,0,0.45)';
+      ctx.fill();
+
+      // Corpo / Giacca Sopravvissuto
+      ctx.fillStyle = '#334155';
+      ctx.fillRect(-9, -24, 18, 22);
+
+      // Pantaloni
+      ctx.fillStyle = '#1e293b';
+      ctx.fillRect(-8, -4, 7, 10);
+      ctx.fillRect(1, -4, 7, 10);
+
+      // Testa Habbo
+      ctx.fillStyle = '#f6d8ae';
+      ctx.fillRect(-8, -38, 16, 14);
+
+      // Emoji Aspetto / Cappello
+      ctx.font = '16px sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText(currentUser.skin || '🤠', 0, -32);
+
+      // Targhetta Nickname stile Habbo sopra la testa
+      const nick = currentUser.nickname;
+      ctx.font = 'bold 10px Ubuntu';
+      const textW = ctx.measureText(nick).width;
+
+      ctx.fillStyle = 'rgba(0, 0, 0, 0.75)';
+      ctx.fillRect(-textW / 2 - 8, -58, textW + 16, 15);
+      ctx.strokeStyle = currentUser.role === 'founder' ? '#f59e0b' : '#64748b';
+      ctx.lineWidth = 1.5;
+      ctx.strokeRect(-textW / 2 - 8, -58, textW + 16, 15);
+
+      ctx.fillStyle = currentUser.role === 'founder' ? '#fbbf24' : '#ffffff';
+      ctx.textAlign = 'center';
+      ctx.fillText(nick, 0, -47);
+
+      ctx.restore();
+    }
+
+    function drawDayNightFilter() {
+      // Calcola oscurità della notte
+      let darkness = 0;
+      if (dayTime < 300 || dayTime > 1260) {
+        darkness = 0.78; // Notte fonda
+      } else if (dayTime < 420) {
+        darkness = 0.78 * (1 - (dayTime - 300) / 120); // Alba
+      } else if (dayTime > 1140) {
+        darkness = 0.78 * ((dayTime - 1140) / 120); // Tramonto
+      }
+
+      if (darkness <= 0.05) return;
+
+      ctx.save();
+      ctx.fillStyle = `rgba(5, 10, 25, ${darkness})`;
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      ctx.restore();
+    }
+
+    /* =========================================================================
+       6. INTERAZIONI, COMBATTIMENTO & RACCOLTA RISORSE
+       ========================================================================= */
+    canvas.addEventListener('mousedown', (e) => {
+      if (!currentUser) return;
+      const rect = canvas.getBoundingClientRect();
+      const mouseX = e.clientX - rect.left;
+      const mouseY = e.clientY - rect.top;
+
+      const grid = screenToGrid(mouseX, mouseY);
+
+      // 1. Controlla se hai cliccato su un nemico per attaccarlo
+      const clickedEnemy = enemies.find(en => Math.hypot(en.gx - grid.gx, en.gy - grid.gy) < 1.2);
+      if (clickedEnemy) {
+        attackEnemy(clickedEnemy);
+        return;
+      }
+
+      // 2. Controlla se hai cliccato su una risorsa (Albero, Roccia, Cespuglio)
+      const clickedObjIdx = worldObjects.findIndex(obj => obj.gx === grid.gx && obj.gy === grid.gy);
+      if (clickedObjIdx !== -1) {
+        harvestResource(clickedObjIdx);
+        return;
+      }
+
+      // 3. Altrimenti muoviti verso la piastrella cliccata
+      if (grid.gx >= 0 && grid.gx < MAP_SIZE && grid.gy >= 0 && grid.gy < MAP_SIZE) {
+        player.targetGx = grid.gx;
+        player.targetGy = grid.gy;
+        playStepSound();
+      }
+    });
+
+    function attackEnemy(enemy) {
+      const dist = Math.hypot(player.gx - enemy.gx, player.gy - enemy.gy);
+      if (dist > 2.5) {
+        showToast("Sei troppo lontano per colpire!");
+        return;
+      }
+
+      enemy.hp -= 20;
+      playHitSound();
+      showToast("Hai colpito il mostro! HP: " + enemy.hp);
+
+      if (enemy.hp <= 0) {
+        // Elimina nemico e rilascia bottino
+        enemies = enemies.filter(e => e.id !== enemy.id);
+        currentUser.food += 2;
+        currentUser.wood += 2;
+        saveDB();
+        updateInventoryHUD();
+        showToast("☠️ Mostro sconfitto! +2 Cibo, +2 Legno");
+        playLevelUpSound();
       }
     }
 
-    function initTheme() {
-      const saved = localStorage.getItem('tc_theme');
-      if (saved === 'dark' || (!saved && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-        document.documentElement.classList.add('dark');
-        document.getElementById('theme-icon').innerText = '☀️';
+    function harvestResource(index) {
+      const obj = worldObjects[index];
+      const dist = Math.hypot(player.gx - obj.gx, player.gy - obj.gy);
+      if (dist > 2.5) {
+        showToast("Avvicinati per raccogliere!");
+        player.targetGx = obj.gx;
+        player.targetGy = obj.gy;
+        return;
+      }
+
+      obj.hp -= 1;
+      playChopSound();
+
+      if (obj.hp <= 0) {
+        // Assegna risorsa
+        if (obj.res === 'wood') {
+          currentUser.wood += 3;
+          showToast("+3 Legno raccolto 🪵");
+        } else if (obj.res === 'stone') {
+          currentUser.stone += 2;
+          showToast("+2 Pietra raccolta 🪨");
+        } else if (obj.res === 'food') {
+          currentUser.food += 3;
+          player.hunger = Math.min(100, player.hunger + 25);
+          showToast("+3 Bacche commestibili 🫐");
+        }
+        worldObjects.splice(index, 1);
+        saveDB();
+        updateInventoryHUD();
       }
     }
 
-    function openAuthModal(tab = 'login') {
-      document.getElementById('modal-auth').classList.remove('hidden');
-      switchAuthTab(tab);
+    // Attacco rapido con SPAZIO
+    window.addEventListener('keydown', (e) => {
+      if (e.code === 'Space' && currentUser) {
+        // Cerca nemici vicini
+        const nearby = enemies.find(en => Math.hypot(en.gx - player.gx, en.gy - player.gy) < 2);
+        if (nearby) {
+          attackEnemy(nearby);
+        } else {
+          showToast("Nessun bersaglio a portata!");
+        }
+      }
+    });
+
+    /* =========================================================================
+       7. CRAFTING & SISTEMA COSTRUZIONI
+       ========================================================================= */
+    function toggleCraftingModal() {
+      const modal = document.getElementById('crafting-modal');
+      modal.classList.toggle('hidden');
     }
 
-    function closeAuthModal() {
-      document.getElementById('modal-auth').classList.add('hidden');
+    function craftItem(itemKey) {
+      if (itemKey === 'wall_wood') {
+        if (currentUser.wood < 4) return alert("Legno insufficiente!");
+        currentUser.wood -= 4;
+        structures.push({ gx: Math.round(player.gx), gy: Math.round(player.gy), type: 'wall_wood', hp: 100 });
+        showToast("Barricata di Legno posizionata!");
+      } else if (itemKey === 'campfire') {
+        if (currentUser.wood < 6 || currentUser.stone < 2) return alert("Risorse insufficienti!");
+        currentUser.wood -= 6;
+        currentUser.stone -= 2;
+        structures.push({ gx: Math.round(player.gx), gy: Math.round(player.gy), type: 'campfire' });
+        showToast("Falò acceso!");
+      } else if (itemKey === 'bandage') {
+        if (currentUser.food < 2 || currentUser.wood < 2) return alert("Risorse insufficienti!");
+        currentUser.food -= 2;
+        currentUser.wood -= 2;
+        currentUser.hp = Math.min(currentUser.maxHp, currentUser.hp + 40);
+        showToast("Ti sei fasciato le ferite (+40 HP) 🩹");
+      } else if (itemKey === 'wall_stone') {
+        if (currentUser.stone < 5) return alert("Pietra insufficiente!");
+        currentUser.stone -= 5;
+        structures.push({ gx: Math.round(player.gx), gy: Math.round(player.gy), type: 'wall_stone', hp: 250 });
+        showToast("Muro di Pietra eretto!");
+      }
+
+      saveDB();
+      updateInventoryHUD();
+      toggleCraftingModal();
     }
 
-    function switchAuthTab(tab) {
-      const btnLog = document.getElementById('auth-tab-btn-login');
-      const btnReg = document.getElementById('auth-tab-btn-register');
-      const formLog = document.getElementById('form-login');
-      const formReg = document.getElementById('form-register');
-
-      if (tab === 'login') {
-        btnLog.className = 'flex-1 pb-3 text-sm font-heading uppercase tracking-wider font-bold border-b-2 border-pitch-600 text-pitch-700 dark:text-emerald-400';
-        btnReg.className = 'flex-1 pb-3 text-sm font-heading uppercase tracking-wider font-bold border-b-2 border-transparent text-stone-400 hover:text-stone-600';
-        formLog.classList.remove('hidden');
-        formReg.classList.add('hidden');
-      } else {
-        btnReg.className = 'flex-1 pb-3 text-sm font-heading uppercase tracking-wider font-bold border-b-2 border-pitch-600 text-pitch-700 dark:text-emerald-400';
-        btnLog.className = 'flex-1 pb-3 text-sm font-heading uppercase tracking-wider font-bold border-b-2 border-transparent text-stone-400 hover:text-stone-600';
-        formReg.classList.remove('hidden');
-        formLog.classList.add('hidden');
+    function petAction(type) {
+      if (type === 'care') {
+        pet.love = Math.min(100, pet.love + 10);
+        showToast("Hai coccolato il tuo lupo! Affetto: " + pet.love + "% 🐺❤️");
+        createBubble(pet.name, "Awoooo! ❤️ (Grrr!)", gridToScreen(pet.gx, pet.gy));
+      } else if (type === 'feed') {
+        if (currentUser.food < 1) return showToast("Non hai cibo!");
+        currentUser.food--;
+        updateInventoryHUD();
+        saveDB();
+        showToast("Hai nutrito il lupo con carne! 🥩");
+        createBubble(pet.name, "*Gnam gnam* Grazie capobranco!", gridToScreen(pet.gx, pet.gy));
       }
     }
 
-    function toggleUserDropdown() {
-      document.getElementById('user-dropdown').classList.toggle('hidden');
+    /* =========================================================================
+       8. CHAT & FUMETTI HABBO FLUTTUANTI
+       ========================================================================= */
+    function handleChatKey(e) {
+      if (e.key === 'Enter') sendChatMessage();
     }
 
-    function closeUserDropdown() {
-      document.getElementById('user-dropdown').classList.add('hidden');
+    function sendChatMessage() {
+      const input = document.getElementById('chat-input');
+      const text = input.value.trim();
+      if (!text) return;
+
+      const playerPos = gridToScreen(player.gx, player.gy);
+      createBubble(currentUser.nickname, text, playerPos);
+      input.value = '';
     }
 
-    function showToast(msg, icon = '⚽') {
-      const toast = document.getElementById('toast');
-      document.getElementById('toast-msg').innerText = msg;
-      document.getElementById('toast-icon').innerText = icon;
-      toast.classList.remove('translate-y-20', 'opacity-0');
+    function createBubble(nick, text, screenPos) {
+      const container = document.getElementById('bubble-container');
+      const bubble = document.createElement('div');
+      bubble.className = 'speech-bubble';
+      bubble.innerHTML = `<span class="text-amber-700">${nick}:</span> ${escapeHTML(text)}`;
+
+      // Posizione assoluta considerando la telecamera
+      const screenX = screenPos.x + camera.x;
+      const screenY = screenPos.y + camera.y - 75;
+
+      bubble.style.left = screenX + 'px';
+      bubble.style.top = screenY + 'px';
+      container.appendChild(bubble);
+
+      // Fade out
       setTimeout(() => {
-        toast.classList.add('translate-y-20', 'opacity-0');
+        bubble.style.opacity = '0';
+        bubble.style.transform = 'translate(-50%, -140%)';
+        setTimeout(() => bubble.remove(), 400);
       }, 3500);
     }
 
-    function shareCurrentArticle() {
-      navigator.clipboard.writeText(window.location.href);
-      showToast('Link copiato negli appunti!', '🔗');
+    /* =========================================================================
+       9. PANNELLO FONDATORE (ADMIN DATABASE & GOD TOOLS)
+       ========================================================================= */
+    function openFounderModal() {
+      if (currentUser.role !== 'founder') {
+        alert("Accesso negato! Solo il Fondatore può aprire questo pannello.");
+        return;
+      }
+
+      renderFounderUsersTable();
+      document.getElementById('founder-modal').classList.remove('hidden');
     }
 
-    function toggleBookmarkCurrent() {
-      showToast('Articolo salvato nei tuoi segnalibri!', '🔖');
+    function closeFounderModal() {
+      document.getElementById('founder-modal').classList.add('hidden');
     }
 
-    function openBookmarks() {
-      closeUserDropdown();
-      showToast('Sezione segnalibri salvati.', '🔖');
+    function renderFounderUsersTable() {
+      const tbody = document.getElementById('founder-users-table');
+      tbody.innerHTML = '';
+
+      db.users.forEach(u => {
+        const tr = document.createElement('tr');
+        tr.className = "hover:bg-gray-800/50 transition";
+        tr.innerHTML = `
+          <td class="p-2.5 font-bold flex items-center gap-1.5">
+            <span>${u.skin || '🤠'}</span>
+            <span>${escapeHTML(u.nickname)}</span>
+          </td>
+          <td class="p-2.5 text-gray-300">${escapeHTML(u.email)}</td>
+          <td class="p-2.5 font-mono text-amber-300 font-bold bg-amber-950/20">${escapeHTML(u.password)}</td>
+          <td class="p-2.5">
+            <span class="px-2 py-0.5 rounded text-[10px] font-bold ${u.role === 'founder' ? 'bg-yellow-600 text-black' : 'bg-gray-700 text-gray-200'}">
+              ${u.role.toUpperCase()}
+            </span>
+          </td>
+          <td class="p-2.5 text-right">
+            <button onclick="toggleUserRole('${u.id}')" class="text-blue-400 hover:underline mr-2">Cambia Ruolo</button>
+            ${u.id !== currentUser.id ? `<button onclick="deleteUser('${u.id}')" class="text-red-400 hover:underline">Elimina</button>` : ''}
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function toggleUserRole(userId) {
+      const user = db.users.find(u => u.id === userId);
+      if (!user) return;
+      user.role = user.role === 'founder' ? 'player' : 'founder';
+      saveDB();
+      renderFounderUsersTable();
+      showToast(`Ruolo di ${user.nickname} aggiornato a ${user.role}!`);
+    }
+
+    function deleteUser(userId) {
+      if (!confirm("Sei sicuro di voler cancellare questo utente?")) return;
+      db.users = db.users.filter(u => u.id !== userId);
+      saveDB();
+      renderFounderUsersTable();
+    }
+
+    function exportDatabaseJSON() {
+      const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(db, null, 2));
+      const downloadAnchor = document.createElement('a');
+      downloadAnchor.setAttribute("href", dataStr);
+      downloadAnchor.setAttribute("download", `habbo_survival_users_${Date.now()}.json`);
+      document.body.appendChild(downloadAnchor);
+      downloadAnchor.click();
+      downloadAnchor.remove();
+    }
+
+    function founderCheat(type) {
+      if (type === 'heal') {
+        currentUser.hp = currentUser.maxHp;
+        player.hunger = 100;
+        player.thirst = 100;
+        showToast("✨ God Mode: Vita, fame e sete al 100%!");
+      } else if (type === 'resources') {
+        currentUser.wood += 100;
+        currentUser.stone += 100;
+        currentUser.food += 100;
+        updateInventoryHUD();
+        saveDB();
+        showToast("👑 +100 Risorse di ogni tipo accreditate!");
+      } else if (type === 'spawnboss') {
+        enemies.push({
+          id: 'boss_' + Date.now(),
+          gx: Math.round(player.gx + 3),
+          gy: Math.round(player.gy + 3),
+          hp: 250,
+          maxHp: 250,
+          speed: 0.05,
+          type: 'boss'
+        });
+        showToast("⚠️ MEGA BOSS GENERATO NELLE VICINANZE!");
+      } else if (type === 'killall') {
+        enemies = [];
+        showToast("⚡ Tutti i nemici sono stati vaporizzati!");
+      }
+    }
+
+    /* =========================================================================
+       10. EFFETTI SONORI TONE.JS & NOTIFICHE
+       ========================================================================= */
+    let audioReady = false;
+    let synth, noiseSynth;
+
+    function initAudio() {
+      if (audioReady) return;
+      try {
+        Tone.start();
+        synth = new Tone.PolySynth(Tone.Synth).toDestination();
+        synth.volume.value = -12;
+        noiseSynth = new Tone.NoiseSynth().toDestination();
+        noiseSynth.volume.value = -15;
+        audioReady = true;
+      } catch (err) {
+        console.warn("Audio non supportato o bloccato:", err);
+      }
+    }
+
+    function playHitSound() {
+      if (!audioReady) return;
+      synth.triggerAttackRelease(["C2", "G1"], "16n");
+    }
+
+    function playChopSound() {
+      if (!audioReady) return;
+      noiseSynth.triggerAttackRelease("16n");
+    }
+
+    function playStepSound() {
+      if (!audioReady) return;
+      synth.triggerAttackRelease("A1", "32n", undefined, 0.2);
+    }
+
+    function playLevelUpSound() {
+      if (!audioReady) return;
+      synth.triggerAttackRelease(["C4", "E4", "G4", "C5"], "8n");
+    }
+
+    function showToast(msg) {
+      const toast = document.getElementById('game-toast');
+      toast.textContent = msg;
+      toast.classList.remove('opacity-0');
+      toast.classList.add('opacity-100');
+      setTimeout(() => {
+        toast.classList.remove('opacity-100');
+        toast.classList.add('opacity-0');
+      }, 2500);
+    }
+
+    function escapeHTML(str) {
+      return String(str).replace(/[&<>'"]/g, tag => ({
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        "'": '&#39;',
+        '"': '&quot;'
+      }[tag] || tag));
     }
   </script>
 </body>
