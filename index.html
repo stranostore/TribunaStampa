@@ -2,759 +2,296 @@
 <html lang="it">
 <head>
   <meta charset="UTF-8">
-  <title>Habbo Retro Engine - Funzionante 100% Locale</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>La Mia Pagina Web Moderna</title>
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Ubuntu:wght@400;700&display=swap');
+    /* Reset e variabili globali */
+    :root {
+      --primary: #2563eb;
+      --primary-dark: #1d4ed8;
+      --text: #1f2937;
+      --text-light: #6b7280;
+      --bg: #f9fafb;
+      --white: #ffffff;
+      --radius: 8px;
+    }
 
     * {
       box-sizing: border-box;
-      user-select: none;
       margin: 0;
       padding: 0;
-      font-family: 'Ubuntu', Tahoma, sans-serif;
-      font-size: 11px;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
     }
 
     body {
-      background: #000;
-      color: #fff;
-      overflow: hidden;
-      height: 100vh;
-      display: flex;
-      flex-direction: column;
+      background-color: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
     }
 
-    #room-viewport {
-      flex: 1;
-      position: relative;
-      background: #000;
-    }
-
-    canvas {
-      display: block;
-      image-rendering: pixelated;
-    }
-
-    /* BARRA INFERIORE ORIGINALE HABBO */
-    #bottom-bar {
-      height: 52px;
-      background: linear-gradient(180deg, #444f56 0%, #293237 50%, #1c2327 100%);
-      border-top: 2px solid #5a676f;
-      display: flex;
-      align-items: center;
-      padding: 0 16px;
-      gap: 12px;
-      z-index: 10;
-    }
-
-    .habbo-btn {
-      background: linear-gradient(180deg, #008cd2 0%, #005f93 100%);
-      border: 1px solid #73d2ff;
-      border-bottom: 2px solid #003653;
-      border-right: 2px solid #003653;
-      border-radius: 4px;
-      color: #fff;
-      font-weight: 700;
-      font-size: 12px;
-      padding: 7px 16px;
-      cursor: pointer;
-      text-shadow: 1px 1px 2px #000;
-      box-shadow: inset 0 1px 0 rgba(255,255,255,0.4);
-    }
-    .habbo-btn:hover {
-      background: linear-gradient(180deg, #1aa4ed 0%, #0074b4 100%);
-    }
-
-    #purse {
-      position: absolute;
-      top: 14px;
-      right: 14px;
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-      z-index: 5;
-    }
-    .purse-badge {
-      background: rgba(28, 35, 39, 0.95);
-      border: 1px solid #48565f;
-      border-radius: 4px;
-      padding: 5px 12px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      min-width: 125px;
-      font-weight: bold;
-    }
-
-    #inventory-tray {
-      flex: 1;
-      height: 42px;
-      background: #14181a;
-      border: 1px solid #3d474e;
-      border-radius: 4px;
-      display: flex;
-      align-items: center;
-      padding: 0 6px;
-      gap: 6px;
-      overflow-x: auto;
-    }
-    .inv-slot {
-      width: 36px;
-      height: 36px;
-      background: #252e33;
-      border: 1px solid #48565f;
-      border-radius: 4px;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      position: relative;
-    }
-    .inv-slot:hover { border-color: #f1c40f; }
-    .inv-slot.selected {
-      border: 2px solid #f1c40f;
-      background: #39464e;
-    }
-    .inv-slot img {
-      max-width: 32px;
-      max-height: 32px;
-      image-rendering: pixelated;
-    }
-    .inv-count {
-      position: absolute;
-      bottom: 1px;
-      right: 2px;
-      font-size: 9px;
-      color: #f1c40f;
-      font-weight: bold;
-      text-shadow: 1px 1px 1px #000;
-    }
-
-    /* CATALOGO */
-    #catalog-modal {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      width: 620px;
-      height: 480px;
-      background: #e9ecef;
-      border-radius: 6px;
-      border: 2px solid #ffffff;
-      box-shadow: 0 12px 40px rgba(0,0,0,0.85);
-      display: none;
-      flex-direction: column;
+    /* Navbar */
+    header {
+      background: var(--white);
+      position: sticky;
+      top: 0;
       z-index: 100;
-      color: #333;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
     }
-    .modal-header {
-      height: 34px;
-      background: linear-gradient(180deg, #1c5576 0%, #11364d 100%);
-      color: #fff;
-      font-weight: bold;
-      padding: 0 14px;
+
+    nav {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 1rem 1.5rem;
       display: flex;
-      align-items: center;
       justify-content: space-between;
-      border-radius: 4px 4px 0 0;
-      border-bottom: 2px solid #0b2230;
-      cursor: move;
+      align-items: center;
     }
-    .close-btn {
-      width: 20px;
-      height: 20px;
-      background: #c0392b;
-      color: #fff;
-      border: 1px solid #fff;
-      border-radius: 3px;
-      font-weight: bold;
-      line-height: 18px;
+
+    .logo {
+      font-size: 1.4rem;
+      font-weight: 700;
+      color: var(--primary);
+      text-decoration: none;
+    }
+
+    .nav-links {
+      display: flex;
+      list-style: none;
+      gap: 1.5rem;
+    }
+
+    .nav-links a {
+      text-decoration: none;
+      color: var(--text);
+      font-weight: 500;
+      transition: color 0.2s;
+    }
+
+    .nav-links a:hover {
+      color: var(--primary);
+    }
+
+    /* Hero Section */
+    .hero {
+      max-width: 1100px;
+      margin: 3rem auto;
+      padding: 2rem 1.5rem;
       text-align: center;
+    }
+
+    .hero h1 {
+      font-size: 2.8rem;
+      margin-bottom: 1rem;
+      color: #111827;
+      line-height: 1.2;
+    }
+
+    .hero p {
+      font-size: 1.2rem;
+      color: var(--text-light);
+      max-width: 600px;
+      margin: 0 auto 2rem;
+    }
+
+    .btn {
+      display: inline-block;
+      background: var(--primary);
+      color: var(--white);
+      padding: 0.8rem 1.8rem;
+      border-radius: var(--radius);
+      text-decoration: none;
+      font-weight: 600;
+      border: none;
       cursor: pointer;
+      transition: background-color 0.2s;
     }
-    .catalog-main {
-      flex: 1;
-      display: flex;
-      padding: 10px;
-      gap: 10px;
-      overflow: hidden;
+
+    .btn:hover {
+      background: var(--primary-dark);
     }
-    .catalog-menu {
-      width: 155px;
-      background: #c5ced4;
-      border: 1px solid #9eabb3;
-      border-radius: 4px;
-      padding: 5px;
-      display: flex;
-      flex-direction: column;
-      gap: 3px;
-      overflow-y: auto;
+
+    /* Griglia Servizi */
+    .services {
+      max-width: 1100px;
+      margin: 4rem auto;
+      padding: 0 1.5rem;
     }
-    .menu-item {
-      padding: 8px 10px;
-      background: #b1bcc3;
-      border: 1px solid #8e9ca4;
-      border-radius: 3px;
-      cursor: pointer;
-      font-weight: bold;
-      color: #24333c;
+
+    .section-title {
+      text-align: center;
+      margin-bottom: 2.5rem;
+      font-size: 2rem;
     }
-    .menu-item.active {
-      background: #fff;
-      color: #11364d;
-      border-color: #11364d;
-    }
-    .catalog-page {
-      flex: 1;
-      background: #fff;
-      border: 1px solid #9eabb3;
-      border-radius: 4px;
-      display: flex;
-      flex-direction: column;
-      padding: 10px;
-    }
-    .catalog-grid {
-      flex: 1;
+
+    .grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(70px, 1fr));
-      grid-auto-rows: 70px;
-      gap: 8px;
-      overflow-y: auto;
-      background: #f4f6f7;
-      border: 1px solid #d0d7db;
-      padding: 8px;
-      border-radius: 3px;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 2rem;
     }
-    .furni-slot {
-      background: #fff;
-      border: 1px solid #c2cbcf;
-      border-radius: 4px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      padding: 4px;
-      position: relative;
+
+    .card {
+      background: var(--white);
+      padding: 2rem;
+      border-radius: var(--radius);
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+      border: 1px solid #e5e7eb;
+      transition: transform 0.2s;
     }
-    .furni-slot:hover { border-color: #008cd2; background: #f0f7fb; }
-    .furni-slot.selected {
-      border: 2px solid #e67e22;
-      background: #fef5e7;
+
+    .card:hover {
+      transform: translateY(-4px);
     }
-    .furni-slot img {
-      max-width: 48px;
-      max-height: 48px;
-      image-rendering: pixelated;
+
+    .card-icon {
+      font-size: 2rem;
+      margin-bottom: 1rem;
     }
-    .furni-preview-bar {
-      height: 95px;
-      border-top: 1px solid #d0d7db;
-      margin-top: 8px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 0 8px;
+
+    .card h3 {
+      margin-bottom: 0.5rem;
     }
-    .preview-left {
-      display: flex;
-      align-items: center;
-      gap: 12px;
+
+    .card p {
+      color: var(--text-light);
     }
-    .preview-img-box {
-      width: 52px;
-      height: 52px;
-      background: #f7f9fa;
-      border: 1px solid #c8d3d8;
-      border-radius: 4px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+
+    /* Modulo Contatto */
+    .contact {
+      max-width: 600px;
+      margin: 4rem auto;
+      padding: 2rem 1.5rem;
+      background: var(--white);
+      border-radius: var(--radius);
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
     }
-    .preview-img-box img {
-      max-width: 48px;
-      max-height: 48px;
-      image-rendering: pixelated;
+
+    .contact h2 {
+      margin-bottom: 1.5rem;
+      text-align: center;
     }
-    .price-tag {
-      font-size: 13px;
-      font-weight: bold;
-      color: #d35400;
+
+    .form-group {
+      margin-bottom: 1.2rem;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 0.4rem;
+      font-weight: 500;
+    }
+
+    .form-group input,
+    .form-group textarea {
+      width: 100%;
+      padding: 0.75rem;
+      border: 1px solid #d1d5db;
+      border-radius: var(--radius);
+      outline: none;
+      font-size: 1rem;
+    }
+
+    .form-group input:focus,
+    .form-group textarea:focus {
+      border-color: var(--primary);
+    }
+
+    /* Footer */
+    footer {
+      background: #111827;
+      color: #9ca3af;
+      text-align: center;
+      padding: 2rem;
+      margin-top: 4rem;
+    }
+
+    /* Responsive */
+    @media (max-width: 640px) {
+      .hero h1 {
+        font-size: 2rem;
+      }
+      .nav-links {
+        display: none; /* Versione semplificata per schermi piccoli */
+      }
     }
   </style>
 </head>
 <body>
 
-  <div id="purse">
-    <div class="purse-badge">
-      <span style="color:#f1c40f;">🪙 Crediti:</span>
-      <span id="cr-count">3000</span>
-    </div>
-    <div class="purse-badge">
-      <span style="color:#5dade2;">💎 Diamanti:</span>
-      <span id="dia-count">250</span>
-    </div>
-  </div>
+  <!-- Barra di Navigazione -->
+  <header>
+    <nav>
+      <a href="#" class="logo">MioBrand</a>
+      <ul class="nav-links">
+        <li><a href="#home">Home</a></li>
+        <li><a href="#servizi">Servizi</a></li>
+        <li><a href="#contatti">Contatti</a></li>
+      </ul>
+    </nav>
+  </header>
 
-  <div id="room-viewport">
-    <canvas id="habbo-canvas"></canvas>
-  </div>
+  <!-- Sezione Hero -->
+  <section class="hero" id="home">
+    <h1>Costruisci progetti digitali solidi e veloci</h1>
+    <p>Soluzioni moderne per aziende e professionisti. Progettiamo interfacce curate e orientate ai risultati.</p>
+    <a href="#contatti" class="btn">Inizia Ora</a>
+  </section>
 
-  <div id="bottom-bar">
-    <button class="habbo-btn" id="open-cat-btn">🛒 Negozio</button>
-    <div style="font-weight:bold; color:#a2b1bb; margin-left:6px;">Inventario:</div>
-    <div id="inventory-tray"></div>
-    <div style="font-size:10px; color:#8496a3;"><b>Click sinistro:</b> Posiziona • <b>Tasto destro:</b> Ritira • <b>Tasto [R]:</b> Ruota</div>
-  </div>
-
-  <!-- MODALE CATALOGO -->
-  <div id="catalog-modal">
-    <div class="modal-header">
-      <span>Catalogo Ufficiale Arredi</span>
-      <div class="close-btn" id="close-cat-btn">✕</div>
-    </div>
-    <div class="catalog-main">
-      <div class="catalog-menu" id="cat-tabs-container"></div>
-      <div class="catalog-page">
-        <div class="catalog-grid" id="cat-items-container"></div>
-        <div class="furni-preview-bar">
-          <div class="preview-left">
-            <div class="preview-img-box">
-              <img id="prev-icon" src="" style="display:none;" />
-            </div>
-            <div>
-              <div id="prev-title" style="font-weight:bold; font-size:13px; color:#1c5576;">Seleziona un articolo</div>
-              <div id="prev-desc" style="color:#666;">Scegli un furni dal catalogo</div>
-              <div id="prev-cost" class="price-tag" style="margin-top:2px;"></div>
-            </div>
-          </div>
-          <button class="habbo-btn" id="btn-buy" style="background:linear-gradient(180deg, #27ae60 0%, #196f3d 100%); border-color:#58d68d; font-size:13px; padding:8px 24px;">Compra</button>
-        </div>
+  <!-- Sezione Servizi -->
+  <section class="services" id="servizi">
+    <h2 class="section-title">Cosa possiamo fare</h2>
+    <div class="grid">
+      <div class="card">
+        <div class="card-icon">⚡</div>
+        <h3>Velocità ed Efficienza</h3>
+        <p>Codice pulito, tempi di caricamento ridotti e architettura ottimizzata per tutti i dispositivi.</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">📱</div>
+        <h3>Design Responsive</h3>
+        <p>Layout flessibili progettati per adattarsi perfettamente a smartphone, tablet e desktop.</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">🔒</div>
+        <h3>Sicurezza e Affidabilità</h3>
+        <p>Standard di sviluppo moderni per garantire stabilità e protezione delle informazioni.</p>
       </div>
     </div>
-  </div>
+  </section>
 
+  <!-- Sezione Contatti -->
+  <section class="contact" id="contatti">
+    <h2>Scrivici un messaggio</h2>
+    <form id="contactForm">
+      <div class="form-group">
+        <label for="name">Nome</label>
+        <input type="text" id="name" required placeholder="Mario Rossi">
+      </div>
+      <div class="form-group">
+        <label for="email">Email</label>
+        <input type="email" id="email" required placeholder="mario@example.com">
+      </div>
+      <div class="form-group">
+        <label for="message">Messaggio</label>
+        <textarea id="message" rows="4" required placeholder="Come possiamo aiutarti?"></textarea>
+      </div>
+      <button type="submit" class="btn" style="width: 100%;">Invia</button>
+    </form>
+  </section>
+
+  <!-- Footer -->
+  <footer>
+    <p>&copy; 2026 MioBrand. Tutti i diritti riservati.</p>
+  </footer>
+
+  <!-- Interattività JavaScript -->
   <script>
-    /* =========================================================================
-       1. SPRITE ORIGINALI EMBEDDATI IN FORMATO SVG PIXEL-ART (ZERO BLOCCHI CORS)
-       ========================================================================= */
-    const SPRITES = {
-      // TRONO HABBO CLASSICO
-      throne: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 60"><path d="M5,15 h30 v38 h-30 z" fill="%23111"/><path d="M7,17 h26 v34 h-26 z" fill="%23f39c12"/><path d="M10,22 h20 v26 h-20 z" fill="%23922b21"/><path d="M12,24 h16 v22 h-16 z" fill="%23c0392b"/><circle cx="15" cy="28" r="1.5" fill="%23f1c40f"/><circle cx="25" cy="28" r="1.5" fill="%23f1c40f"/><circle cx="20" cy="34" r="1.5" fill="%23f1c40f"/><circle cx="15" cy="40" r="1.5" fill="%23f1c40f"/><circle cx="25" cy="40" r="1.5" fill="%23f1c40f"/><rect x="6" y="8" width="5" height="7" fill="%23f1c40f"/><rect x="18" y="5" width="5" height="10" fill="%23f1c40f"/><rect x="30" y="8" width="5" height="7" fill="%23f1c40f"/><rect x="3" y="44" width="7" height="14" fill="%233e2723"/><rect x="31" y="44" width="7" height="14" fill="%233e2723"/><rect x="5" y="40" width="31" height="6" fill="%23f39c12"/></svg>',
-
-      // LINGOTTO 500 CREDITI
-      goldbar: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 50 35"><polygon points="5,20 18,7 44,7 32,20" fill="%23f9e79f" stroke="%23111" stroke-width="1.5"/><polygon points="32,20 44,7 44,14 32,27" fill="%23d4ac0d" stroke="%23111" stroke-width="1.5"/><polygon points="5,20 32,20 32,27 5,27" fill="%23b7950b" stroke="%23111" stroke-width="1.5"/><rect x="15" y="12" width="10" height="3" fill="%237d6608"/></svg>',
-
-      // SEDIA PLASTO BLU
-      plasto_blue: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 36 50"><rect x="10" y="30" width="3" height="18" fill="%23566573"/><rect x="23" y="30" width="3" height="18" fill="%23566573"/><path d="M6,12 h24 v22 h-24 z" fill="%23111"/><path d="M8,14 h20 v18 h-20 z" fill="%231f77b4"/><path d="M8,14 h20 v4 h-20 z" fill="%235dade2"/><path d="M6,32 h24 v8 h-24 z" fill="%23154360"/></svg>',
-
-      // SEDIA PLASTO ROSSA
-      plasto_red: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 36 50"><rect x="10" y="30" width="3" height="18" fill="%23566573"/><rect x="23" y="30" width="3" height="18" fill="%23566573"/><path d="M6,12 h24 v22 h-24 z" fill="%23111"/><path d="M8,14 h20 v18 h-20 z" fill="%23c0392b"/><path d="M8,14 h20 v4 h-20 z" fill="%23e74c3c"/><path d="M6,32 h24 v8 h-24 z" fill="%2378281f"/></svg>',
-
-      // DISTRIBUTORE CALIPPO RETRÒ
-      calippo: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 60"><rect x="4" y="4" width="32" height="52" fill="%23111"/><rect x="6" y="6" width="28" height="48" fill="%2327ae60"/><rect x="9" y="10" width="22" height="14" fill="%23f1c40f"/><rect x="9" y="28" width="22" height="14" fill="%231b2631"/><circle cx="14" cy="35" r="2.5" fill="%23e74c3c"/><circle cx="21" cy="35" r="2.5" fill="%233498db"/><rect x="10" y="45" width="20" height="7" fill="%230b1013"/></svg>',
-
-      // PIANTA YUCCA
-      yucca: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 50"><rect x="13" y="32" width="14" height="14" fill="%23d35400" stroke="%23111" stroke-width="1.5"/><rect x="18" y="18" width="4" height="15" fill="%236e2c00"/><polygon points="20,2 14,20 26,20" fill="%2327ae60" stroke="%23111" stroke-width="1"/><polygon points="7,10 18,22 10,24" fill="%232ecc71" stroke="%23111" stroke-width="1"/><polygon points="33,10 22,22 30,24" fill="%231e8449" stroke="%23111" stroke-width="1"/></svg>'
-    };
-
-    const FURNI_ITEMS = [
-      { id: "CFC_500_goldbar", name: "Lingotto 500cr", cat: "currency", credits: 500, diamonds: 0, sprite: SPRITES.goldbar, w: 42, h: 30 },
-      { id: "LT_throne", name: "Trono Habbo Classico", cat: "currency", credits: 250, diamonds: 50, sprite: SPRITES.throne, w: 38, h: 56 },
-      { id: "chair_plasto_1", name: "Sedia Plasto Blu", cat: "plasto", credits: 3, diamonds: 0, sprite: SPRITES.plasto_blue, w: 32, h: 44 },
-      { id: "chair_plasto_4", name: "Sedia Plasto Rossa", cat: "plasto", credits: 3, diamonds: 0, sprite: SPRITES.plasto_red, w: 32, h: 44 },
-      { id: "classic1_plant", name: "Pianta Yucca", cat: "plasto", credits: 4, diamonds: 0, sprite: SPRITES.yucca, w: 36, h: 46 },
-      { id: "ads_calip_cola_1", name: "Distributore Calippo", cat: "retro", credits: 15, diamonds: 0, sprite: SPRITES.calippo, w: 36, h: 54 }
-    ];
-
-    const CATEGORIES = [
-      { id: "currency", name: "Rari & Valute" },
-      { id: "plasto", name: "Plasto Classico" },
-      { id: "retro", name: "Sponsor Retrò" }
-    ];
-
-    /* =========================================================================
-       2. PRECARICAMENTO IMMAGINI
-       ========================================================================= */
-    const imageCache = {};
-
-    FURNI_ITEMS.forEach(f => {
-      const img = new Image();
-      img.src = f.sprite;
-      imageCache[f.id] = img;
-    });
-
-    /* =========================================================================
-       3. STANZA ISOMETRICA & LOGICA
-       ========================================================================= */
-    const canvas = document.getElementById("habbo-canvas");
-    const ctx = canvas.getContext("2d");
-
-    const state = {
-      credits: 3000,
-      diamonds: 250,
-      gridSize: 9,
-      tileW: 64,
-      tileH: 32,
-      activeCategory: "currency",
-      selectedCatalog: null,
-      inventory: [
-        { ...FURNI_ITEMS[0], count: 2 },
-        { ...FURNI_ITEMS[1], count: 1 }
-      ],
-      selectedInvIdx: -1,
-      placedFurni: [
-        { x: 3, y: 3, item: FURNI_ITEMS[1] },
-        { x: 4, y: 3, item: FURNI_ITEMS[0] }
-      ],
-      avatar: { x: 4, y: 5 },
-      mouseTile: { x: -1, y: -1 }
-    };
-
-    function resizeCanvas() {
-      canvas.width = canvas.parentElement.clientWidth;
-      canvas.height = canvas.parentElement.clientHeight;
-    }
-    window.addEventListener("resize", resizeCanvas);
-    resizeCanvas();
-
-    function toIso(x, y) {
-      const ox = canvas.width / 2;
-      const oy = canvas.height / 2 - (state.gridSize * state.tileH) / 3.2;
-      return {
-        sx: ox + (x - y) * (state.tileW / 2),
-        sy: oy + (x + y) * (state.tileH / 2)
-      };
-    }
-
-    function fromIso(sx, sy) {
-      const ox = canvas.width / 2;
-      const oy = canvas.height / 2 - (state.gridSize * state.tileH) / 3.2;
-      const dx = sx - ox;
-      const dy = sy - oy;
-      return {
-        x: Math.floor((dy / (state.tileH / 2) + dx / (state.tileW / 2)) / 2),
-        y: Math.floor((dy / (state.tileH / 2) - dx / (state.tileW / 2)) / 2)
-      };
-    }
-
-    function drawRoomTile(x, y, isHover) {
-      const { sx, sy } = toIso(x, y);
-      const hw = state.tileW / 2;
-      const hh = state.tileH / 2;
-
-      ctx.beginPath();
-      ctx.moveTo(sx, sy);
-      ctx.lineTo(sx + hw, sy + hh);
-      ctx.lineTo(sx, sy + state.tileH);
-      ctx.lineTo(sx - hw, sy + hh);
-      ctx.closePath();
-
-      ctx.fillStyle = isHover ? "#ffffff" : ((x + y) % 2 === 0 ? "#98aab4" : "#8c9ea8");
-      ctx.fill();
-      ctx.strokeStyle = isHover ? "#00c0ff" : "#72838c";
-      ctx.lineWidth = 1;
-      ctx.stroke();
-    }
-
-    function drawWalls() {
-      for (let y = 0; y < state.gridSize; y++) {
-        const { sx, sy } = toIso(0, y);
-        ctx.fillStyle = "#55646d";
-        ctx.beginPath();
-        ctx.moveTo(sx - state.tileW/2, sy + state.tileH/2);
-        ctx.lineTo(sx, sy);
-        ctx.lineTo(sx, sy - 85);
-        ctx.lineTo(sx - state.tileW/2, sy + state.tileH/2 - 85);
-        ctx.closePath();
-        ctx.fill();
-        ctx.strokeStyle = "#38434a";
-        ctx.stroke();
-      }
-
-      for (let x = 0; x < state.gridSize; x++) {
-        const { sx, sy } = toIso(x, 0);
-        ctx.fillStyle = "#697a85";
-        ctx.beginPath();
-        ctx.moveTo(sx, sy);
-        ctx.lineTo(sx + state.tileW/2, sy + state.tileH/2);
-        ctx.lineTo(sx + state.tileW/2, sy + state.tileH/2 - 85);
-        ctx.lineTo(sx, sy - 85);
-        ctx.closePath();
-        ctx.fill();
-        ctx.strokeStyle = "#38434a";
-        ctx.stroke();
-      }
-    }
-
-    function drawAvatar(x, y) {
-      const { sx, sy } = toIso(x, y);
-      const px = sx;
-      const py = sy + 6;
-
-      ctx.save();
-      ctx.fillStyle = "rgba(0,0,0,0.35)";
-      ctx.beginPath();
-      ctx.ellipse(px, py, 14, 7, 0, 0, Math.PI * 2);
-      ctx.fill();
-
-      // Pantaloni & Scarpe
-      ctx.fillStyle = "#111";
-      ctx.fillRect(px - 5, py - 4, 4, 3);
-      ctx.fillRect(px + 2, py - 4, 4, 3);
-      ctx.fillStyle = "#1b4f72";
-      ctx.fillRect(px - 5, py - 18, 4, 14);
-      ctx.fillRect(px + 1, py - 18, 4, 14);
-
-      // Maglia
-      ctx.fillStyle = "#111";
-      ctx.fillRect(px - 7, py - 32, 14, 15);
-      ctx.fillStyle = "#f39c12";
-      ctx.fillRect(px - 6, py - 31, 12, 13);
-
-      // Viso
-      ctx.fillStyle = "#f5cba7";
-      ctx.fillRect(px - 5, py - 43, 10, 11);
-      ctx.fillStyle = "#000";
-      ctx.fillRect(px - 2, py - 38, 2, 2);
-      ctx.fillRect(px + 2, py - 38, 2, 2);
-
-      // Capelli
-      ctx.fillStyle = "#4a235a";
-      ctx.fillRect(px - 6, py - 47, 12, 5);
-      ctx.fillRect(px - 7, py - 44, 3, 7);
-      ctx.restore();
-    }
-
-    function drawFurni(item, sx, sy, alpha = 1.0) {
-      const img = imageCache[item.id];
-      if (img && img.complete) {
-        ctx.save();
-        ctx.globalAlpha = alpha;
-        ctx.drawImage(img, sx - item.w / 2, sy + state.tileH / 2 - item.h + 6, item.w, item.h);
-        ctx.restore();
-      }
-    }
-
-    function loop() {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      drawWalls();
-
-      for (let x = 0; x < state.gridSize; x++) {
-        for (let y = 0; y < state.gridSize; y++) {
-          const isH = (state.mouseTile.x === x && state.mouseTile.y === y);
-          drawRoomTile(x, y, isH);
-        }
-      }
-
-      const renderList = [];
-      state.placedFurni.forEach(f => {
-        renderList.push({ type: "furni", x: f.x, y: f.y, depth: f.x + f.y, data: f });
-      });
-
-      renderList.push({
-        type: "avatar",
-        x: state.avatar.x,
-        y: state.avatar.y,
-        depth: state.avatar.x + state.avatar.y
-      });
-
-      renderList.sort((a, b) => a.depth - b.depth);
-
-      renderList.forEach(obj => {
-        if (obj.type === "furni") {
-          const { sx, sy } = toIso(obj.x, obj.y);
-          drawFurni(obj.data.item, sx, sy);
-        } else if (obj.type === "avatar") {
-          drawAvatar(obj.x, obj.y);
-        }
-      });
-
-      if (state.selectedInvIdx >= 0 && state.mouseTile.x >= 0 && state.mouseTile.x < state.gridSize && state.mouseTile.y >= 0 && state.mouseTile.y < state.gridSize) {
-        const item = state.inventory[state.selectedInvIdx];
-        if (item) {
-          const { sx, sy } = toIso(state.mouseTile.x, state.mouseTile.y);
-          drawFurni(item, sx, sy, 0.55);
-        }
-      }
-
-      requestAnimationFrame(loop);
-    }
-    requestAnimationFrame(loop);
-
-    /* =========================================================================
-       4. INTERAZIONE STANZA
-       ========================================================================= */
-    canvas.addEventListener("mousemove", (e) => {
-      const r = canvas.getBoundingClientRect();
-      state.mouseTile = fromIso(e.clientX - r.left, e.clientY - r.top);
-    });
-
-    canvas.addEventListener("click", () => {
-      const { x, y } = state.mouseTile;
-      if (x < 0 || x >= state.gridSize || y < 0 || y >= state.gridSize) return;
-
-      if (state.selectedInvIdx >= 0) {
-        const item = state.inventory[state.selectedInvIdx];
-        state.placedFurni.push({ x: x, y: y, item: item });
-
-        item.count--;
-        if (item.count <= 0) {
-          state.inventory.splice(state.selectedInvIdx, 1);
-          state.selectedInvIdx = -1;
-        }
-        updateInventoryUI();
-      } else {
-        state.avatar.x = x;
-        state.avatar.y = y;
-      }
-    });
-
-    canvas.addEventListener("contextmenu", (e) => {
+    document.getElementById('contactForm').addEventListener('submit', function(e) {
       e.preventDefault();
-      const { x, y } = state.mouseTile;
-      const idx = state.placedFurni.findIndex(f => f.x === x && f.y === y);
-      if (idx !== -1) {
-        const removed = state.placedFurni.splice(idx, 1)[0];
-        const exist = state.inventory.find(i => i.id === removed.item.id);
-        if (exist) {
-          exist.count++;
-        } else {
-          state.inventory.push({ ...removed.item, count: 1 });
-        }
-        updateInventoryUI();
-      }
+      const nome = document.getElementById('name').value;
+      alert(`Grazie ${nome}! Il tuo messaggio è stato ricevuto con successo.`);
+      this.reset();
     });
-
-    /* =========================================================================
-       5. CATALOGO & INVENTARIO
-       ========================================================================= */
-    const catModal = document.getElementById("catalog-modal");
-    const openBtn = document.getElementById("open-cat-btn");
-    const closeBtn = document.getElementById("close-cat-btn");
-    const tabsCont = document.getElementById("cat-tabs-container");
-    const itemsCont = document.getElementById("cat-items-container");
-    const buyBtn = document.getElementById("btn-buy");
-
-    openBtn.onclick = () => {
-      catModal.style.display = "flex";
-      buildTabs();
-      buildItems();
-    };
-
-    closeBtn.onclick = () => {
-      catModal.style.display = "none";
-    };
-
-    function buildTabs() {
-      tabsCont.innerHTML = "";
-      CATEGORIES.forEach(c => {
-        const div = document.createElement("div");
-        div.className = `menu-item ${state.activeCategory === c.id ? "active" : ""}`;
-        div.innerText = c.name;
-        div.onclick = () => {
-          state.activeCategory = c.id;
-          state.selectedCatalog = null;
-          buildTabs();
-          buildItems();
-          updatePreview();
-        };
-        tabsCont.appendChild(div);
-      });
-    }
-
-    function buildItems() {
-      itemsCont.innerHTML = "";
-      const filtered = FURNI_ITEMS.filter(f => f.cat === state.activeCategory);
-
-      filtered.forEach(item => {
-        const slot = document.createElement("div");
-        slot.className = `furni-slot ${state.selectedCatalog && state.selectedCatalog.id === item.id ? "selected" : ""}`;
-
-        const img = document.createElement("img");
-        img.src = item.sprite;
-        slot.appendChild(img);
-
-        slot.onclick = () => {
-          state.selectedCatalog = item;
-          buildItems();
-          updatePreview();
-        };
-
-        itemsCont.appendChild(slot);
-      });
-    }
-
-    function updatePreview() {
-      const it = state.selectedCatalog;
-      const prevIcon = document.getElementById("prev-icon");
-
-      if (!it) {
-        document.getElementById("prev-title").innerText = "Seleziona un articolo";
-        document.getElementById("prev-desc").innerText = "Scegli un furni dal catalogo";
-        document.getElementById("prev-cost").innerText = "";
-        prevIcon.style.display = "none";
-        return;
-      }
-
-      prevIcon.src = it.sprite;
-      prevIcon.style.display = "block";
-      document.getElementById("prev-title").innerText = it.name;
-      document.getElementById("prev-desc").innerText = `Prezzo Ufficiale:`;
-      document.getElementById("prev-cost").innerText = `${it.credits} Crediti ${it.diamonds > 0 ? "+ " + it.diamonds + " Diamanti" : ""}`;
-    }
-
-    buyBtn.onclick = () => {
-      const it = state.selectedCatalog;
-      if (!it) return;
-
-      if (state.credits < it.credits || state.diamonds < it.diamonds) {
-        alert("Crediti insufficienti!");
-        return;
-      }
-
-      state.credits -= it.credits;
-      state.diamonds -= it.diamonds;
-      document.getElementById("cr-count").innerText = state.credits;
-      document.getElementById("dia-count").innerText = state.diamonds;
-
-      const exist = state.inventory.find(i => i.id === it.id);
-      if (exist) {
-        exist.count++;
-      } else {
-        state.inventory.push({ ...it, count: 1 });
-      }
-      updateInventoryUI();
-    };
-
-    function updateInventoryUI() {
-      const tray = document.getElementById("inventory-tray");
-      tray.innerHTML = "";
-
-      state.inventory.forEach((item, idx) => {
-        const slot = document.createElement("div");
-        slot.className = `inv-slot ${state.selectedInvIdx === idx ? "selected" : ""}`;
-
-        const img = document.createElement("img");
-        img.src = item.sprite;
-
-        const count = document.createElement("span");
-        count.className = "inv-count";
-        count.innerText = item.count;
-
-        slot.appendChild(img);
-        slot.appendChild(count);
-
-        slot.onclick = () => {
-          state.selectedInvIdx = (state.selectedInvIdx === idx) ? -1 : idx;
-          updateInventoryUI();
-        };
-
-        tray.appendChild(slot);
-      });
-    }
-
-    updateInventoryUI();
   </script>
+
 </body>
 </html>
