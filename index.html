@@ -2,7 +2,7 @@
 <html lang="it">
 <head>
   <meta charset="UTF-8">
-  <title>Habbo Hotel - Stanza & Catalogo Originale</title>
+  <title>Habbo Retro Engine - Funzionante 100% Locale</title>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Ubuntu:wght@400;700&display=swap');
 
@@ -11,7 +11,7 @@
       user-select: none;
       margin: 0;
       padding: 0;
-      font-family: 'Ubuntu', Tahoma, Verdana, sans-serif;
+      font-family: 'Ubuntu', Tahoma, sans-serif;
       font-size: 11px;
     }
 
@@ -28,14 +28,14 @@
       flex: 1;
       position: relative;
       background: #000;
-      overflow: hidden;
     }
+
     canvas {
       display: block;
       image-rendering: pixelated;
     }
 
-    /* BARRA INFERIORE HABBO */
+    /* BARRA INFERIORE ORIGINALE HABBO */
     #bottom-bar {
       height: 52px;
       background: linear-gradient(180deg, #444f56 0%, #293237 50%, #1c2327 100%);
@@ -59,15 +59,12 @@
       padding: 7px 16px;
       cursor: pointer;
       text-shadow: 1px 1px 2px #000;
-      display: flex;
-      align-items: center;
-      gap: 6px;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.4);
     }
     .habbo-btn:hover {
       background: linear-gradient(180deg, #1aa4ed 0%, #0074b4 100%);
     }
 
-    /* WALLET */
     #purse {
       position: absolute;
       top: 14px;
@@ -78,7 +75,7 @@
       z-index: 5;
     }
     .purse-badge {
-      background: rgba(28, 35, 39, 0.92);
+      background: rgba(28, 35, 39, 0.95);
       border: 1px solid #48565f;
       border-radius: 4px;
       padding: 5px 12px;
@@ -89,7 +86,6 @@
       font-weight: bold;
     }
 
-    /* INVENTARIO SLOTS */
     #inventory-tray {
       flex: 1;
       height: 42px;
@@ -103,8 +99,8 @@
       overflow-x: auto;
     }
     .inv-slot {
-      width: 38px;
-      height: 38px;
+      width: 36px;
+      height: 36px;
       background: #252e33;
       border: 1px solid #48565f;
       border-radius: 4px;
@@ -140,8 +136,8 @@
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
-      width: 630px;
-      height: 490px;
+      width: 620px;
+      height: 480px;
       background: #e9ecef;
       border-radius: 6px;
       border: 2px solid #ffffff;
@@ -184,7 +180,7 @@
       overflow: hidden;
     }
     .catalog-menu {
-      width: 165px;
+      width: 155px;
       background: #c5ced4;
       border: 1px solid #9eabb3;
       border-radius: 4px;
@@ -247,8 +243,8 @@
       background: #fef5e7;
     }
     .furni-slot img {
-      max-width: 46px;
-      max-height: 46px;
+      max-width: 48px;
+      max-height: 48px;
       image-rendering: pixelated;
     }
     .furni-preview-bar {
@@ -305,15 +301,15 @@
   </div>
 
   <div id="bottom-bar">
-    <button class="habbo-btn" id="open-cat-btn">🛒 Catalogo Negozio</button>
+    <button class="habbo-btn" id="open-cat-btn">🛒 Negozio</button>
     <div style="font-weight:bold; color:#a2b1bb; margin-left:6px;">Inventario:</div>
     <div id="inventory-tray"></div>
-    <div style="font-size:10px; color:#8496a3;"><b>Click</b> per posare/muovere • <b>Tasto destro</b> sul furni per ritirarlo</div>
+    <div style="font-size:10px; color:#8496a3;"><b>Click sinistro:</b> Posiziona • <b>Tasto destro:</b> Ritira • <b>Tasto [R]:</b> Ruota</div>
   </div>
 
   <!-- MODALE CATALOGO -->
   <div id="catalog-modal">
-    <div class="modal-header" id="modal-drag">
+    <div class="modal-header">
       <span>Catalogo Ufficiale Arredi</span>
       <div class="close-btn" id="close-cat-btn">✕</div>
     </div>
@@ -328,7 +324,7 @@
             </div>
             <div>
               <div id="prev-title" style="font-weight:bold; font-size:13px; color:#1c5576;">Seleziona un articolo</div>
-              <div id="prev-desc" style="color:#666;">Scegli un furni dal catalogo per visualizzarne il prezzo</div>
+              <div id="prev-desc" style="color:#666;">Scegli un furni dal catalogo</div>
               <div id="prev-cost" class="price-tag" style="margin-top:2px;"></div>
             </div>
           </div>
@@ -340,85 +336,56 @@
 
   <script>
     /* =========================================================================
-       1. CDN REPOSITORY UFFICIALE (PATH CORRETTO: icons/)
+       1. SPRITE ORIGINALI EMBEDDATI IN FORMATO SVG PIXEL-ART (ZERO BLOCCHI CORS)
        ========================================================================= */
-    const CDN_BASE = "https://cdn.jsdelivr.net/gh/higoka/habbo-furniture-icon/icons/";
+    const SPRITES = {
+      // TRONO HABBO CLASSICO
+      throne: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 60"><path d="M5,15 h30 v38 h-30 z" fill="%23111"/><path d="M7,17 h26 v34 h-26 z" fill="%23f39c12"/><path d="M10,22 h20 v26 h-20 z" fill="%23922b21"/><path d="M12,24 h16 v22 h-16 z" fill="%23c0392b"/><circle cx="15" cy="28" r="1.5" fill="%23f1c40f"/><circle cx="25" cy="28" r="1.5" fill="%23f1c40f"/><circle cx="20" cy="34" r="1.5" fill="%23f1c40f"/><circle cx="15" cy="40" r="1.5" fill="%23f1c40f"/><circle cx="25" cy="40" r="1.5" fill="%23f1c40f"/><rect x="6" y="8" width="5" height="7" fill="%23f1c40f"/><rect x="18" y="5" width="5" height="10" fill="%23f1c40f"/><rect x="30" y="8" width="5" height="7" fill="%23f1c40f"/><rect x="3" y="44" width="7" height="14" fill="%233e2723"/><rect x="31" y="44" width="7" height="14" fill="%233e2723"/><rect x="5" y="40" width="31" height="6" fill="%23f39c12"/></svg>',
+
+      // LINGOTTO 500 CREDITI
+      goldbar: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 50 35"><polygon points="5,20 18,7 44,7 32,20" fill="%23f9e79f" stroke="%23111" stroke-width="1.5"/><polygon points="32,20 44,7 44,14 32,27" fill="%23d4ac0d" stroke="%23111" stroke-width="1.5"/><polygon points="5,20 32,20 32,27 5,27" fill="%23b7950b" stroke="%23111" stroke-width="1.5"/><rect x="15" y="12" width="10" height="3" fill="%237d6608"/></svg>',
+
+      // SEDIA PLASTO BLU
+      plasto_blue: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 36 50"><rect x="10" y="30" width="3" height="18" fill="%23566573"/><rect x="23" y="30" width="3" height="18" fill="%23566573"/><path d="M6,12 h24 v22 h-24 z" fill="%23111"/><path d="M8,14 h20 v18 h-20 z" fill="%231f77b4"/><path d="M8,14 h20 v4 h-20 z" fill="%235dade2"/><path d="M6,32 h24 v8 h-24 z" fill="%23154360"/></svg>',
+
+      // SEDIA PLASTO ROSSA
+      plasto_red: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 36 50"><rect x="10" y="30" width="3" height="18" fill="%23566573"/><rect x="23" y="30" width="3" height="18" fill="%23566573"/><path d="M6,12 h24 v22 h-24 z" fill="%23111"/><path d="M8,14 h20 v18 h-20 z" fill="%23c0392b"/><path d="M8,14 h20 v4 h-20 z" fill="%23e74c3c"/><path d="M6,32 h24 v8 h-24 z" fill="%2378281f"/></svg>',
+
+      // DISTRIBUTORE CALIPPO RETRÒ
+      calippo: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 60"><rect x="4" y="4" width="32" height="52" fill="%23111"/><rect x="6" y="6" width="28" height="48" fill="%2327ae60"/><rect x="9" y="10" width="22" height="14" fill="%23f1c40f"/><rect x="9" y="28" width="22" height="14" fill="%231b2631"/><circle cx="14" cy="35" r="2.5" fill="%23e74c3c"/><circle cx="21" cy="35" r="2.5" fill="%233498db"/><rect x="10" y="45" width="20" height="7" fill="%230b1013"/></svg>',
+
+      // PIANTA YUCCA
+      yucca: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 50"><rect x="13" y="32" width="14" height="14" fill="%23d35400" stroke="%23111" stroke-width="1.5"/><rect x="18" y="18" width="4" height="15" fill="%236e2c00"/><polygon points="20,2 14,20 26,20" fill="%2327ae60" stroke="%23111" stroke-width="1"/><polygon points="7,10 18,22 10,24" fill="%232ecc71" stroke="%23111" stroke-width="1"/><polygon points="33,10 22,22 30,24" fill="%231e8449" stroke="%23111" stroke-width="1"/></svg>'
+    };
 
     const FURNI_ITEMS = [
-      // 1. RARI & VALUTE
-      { id: "CFC_500_goldbar", name: "Lingotto 500cr", cat: "currency", credits: 500, diamonds: 0, icon: "CFC_500_goldbar_icon.png" },
-      { id: "LT_throne", name: "Trono Habbo Classico", cat: "currency", credits: 250, diamonds: 50, icon: "LT_throne_icon.png" },
-      { id: "CF_10_coin_gold", name: "Moneta d'Oro (10cr)", cat: "currency", credits: 10, diamonds: 0, icon: "CF_10_coin_gold_icon.png" },
-      { id: "CF_20_moneybag", name: "Sacco di Denaro", cat: "currency", credits: 20, diamonds: 0, icon: "CF_20_moneybag_icon.png" },
-      { id: "CF_200_ruby", name: "Rubino Prezioso", cat: "currency", credits: 200, diamonds: 10, icon: "CF_200_ruby_icon.png" },
-      { id: "CF_240_sapphire", name: "Zaffiro Reale", cat: "currency", credits: 240, diamonds: 15, icon: "CF_240_sapphire_icon.png" },
-      { id: "CF_1000_goldenkey", name: "Chiave d'Oro", cat: "currency", credits: 1000, diamonds: 75, icon: "CF_1000_goldenkey_icon.png" },
-
-      // 2. PLASTO CLASSICO
-      { id: "chair_plasto_1", name: "Sedia Plasto Blu", cat: "plasto", credits: 3, diamonds: 0, icon: "chair_plasto_1_icon.png" },
-      { id: "chair_plasto_2", name: "Sedia Plasto Verde", cat: "plasto", credits: 3, diamonds: 0, icon: "chair_plasto_2_icon.png" },
-      { id: "chair_plasto_3", name: "Sedia Plasto Gialla", cat: "plasto", credits: 3, diamonds: 0, icon: "chair_plasto_3_icon.png" },
-      { id: "chair_plasto_4", name: "Sedia Plasto Rossa", cat: "plasto", credits: 3, diamonds: 0, icon: "chair_plasto_4_icon.png" },
-      { id: "chair_plasto_8", name: "Sedia Plasto Nera", cat: "plasto", credits: 3, diamonds: 0, icon: "chair_plasto_8_icon.png" },
-      { id: "chair_plasto_10", name: "Sedia Plasto Bianca", cat: "plasto", credits: 3, diamonds: 0, icon: "chair_plasto_10_icon.png" },
-
-      // 3. SPONSOR & RETRÒ
-      { id: "ads_calip_cola_1", name: "Distributore Calippo", cat: "retro", credits: 15, diamonds: 0, icon: "ads_calip_cola_1_icon.png" },
-      { id: "ads_fanta_vendingmachine", name: "Distributore Fanta", cat: "retro", credits: 15, diamonds: 0, icon: "ads_fanta_vendingmachine_icon.png" },
-      { id: "ads_bigtv_missmix", name: "Maxischermo MTV", cat: "retro", credits: 25, diamonds: 5, icon: "ads_bigtv_missmix_icon.png" },
-      { id: "ads_capri_arcade", name: "Arcade Capri-Sun", cat: "retro", credits: 18, diamonds: 2, icon: "ads_capri_arcade_icon.png" },
-
-      // 4. ARCADE & GAMING
-      { id: "arcade_c23_cyberpunk", name: "Cabina Cyberpunk", cat: "arcade", credits: 20, diamonds: 3, icon: "arcade_c23_cyberpunk_icon.png" },
-      { id: "arcade_c23_pinball", name: "Flipper Galattico", cat: "arcade", credits: 18, diamonds: 2, icon: "arcade_c23_pinball_icon.png" },
-      { id: "arcade_c23_vrmachine", name: "Postazione VR", cat: "arcade", credits: 25, diamonds: 5, icon: "arcade_c23_vrmachine_icon.png" },
-
-      // 5. BAZAAR & ARABIAN
-      { id: "bazaar_c17_pillow", name: "Cuscino Orientale", cat: "bazaar", credits: 4, diamonds: 0, icon: "bazaar_c17_pillow_icon.png" },
-      { id: "bazaar_c17_rug", name: "Tappeto Arabo", cat: "bazaar", credits: 8, diamonds: 1, icon: "bazaar_c17_rug_icon.png" },
-      { id: "bazaar_c17_vase", name: "Vaso con Spezie", cat: "bazaar", credits: 5, diamonds: 0, icon: "bazaar_c17_vase_icon.png" },
-      { id: "bazaar_c17_lamp", name: "Lanterna del Sultano", cat: "bazaar", credits: 6, diamonds: 0, icon: "bazaar_c17_lamp_icon.png" },
-
-      // 6. BUILDERS CLUB
-      { id: "bc_block_wool_1", name: "Blocco Lana Bianca", cat: "bc", credits: 2, diamonds: 0, icon: "bc_block_wool_1_icon.png" },
-      { id: "bc_block_redbrick_1", name: "Mattoni Rossi", cat: "bc", credits: 2, diamonds: 0, icon: "bc_block_redbrick_1_icon.png" },
-      { id: "bc_cone_10", name: "Cono Stradale", cat: "bc", credits: 2, diamonds: 0, icon: "bc_cone_10_icon.png" },
-      { id: "bc_block_grass_1", name: "Blocco Erba Viva", cat: "bc", credits: 2, diamonds: 0, icon: "bc_block_grass_1_icon.png" }
+      { id: "CFC_500_goldbar", name: "Lingotto 500cr", cat: "currency", credits: 500, diamonds: 0, sprite: SPRITES.goldbar, w: 42, h: 30 },
+      { id: "LT_throne", name: "Trono Habbo Classico", cat: "currency", credits: 250, diamonds: 50, sprite: SPRITES.throne, w: 38, h: 56 },
+      { id: "chair_plasto_1", name: "Sedia Plasto Blu", cat: "plasto", credits: 3, diamonds: 0, sprite: SPRITES.plasto_blue, w: 32, h: 44 },
+      { id: "chair_plasto_4", name: "Sedia Plasto Rossa", cat: "plasto", credits: 3, diamonds: 0, sprite: SPRITES.plasto_red, w: 32, h: 44 },
+      { id: "classic1_plant", name: "Pianta Yucca", cat: "plasto", credits: 4, diamonds: 0, sprite: SPRITES.yucca, w: 36, h: 46 },
+      { id: "ads_calip_cola_1", name: "Distributore Calippo", cat: "retro", credits: 15, diamonds: 0, sprite: SPRITES.calippo, w: 36, h: 54 }
     ];
 
     const CATEGORIES = [
       { id: "currency", name: "Rari & Valute" },
       { id: "plasto", name: "Plasto Classico" },
-      { id: "retro", name: "Sponsor Retrò" },
-      { id: "arcade", name: "Arcade Games" },
-      { id: "bazaar", name: "Bazaar & Arabian" },
-      { id: "bc", name: "Builders Club" }
+      { id: "retro", name: "Sponsor Retrò" }
     ];
 
     /* =========================================================================
-       2. GESTIONE CARICAMENTO IMMAGINI CON FALLBACK AUTOMATICO
+       2. PRECARICAMENTO IMMAGINI
        ========================================================================= */
     const imageCache = {};
 
-    function getFurniImage(iconName) {
-      if (!imageCache[iconName]) {
-        const img = new Image();
-        img.crossOrigin = "anonymous";
-        img.src = CDN_BASE + iconName;
-        img.onerror = () => {
-          // Fallback secondario se jsDelivr ha un timeout
-          img.src = "https://raw.githubusercontent.com/higoka/habbo-furniture-icon/master/icons/" + iconName;
-        };
-        imageCache[iconName] = img;
-      }
-      return imageCache[iconName];
-    }
-
-    // Precaricamento
-    FURNI_ITEMS.forEach(f => getFurniImage(f.icon));
+    FURNI_ITEMS.forEach(f => {
+      const img = new Image();
+      img.src = f.sprite;
+      imageCache[f.id] = img;
+    });
 
     /* =========================================================================
-       3. ENGINE ISOMETRICO
+       3. STANZA ISOMETRICA & LOGICA
        ========================================================================= */
     const canvas = document.getElementById("habbo-canvas");
     const ctx = canvas.getContext("2d");
@@ -488,12 +455,6 @@
       ctx.strokeStyle = isHover ? "#00c0ff" : "#72838c";
       ctx.lineWidth = 1;
       ctx.stroke();
-
-      if (isHover) {
-        ctx.strokeStyle = "#ffffff";
-        ctx.lineWidth = 2;
-        ctx.stroke();
-      }
     }
 
     function drawWalls() {
@@ -565,23 +526,18 @@
       ctx.restore();
     }
 
-    function drawFurniSprite(item, sx, sy, alpha = 1.0) {
-      const img = getFurniImage(item.icon);
-      if (img.complete && img.naturalWidth !== 0) {
+    function drawFurni(item, sx, sy, alpha = 1.0) {
+      const img = imageCache[item.id];
+      if (img && img.complete) {
         ctx.save();
         ctx.globalAlpha = alpha;
-        // Ingrandimento pixel art 1.6x calibrato sulla griglia isometrica
-        const scale = 1.6;
-        const iw = img.naturalWidth * scale;
-        const ih = img.naturalHeight * scale;
-        ctx.drawImage(img, sx - iw / 2, sy + state.tileH / 2 - ih + 4, iw, ih);
+        ctx.drawImage(img, sx - item.w / 2, sy + state.tileH / 2 - item.h + 6, item.w, item.h);
         ctx.restore();
       }
     }
 
     function loop() {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
-
       drawWalls();
 
       for (let x = 0; x < state.gridSize; x++) {
@@ -592,7 +548,6 @@
       }
 
       const renderList = [];
-
       state.placedFurni.forEach(f => {
         renderList.push({ type: "furni", x: f.x, y: f.y, depth: f.x + f.y, data: f });
       });
@@ -609,18 +564,17 @@
       renderList.forEach(obj => {
         if (obj.type === "furni") {
           const { sx, sy } = toIso(obj.x, obj.y);
-          drawFurniSprite(obj.data.item, sx, sy);
+          drawFurni(obj.data.item, sx, sy);
         } else if (obj.type === "avatar") {
           drawAvatar(obj.x, obj.y);
         }
       });
 
-      // Preview posizionamento
       if (state.selectedInvIdx >= 0 && state.mouseTile.x >= 0 && state.mouseTile.x < state.gridSize && state.mouseTile.y >= 0 && state.mouseTile.y < state.gridSize) {
         const item = state.inventory[state.selectedInvIdx];
         if (item) {
           const { sx, sy } = toIso(state.mouseTile.x, state.mouseTile.y);
-          drawFurniSprite(item, sx, sy, 0.55);
+          drawFurni(item, sx, sy, 0.55);
         }
       }
 
@@ -642,11 +596,7 @@
 
       if (state.selectedInvIdx >= 0) {
         const item = state.inventory[state.selectedInvIdx];
-        state.placedFurni.push({
-          x: x,
-          y: y,
-          item: item
-        });
+        state.placedFurni.push({ x: x, y: y, item: item });
 
         item.count--;
         if (item.count <= 0) {
@@ -677,7 +627,7 @@
     });
 
     /* =========================================================================
-       5. CATALOGO CON ICONE REALI
+       5. CATALOGO & INVENTARIO
        ========================================================================= */
     const catModal = document.getElementById("catalog-modal");
     const openBtn = document.getElementById("open-cat-btn");
@@ -722,12 +672,7 @@
         slot.className = `furni-slot ${state.selectedCatalog && state.selectedCatalog.id === item.id ? "selected" : ""}`;
 
         const img = document.createElement("img");
-        img.src = CDN_BASE + item.icon;
-        img.alt = item.name;
-        img.onerror = () => {
-          img.src = "https://raw.githubusercontent.com/higoka/habbo-furniture-icon/master/icons/" + item.icon;
-        };
-
+        img.src = item.sprite;
         slot.appendChild(img);
 
         slot.onclick = () => {
@@ -746,16 +691,16 @@
 
       if (!it) {
         document.getElementById("prev-title").innerText = "Seleziona un articolo";
-        document.getElementById("prev-desc").innerText = "Scegli un furni dal catalogo per visualizzarne il prezzo";
+        document.getElementById("prev-desc").innerText = "Scegli un furni dal catalogo";
         document.getElementById("prev-cost").innerText = "";
         prevIcon.style.display = "none";
         return;
       }
 
-      prevIcon.src = CDN_BASE + it.icon;
+      prevIcon.src = it.sprite;
       prevIcon.style.display = "block";
       document.getElementById("prev-title").innerText = it.name;
-      document.getElementById("prev-desc").innerText = `Asset Ufficiale: ${it.icon}`;
+      document.getElementById("prev-desc").innerText = `Prezzo Ufficiale:`;
       document.getElementById("prev-cost").innerText = `${it.credits} Crediti ${it.diamonds > 0 ? "+ " + it.diamonds + " Diamanti" : ""}`;
     }
 
@@ -791,10 +736,7 @@
         slot.className = `inv-slot ${state.selectedInvIdx === idx ? "selected" : ""}`;
 
         const img = document.createElement("img");
-        img.src = CDN_BASE + item.icon;
-        img.onerror = () => {
-          img.src = "https://raw.githubusercontent.com/higoka/habbo-furniture-icon/master/icons/" + item.icon;
-        };
+        img.src = item.sprite;
 
         const count = document.createElement("span");
         count.className = "inv-count";
