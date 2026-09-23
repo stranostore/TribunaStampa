@@ -2,1453 +2,889 @@
 <html lang="it">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Habbo Survival: Post-Apocalyptic RPG</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js"></script>
+  <title>Habbo Retro Engine - Catalogo Completo & Stanza Isometrica</title>
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=VT323&family=Press+Start+2P&family=Ubuntu:wght@400;500;700&display=swap');
-    
     * {
       box-sizing: border-box;
       user-select: none;
-      -webkit-user-select: none;
-    }
-    
-    body {
       margin: 0;
-      overflow: hidden;
-      background-color: #121517;
-      font-family: 'Ubuntu', sans-serif;
+      padding: 0;
+      font-family: "Volter Goldfish", "Ubuntu", Tahoma, sans-serif;
+      font-size: 11px;
+    }
+    body {
+      background: #1e262c;
       color: #fff;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
     }
 
-    .pixel-text {
-      font-family: 'Press Start 2P', monospace;
+    /* TOP BAR STATS */
+    #topbar {
+      height: 38px;
+      background: #2b3339;
+      border-bottom: 2px solid #101518;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 16px;
+      z-index: 10;
     }
-    
-    .retro-font {
-      font-family: 'VT323', monospace;
+    .wallet-box {
+      display: flex;
+      gap: 15px;
+    }
+    .badge {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: #1b2024;
+      padding: 4px 10px;
+      border-radius: 4px;
+      border: 1px solid #3d474e;
+      font-weight: bold;
+    }
+    .coin-gold { color: #f5b041; }
+    .diamond { color: #5dade2; }
+
+    /* VIEWPORT STANZA */
+    #game-container {
+      flex: 1;
+      position: relative;
+      background: radial-gradient(circle at center, #2e3943 0%, #171d22 100%);
+      overflow: hidden;
+    }
+    canvas {
+      display: block;
+      image-rendering: pixelated;
     }
 
-    /* Habbo Bubble */
-    .speech-bubble {
+    /* TOOLBAR INFERIORE */
+    #bottom-bar {
+      height: 48px;
+      background: #242b31;
+      border-top: 2px solid #14181b;
+      display: flex;
+      align-items: center;
+      padding: 0 10px;
+      gap: 10px;
+      z-index: 10;
+    }
+    .btn {
+      background: #41515d;
+      border: 2px solid #5a6e7e;
+      border-bottom-color: #28323a;
+      border-right-color: #28323a;
+      color: #fff;
+      padding: 6px 14px;
+      font-weight: bold;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .btn:hover { background: #4e606e; }
+    .btn:active {
+      border-color: #28323a #5a6e7e #5a6e7e #28323a;
+    }
+
+    /* INVENTARIO DOCK */
+    #inventory-dock {
+      flex: 1;
+      display: flex;
+      gap: 6px;
+      overflow-x: auto;
+      padding: 4px;
+      background: #1b2024;
+      border: 1px solid #343f47;
+      border-radius: 4px;
+      height: 38px;
+      align-items: center;
+    }
+    .inv-item {
+      min-width: 32px;
+      height: 32px;
+      background: #2d373f;
+      border: 1px solid #4a5966;
+      border-radius: 3px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+    .inv-item.selected {
+      border-color: #f1c40f;
+      box-shadow: 0 0 5px #f1c40f;
+    }
+    .inv-item-count {
       position: absolute;
-      background: #ffffff;
-      color: #111;
-      padding: 5px 10px;
+      bottom: 1px;
+      right: 2px;
+      font-size: 9px;
+      color: #ddd;
+    }
+
+    /* FINESTRA CATALOGO */
+    .habbo-window {
+      position: absolute;
+      top: 50px;
+      left: 50px;
+      width: 580px;
+      height: 440px;
+      background: #e2e2e2;
+      color: #222;
       border-radius: 6px;
-      font-weight: 700;
-      font-size: 12px;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.5);
-      pointer-events: none;
-      white-space: nowrap;
-      transform: translate(-50%, -100%);
-      border: 2px solid #000;
-      transition: opacity 0.3s, transform 0.3s;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.6);
+      display: none;
+      flex-direction: column;
+      border: 2px solid #ffffff;
       z-index: 100;
     }
-
-    .speech-bubble::after {
-      content: '';
-      position: absolute;
-      bottom: -8px;
-      left: 50%;
-      transform: translateX(-50%);
-      border-width: 8px 6px 0;
-      border-style: solid;
-      border-color: #ffffff transparent;
-      display: block;
-      width: 0;
+    .habbo-header {
+      background: #1c5274;
+      color: #fff;
+      padding: 6px 10px;
+      font-weight: bold;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-radius: 4px 4px 0 0;
+      cursor: move;
     }
-
-    /* Custom Scrollbar */
-    ::-webkit-scrollbar {
-      width: 6px;
-      height: 6px;
+    .habbo-close {
+      background: #d9534f;
+      color: #fff;
+      border: 1px solid #fff;
+      padding: 0 6px;
+      cursor: pointer;
+      font-weight: bold;
     }
-    ::-webkit-scrollbar-track {
-      background: #1e2429;
+    .catalog-body {
+      flex: 1;
+      display: flex;
+      padding: 8px;
+      gap: 8px;
+      overflow: hidden;
     }
-    ::-webkit-scrollbar-thumb {
-      background: #4a5568;
+    .catalog-tabs {
+      width: 140px;
+      background: #ced5d9;
+      border: 1px solid #a4b0b7;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      padding: 4px;
+      overflow-y: auto;
+    }
+    .cat-tab {
+      padding: 6px 8px;
+      background: #b5c1c7;
+      border: 1px solid #94a3ab;
+      cursor: pointer;
+      font-weight: bold;
       border-radius: 3px;
     }
-
-    /* Modal Backdrop */
-    .modal-backdrop {
-      background: rgba(10, 15, 20, 0.85);
-      backdrop-filter: blur(4px);
+    .cat-tab.active {
+      background: #fff;
+      border-color: #1c5274;
+      color: #1c5274;
+    }
+    .catalog-content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      background: #fff;
+      border: 1px solid #a4b0b7;
+      padding: 8px;
+    }
+    .catalog-grid {
+      flex: 1;
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(68px, 1fr));
+      grid-auto-rows: 68px;
+      gap: 6px;
+      overflow-y: auto;
+      padding: 4px;
+      background: #f7f9fa;
+      border: 1px solid #d5dcde;
+    }
+    .cat-card {
+      border: 1px solid #c9d2d6;
+      background: #fff;
+      border-radius: 4px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      padding: 4px;
+      position: relative;
+    }
+    .cat-card:hover {
+      background: #eef5f9;
+      border-color: #1c5274;
+    }
+    .cat-card.selected {
+      border: 2px solid #f39c12;
+      background: #fef9e7;
+    }
+    .catalog-preview {
+      height: 95px;
+      border-top: 1px solid #d5dcde;
+      margin-top: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 6px;
+    }
+    .preview-info {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .preview-title {
+      font-weight: bold;
+      font-size: 13px;
+      color: #1c5274;
+    }
+    .preview-cost {
+      font-weight: bold;
+      color: #d35400;
+    }
+    .rotate-hint {
+      position: absolute;
+      bottom: 60px;
+      left: 10px;
+      background: rgba(0,0,0,0.7);
+      padding: 6px 12px;
+      border-radius: 4px;
+      font-size: 11px;
+      pointer-events: none;
     }
   </style>
 </head>
-<body class="w-screen h-screen relative select-none">
+<body>
 
-  <!-- ================= CANVAS PRINCIPALE GIOCO ================= -->
-  <div id="game-view" class="w-full h-full relative hidden">
-    <canvas id="survivalCanvas" class="w-full h-full block cursor-crosshair"></canvas>
-
-    <!-- Top Left HUD: Stato del Sopravvissuto -->
-    <div class="absolute top-4 left-4 flex flex-col gap-2 z-20">
-      <div class="bg-gray-900/90 border-2 border-gray-700 p-3 rounded-lg shadow-xl flex items-center gap-3 backdrop-blur-sm">
-        <div id="hud-avatar-box" class="w-12 h-12 bg-amber-600 rounded-md border-2 border-amber-400 flex items-center justify-center text-xl font-bold shadow-inner">
-          🤠
-        </div>
-        <div class="flex flex-col gap-1 w-44">
-          <div class="flex justify-between items-center text-xs font-bold">
-            <span id="hud-nickname" class="text-amber-300">Player</span>
-            <span id="hud-lvl" class="text-xs bg-red-800 text-white px-1.5 py-0.5 rounded">LV 1</span>
-          </div>
-          <!-- Barra Vita -->
-          <div class="w-full bg-gray-800 rounded-full h-3 border border-gray-600 overflow-hidden relative">
-            <div id="bar-hp" class="bg-red-600 h-full transition-all duration-200" style="width: 100%;"></div>
-            <span id="text-hp" class="absolute inset-0 text-[9px] flex items-center justify-center font-bold">100/100 HP</span>
-          </div>
-          <!-- Barra Fame -->
-          <div class="w-full bg-gray-800 rounded-full h-2.5 border border-gray-600 overflow-hidden relative">
-            <div id="bar-hunger" class="bg-amber-500 h-full transition-all duration-200" style="width: 100%;"></div>
-            <span id="text-hunger" class="absolute inset-0 text-[8px] flex items-center justify-center font-bold">Fame: 100%</span>
-          </div>
-          <!-- Barra Sete -->
-          <div class="w-full bg-gray-800 rounded-full h-2.5 border border-gray-600 overflow-hidden relative">
-            <div id="bar-thirst" class="bg-blue-500 h-full transition-all duration-200" style="width: 100%;"></div>
-            <span id="text-thirst" class="absolute inset-0 text-[8px] flex items-center justify-center font-bold">Sete: 100%</span>
-          </div>
-        </div>
-      </div>
-
-      <!-- Ciclo Giorno / Notte & Mini Orologio -->
-      <div class="bg-gray-900/90 border border-gray-700 px-3 py-1.5 rounded-lg flex items-center justify-between text-xs w-48 shadow">
-        <span id="time-icon">☀️ Giorno</span>
-        <span id="time-text" class="text-amber-400 font-mono">12:00</span>
-        <span id="day-counter" class="text-gray-400 text-[10px]">Giorno 1</span>
-      </div>
-    </div>
-
-    <!-- Top Right: Risorse Raccolte & Tasto Fondatore -->
-    <div class="absolute top-4 right-4 flex flex-col gap-2 z-20 items-end">
-      <div class="bg-gray-900/90 border-2 border-gray-700 p-2.5 rounded-lg flex items-center gap-3 text-xs shadow-xl font-bold">
-        <div class="flex items-center gap-1.5 bg-gray-800 px-2 py-1 rounded border border-gray-700">
-          <span>🪵 Legno:</span>
-          <span id="res-wood" class="text-amber-400">0</span>
-        </div>
-        <div class="flex items-center gap-1.5 bg-gray-800 px-2 py-1 rounded border border-gray-700">
-          <span>🪨 Pietra:</span>
-          <span id="res-stone" class="text-gray-300">0</span>
-        </div>
-        <div class="flex items-center gap-1.5 bg-gray-800 px-2 py-1 rounded border border-gray-700">
-          <span>🫐 Cibo:</span>
-          <span id="res-food" class="text-red-400">0</span>
-        </div>
-      </div>
-
-      <div class="flex gap-2">
-        <button onclick="toggleCraftingModal()" class="bg-emerald-700 hover:bg-emerald-600 border-2 border-emerald-500 px-3 py-1.5 rounded text-xs font-bold flex items-center gap-1 shadow-lg transition">
-          🔨 Crafting & Basi
-        </button>
-        <button id="founder-btn" onclick="openFounderModal()" class="hidden bg-yellow-600 hover:bg-yellow-500 border-2 border-yellow-400 px-3 py-1.5 rounded text-xs font-bold flex items-center gap-1 shadow-lg text-black transition">
-          👑 Pannello Fondatore
-        </button>
-        <button onclick="logout()" class="bg-red-800 hover:bg-red-700 border border-red-600 px-2.5 py-1.5 rounded text-xs font-bold transition">
-          Esci
-        </button>
-      </div>
-    </div>
-
-    <!-- Finestra Notifiche di Gioco -->
-    <div id="game-toast" class="absolute top-20 left-1/2 -translate-x-1/2 bg-black/85 border border-amber-500/80 px-4 py-1.5 rounded-full text-xs font-bold text-amber-300 pointer-events-none transition-all duration-300 opacity-0 z-30 shadow-lg">
-      Notifica
-    </div>
-
-    <!-- Controlli Rapidi & Pet Control Bottom Left -->
-    <div class="absolute bottom-20 left-4 flex flex-col gap-2 z-20">
-      <div class="bg-gray-900/90 border border-gray-700 p-2 rounded-lg flex items-center gap-2 text-xs">
-        <button onclick="petAction('care')" class="bg-gray-800 hover:bg-gray-700 px-2.5 py-1 rounded border border-gray-600 flex items-center gap-1">
-          🐕 Accarezza Lupo
-        </button>
-        <button onclick="petAction('feed')" class="bg-gray-800 hover:bg-gray-700 px-2.5 py-1 rounded border border-gray-600 flex items-center gap-1">
-          🥩 Dai Carne (-1 Cibo)
-        </button>
-      </div>
-      <div class="text-[10px] text-gray-400 bg-black/60 px-2 py-1 rounded max-w-xs">
-        💡 <b>Click sinistro</b>: Cammina / Taglia alberi / Piccona / Attacca Zombie. <br>
-        💡 <b>Spazio</b>: Attacco a corto raggio.
-      </div>
-    </div>
-
-    <!-- Barra di Chat in basso in puro Stile Habbo -->
-    <div class="absolute bottom-4 left-1/2 -translate-x-1/2 w-11/12 max-w-xl z-20 flex gap-2">
-      <div class="flex-1 bg-white text-gray-900 rounded-full px-4 py-1.5 flex items-center shadow-2xl border-2 border-gray-300 focus-within:border-amber-500 transition">
-        <input id="chat-input" type="text" placeholder="Scrivi un messaggio di soccorso o chatta..." class="w-full bg-transparent outline-none text-xs text-gray-900 font-medium placeholder-gray-500" onkeydown="handleChatKey(event)">
-      </div>
-      <button onclick="sendChatMessage()" class="bg-amber-600 hover:bg-amber-500 text-black font-bold px-4 py-1.5 rounded-full text-xs shadow-md transition">
-        Invia
-      </button>
-    </div>
-
-    <!-- Contenitore Fumetti Fluttuanti -->
-    <div id="bubble-container" class="absolute inset-0 pointer-events-none z-30 overflow-hidden"></div>
-  </div>
-
-
-  <!-- ================= SCHERMATA LOGIN & REGISTRAZIONE ================= -->
-  <div id="auth-view" class="w-full h-full flex items-center justify-center relative p-4 bg-gradient-to-br from-slate-900 via-gray-900 to-black">
-    <!-- Effetto sfondo particelle o griglia -->
-    <div class="absolute inset-0 opacity-10 bg-[radial-gradient(#ffffff_1px,transparent_1px)] [background-size:16px_16px]"></div>
-
-    <div class="bg-gray-900 border-2 border-gray-700 w-full max-w-md rounded-2xl shadow-2xl overflow-hidden relative z-10">
-      <!-- Header -->
-      <div class="bg-gradient-to-r from-amber-700 via-red-800 to-amber-900 p-5 text-center border-b-2 border-amber-600/50">
-        <div class="text-3xl mb-1">🏕️ 🧟</div>
-        <h1 class="text-xl font-bold tracking-wider text-amber-200 pixel-text">HABBO SURVIVAL</h1>
-        <p class="text-xs text-amber-100/80 mt-1">Post-Apocalyptic Multiplayer RPG</p>
-      </div>
-
-      <!-- Tab Selettore -->
-      <div class="flex border-b border-gray-800 bg-gray-950/50 text-xs font-bold">
-        <button id="tab-login" onclick="switchAuthTab('login')" class="flex-1 py-3 text-amber-400 border-b-2 border-amber-500">ACCEDI</button>
-        <button id="tab-reg" onclick="switchAuthTab('reg')" class="flex-1 py-3 text-gray-400 hover:text-white">NUOVO SOPRAVVISSUTO</button>
-      </div>
-
-      <!-- Form Login -->
-      <form id="form-login" onsubmit="handleLogin(event)" class="p-6 flex flex-col gap-4">
-        <div>
-          <label class="block text-xs font-semibold text-gray-400 mb-1">Email</label>
-          <input id="login-email" type="email" required placeholder="tua@email.com" class="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-xs text-white focus:border-amber-500 outline-none">
-        </div>
-        <div>
-          <label class="block text-xs font-semibold text-gray-400 mb-1">Password</label>
-          <input id="login-pass" type="password" required placeholder="••••••••" class="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-xs text-white focus:border-amber-500 outline-none">
-        </div>
-        
-        <button type="submit" class="bg-gradient-to-r from-amber-600 to-amber-700 hover:from-amber-500 hover:to-amber-600 text-black font-bold py-2.5 rounded-lg text-xs tracking-wider transition shadow-lg mt-2">
-          ENTRA NEL MONDO
-        </button>
-
-        <div class="pt-2 border-t border-gray-800 text-center">
-          <p class="text-[11px] text-gray-400">Account Fondatore Predefinito:</p>
-          <button type="button" onclick="fillFounderDemo()" class="text-xs text-amber-400 hover:underline mt-0.5">
-            🔑 Accesso Rapido Fondatore (admin@habbo.it)
-          </button>
-        </div>
-      </form>
-
-      <!-- Form Registrazione -->
-      <form id="form-reg" onsubmit="handleRegister(event)" class="p-6 flex flex-col gap-3.5 hidden">
-        <div>
-          <label class="block text-xs font-semibold text-gray-400 mb-1">Nickname del Sopravvissuto</label>
-          <input id="reg-nick" type="text" required maxlength="14" placeholder="Es. Rick_Grimes" class="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-xs text-white focus:border-amber-500 outline-none">
-        </div>
-        <div>
-          <label class="block text-xs font-semibold text-gray-400 mb-1">Email</label>
-          <input id="reg-email" type="email" required placeholder="tua@email.com" class="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-xs text-white focus:border-amber-500 outline-none">
-        </div>
-        <div>
-          <label class="block text-xs font-semibold text-gray-400 mb-1">Password</label>
-          <input id="reg-pass" type="password" required placeholder="Crea una password" class="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-xs text-white focus:border-amber-500 outline-none">
-        </div>
-
-        <div>
-          <label class="block text-xs font-semibold text-gray-400 mb-1">Aspetto Iniziale</label>
-          <div class="flex gap-2">
-            <button type="button" onclick="selectSkin('🤠')" class="flex-1 py-1.5 bg-gray-800 rounded border border-amber-500/50 hover:bg-gray-700 text-base">🤠</button>
-            <button type="button" onclick="selectSkin('🥷')" class="flex-1 py-1.5 bg-gray-800 rounded border border-gray-700 hover:bg-gray-700 text-base">🥷</button>
-            <button type="button" onclick="selectSkin('👩‍🎤')" class="flex-1 py-1.5 bg-gray-800 rounded border border-gray-700 hover:bg-gray-700 text-base">👩‍🎤</button>
-            <button type="button" onclick="selectSkin('👨‍🚀')" class="flex-1 py-1.5 bg-gray-800 rounded border border-gray-700 hover:bg-gray-700 text-base">👨‍🚀</button>
-          </div>
-        </div>
-
-        <button type="submit" class="bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-2.5 rounded-lg text-xs tracking-wider transition shadow-lg mt-2">
-          CREA PERSONAGGIO & SALVA
-        </button>
-      </form>
+  <!-- BARRA SUPERIORE -->
+  <div id="topbar">
+    <div style="font-size:14px; font-weight:bold; letter-spacing:1px; color:#f1c40f;">HABBO ORIGINS ENGINE</div>
+    <div class="wallet-box">
+      <div class="badge coin-gold">● Crediti: <span id="val-credits">5000</span></div>
+      <div class="badge diamond">◆ Diamanti: <span id="val-diamonds">250</span></div>
     </div>
   </div>
 
+  <!-- STANZA ISOMETRICA -->
+  <div id="game-container">
+    <canvas id="stage"></canvas>
+    <div class="rotate-hint">Premi <b>R</b> per ruotare l'oggetto selezionato prima di posarlo. Clicca con tasto destro su un furni per rimuoverlo.</div>
+  </div>
 
-  <!-- ================= MODALE CRAFTING & COSTRUZIONI ================= -->
-  <div id="crafting-modal" class="fixed inset-0 modal-backdrop z-50 flex items-center justify-center p-4 hidden">
-    <div class="bg-gray-900 border-2 border-emerald-500/80 rounded-xl w-full max-w-lg shadow-2xl overflow-hidden flex flex-col max-h-[85vh]">
-      <div class="bg-gray-950 p-4 border-b border-gray-800 flex justify-between items-center">
-        <h2 class="text-sm font-bold text-emerald-400 flex items-center gap-2">
-          🔨 Banco di Lavoro & Costruzioni
-        </h2>
-        <button onclick="toggleCraftingModal()" class="text-gray-400 hover:text-white text-lg font-bold">&times;</button>
-      </div>
+  <!-- TOOLBAR INFERIORE -->
+  <div id="bottom-bar">
+    <button class="btn" id="btn-open-catalog">🛒 Catalogo</button>
+    <div style="color:#aaa; font-weight:bold;">Inventario:</div>
+    <div id="inventory-dock"></div>
+  </div>
 
-      <div class="p-4 overflow-y-auto flex flex-col gap-3">
-        <!-- Ricetta 1: Barricata di Legno -->
-        <div class="bg-gray-800/80 border border-gray-700 rounded-lg p-3 flex items-center justify-between">
-          <div class="flex items-center gap-3">
-            <span class="text-2xl">🪵</span>
-            <div>
-              <div class="text-xs font-bold text-white">Barricata di Legno</div>
-              <div class="text-[10px] text-gray-400">Blocca il passaggio dei mostri</div>
-              <div class="text-[11px] text-amber-400 font-bold mt-0.5">Costo: 4 Legno</div>
-            </div>
+  <!-- FINESTRA CATALOGO -->
+  <div class="habbo-window" id="catalog-window">
+    <div class="habbo-header" id="cat-drag">
+      <span>Catalogo Ufficiale</span>
+      <span class="habbo-close" id="btn-close-catalog">✕</span>
+    </div>
+    <div class="catalog-body">
+      <div class="catalog-tabs" id="category-tabs"></div>
+      <div class="catalog-content">
+        <div class="catalog-grid" id="catalog-items-grid"></div>
+        <div class="catalog-preview">
+          <div class="preview-info">
+            <span class="preview-title" id="prev-name">Seleziona un articolo</span>
+            <span id="prev-desc" style="color:#666;">Esplora i mobili inseriti nel gioco.</span>
+            <span class="preview-cost" id="prev-price"></span>
           </div>
-          <button onclick="craftItem('wall_wood')" class="bg-emerald-700 hover:bg-emerald-600 px-3 py-1.5 rounded text-xs font-bold">Costruisci</button>
-        </div>
-
-        <!-- Ricetta 2: Falò da Campo -->
-        <div class="bg-gray-800/80 border border-gray-700 rounded-lg p-3 flex items-center justify-between">
-          <div class="flex items-center gap-3">
-            <span class="text-2xl">🔥</span>
-            <div>
-              <div class="text-xs font-bold text-white">Falò Protettivo</div>
-              <div class="text-[10px] text-gray-400">Illumina la notte e allontana le creature</div>
-              <div class="text-[11px] text-amber-400 font-bold mt-0.5">Costo: 6 Legno + 2 Pietre</div>
-            </div>
-          </div>
-          <button onclick="craftItem('campfire')" class="bg-emerald-700 hover:bg-emerald-600 px-3 py-1.5 rounded text-xs font-bold">Costruisci</button>
-        </div>
-
-        <!-- Ricetta 3: Benda Medica -->
-        <div class="bg-gray-800/80 border border-gray-700 rounded-lg p-3 flex items-center justify-between">
-          <div class="flex items-center gap-3">
-            <span class="text-2xl">🩹</span>
-            <div>
-              <div class="text-xs font-bold text-white">Benda Curativa</div>
-              <div class="text-[10px] text-gray-400">Ripristina +40 HP</div>
-              <div class="text-[11px] text-amber-400 font-bold mt-0.5">Costo: 2 Bacche + 2 Legno</div>
-            </div>
-          </div>
-          <button onclick="craftItem('bandage')" class="bg-emerald-700 hover:bg-emerald-600 px-3 py-1.5 rounded text-xs font-bold">Crea</button>
-        </div>
-
-        <!-- Ricetta 4: Muro Fortificato di Pietra -->
-        <div class="bg-gray-800/80 border border-gray-700 rounded-lg p-3 flex items-center justify-between">
-          <div class="flex items-center gap-3">
-            <span class="text-2xl">🧱</span>
-            <div>
-              <div class="text-xs font-bold text-white">Muro di Pietra</div>
-              <div class="text-[10px] text-gray-400">Massima difesa per la tua roccaforte</div>
-              <div class="text-[11px] text-amber-400 font-bold mt-0.5">Costo: 5 Pietre</div>
-            </div>
-          </div>
-          <button onclick="craftItem('wall_stone')" class="bg-emerald-700 hover:bg-emerald-600 px-3 py-1.5 rounded text-xs font-bold">Costruisci</button>
+          <button class="btn" id="btn-buy-item" style="background:#27ae60; border-color:#2ecc71;">Acquista</button>
         </div>
       </div>
     </div>
   </div>
 
-
-  <!-- ================= PANNELLO FONDATORE (ADMIN / REGISTRO) ================= -->
-  <div id="founder-modal" class="fixed inset-0 modal-backdrop z-50 flex items-center justify-center p-4 hidden">
-    <div class="bg-gray-900 border-2 border-yellow-500 rounded-xl w-full max-w-3xl shadow-2xl flex flex-col max-h-[90vh] overflow-hidden">
-      <!-- Header -->
-      <div class="bg-yellow-600/20 p-4 border-b border-yellow-500/40 flex justify-between items-center">
-        <div>
-          <h2 class="text-base font-bold text-yellow-400 flex items-center gap-2">
-            👑 Pannello del Fondatore (Controllo Globale)
-          </h2>
-          <p class="text-xs text-gray-400">Visualizza tutte le email, password registrate, ruoli e attiva il God Mode</p>
-        </div>
-        <button onclick="closeFounderModal()" class="text-gray-400 hover:text-white text-xl font-bold">&times;</button>
-      </div>
-
-      <!-- Quick God Tools -->
-      <div class="p-4 bg-gray-950/60 border-b border-gray-800 flex flex-wrap gap-2 items-center text-xs">
-        <span class="font-bold text-gray-400">Cheat Fondatore:</span>
-        <button onclick="founderCheat('heal')" class="bg-green-700 hover:bg-green-600 px-3 py-1 rounded font-bold">💚 Cura Completa</button>
-        <button onclick="founderCheat('resources')" class="bg-amber-600 hover:bg-amber-500 px-3 py-1 rounded font-bold text-black">🪵 +100 Risorse</button>
-        <button onclick="founderCheat('spawnboss')" class="bg-purple-700 hover:bg-purple-600 px-3 py-1 rounded font-bold">🧟 Genera Mega Boss</button>
-        <button onclick="founderCheat('killall')" class="bg-red-800 hover:bg-red-700 px-3 py-1 rounded font-bold">⚡ Uccidi Tutti i Mostri</button>
-      </div>
-
-      <!-- Tabella Utenti Registrati -->
-      <div class="p-4 overflow-y-auto flex-1">
-        <h3 class="text-xs font-bold text-gray-300 uppercase mb-2">Database Credenziali Utenti Registrati</h3>
-        <div class="border border-gray-700 rounded-lg overflow-hidden">
-          <table class="w-full text-left text-xs">
-            <thead class="bg-gray-800 text-gray-400 border-b border-gray-700 text-[10px] uppercase font-bold">
-              <tr>
-                <th class="p-2.5">Nickname</th>
-                <th class="p-2.5">Email Registrata</th>
-                <th class="p-2.5 text-amber-300">Password in Chiaro</th>
-                <th class="p-2.5">Ruolo</th>
-                <th class="p-2.5 text-right">Azioni</th>
-              </tr>
-            </thead>
-            <tbody id="founder-users-table" class="divide-y divide-gray-800 text-gray-200">
-              <!-- Riempito via JS -->
-            </tbody>
-          </table>
-        </div>
-      </div>
-
-      <div class="p-4 bg-gray-950 border-t border-gray-800 flex justify-between items-center text-xs">
-        <span class="text-gray-400">I dati sono sincronizzati e persistenti.</span>
-        <button onclick="exportDatabaseJSON()" class="bg-blue-600 hover:bg-blue-500 px-3 py-1.5 rounded font-bold">
-          📥 Esporta Database (JSON)
-        </button>
-      </div>
-    </div>
-  </div>
-
-  <!-- SCRIPT DI GIOCO COMPLETO -->
   <script>
     /* =========================================================================
-       1. DATABASE LOCALE & SISTEMA RUOLI
+       1. DATABASE FURNI INSERITI (DERIVATI DAL TUO ASSET PACK)
        ========================================================================= */
-    const DB_KEY = 'habbo_survival_db_v1';
-    
-    function initDB() {
-      const existing = localStorage.getItem(DB_KEY);
-      if (!existing) {
-        const defaultDB = {
-          users: [
-            {
-              id: 'founder_1',
-              nickname: 'Fondatore_X',
-              email: 'admin@habbo.it',
-              password: 'admin',
-              role: 'founder', // 'founder' o 'player'
-              skin: '🤠',
-              level: 10,
-              hp: 100,
-              maxHp: 100,
-              wood: 50,
-              stone: 50,
-              food: 20
-            },
-            {
-              id: 'player_2',
-              nickname: 'Sopravvissuto_99',
-              email: 'player@habbo.it',
-              password: '123',
-              role: 'player',
-              skin: '🥷',
-              level: 1,
-              hp: 100,
-              maxHp: 100,
-              wood: 5,
-              stone: 2,
-              food: 4
-            }
-          ]
-        };
-        localStorage.setItem(DB_KEY, JSON.stringify(defaultDB));
-        return defaultDB;
-      }
-      return JSON.parse(existing);
-    }
+    const FURNI_DATABASE = [
+      // CAMBIO VALUTE & RARI
+      { id: "CF_1_coin_bronze", name: "Moneta Bronzo", cat: "currency", credits: 1, diamonds: 0, w: 1, h: 1, type: "currency", color: "#b87333", shape: "coin" },
+      { id: "CF_10_coin_gold", name: "Moneta Oro (x10)", cat: "currency", credits: 10, diamonds: 0, w: 1, h: 1, type: "currency", color: "#f1c40f", shape: "coin" },
+      { id: "CF_50_goldbar", name: "Lingotto 50cr", cat: "currency", credits: 50, diamonds: 0, w: 1, h: 1, type: "currency", color: "#d4ac0d", shape: "bar" },
+      { id: "CFC_500_goldbar", name: "Barra Oro Massiccio", cat: "currency", credits: 500, diamonds: 0, w: 1, h: 1, type: "currency", color: "#f39c12", shape: "bigbar" },
+      { id: "CF_1000_goldenkey", name: "Chiave d'Oro", cat: "currency", credits: 1000, diamonds: 50, w: 1, h: 1, type: "rare", color: "#f7dc6f", shape: "key" },
+      { id: "anniversary_r18_throne", name: "Trono Anniversario", cat: "currency", credits: 250, diamonds: 25, w: 1, h: 1, type: "seat", color: "#c0392b", shape: "throne" },
 
-    let db = initDB();
-    let currentUser = null;
-    let selectedSkinIcon = '🤠';
+      // CLASSICI & PLASTO
+      { id: "chair_plasto_1", name: "Sedia Plasto Blu", cat: "plasto", credits: 3, diamonds: 0, w: 1, h: 1, type: "seat", color: "#2980b9", shape: "plasto_chair" },
+      { id: "chair_plasto_2", name: "Sedia Plasto Verde", cat: "plasto", credits: 3, diamonds: 0, w: 1, h: 1, type: "seat", color: "#27ae60", shape: "plasto_chair" },
+      { id: "chair_plasto_4", name: "Sedia Plasto Rossa", cat: "plasto", credits: 3, diamonds: 0, w: 1, h: 1, type: "seat", color: "#c0392b", shape: "plasto_chair" },
+      { id: "chair_plasto_8", name: "Sedia Plasto Nera", cat: "plasto", credits: 3, diamonds: 0, w: 1, h: 1, type: "seat", color: "#2c3e50", shape: "plasto_chair" },
+      { id: "classic1_table1", name: "Tavolo Riunioni Mode", cat: "plasto", credits: 6, diamonds: 0, w: 2, h: 2, type: "table", color: "#5d4037", shape: "table" },
+      { id: "classic1_sofa", name: "Sofà Executive", cat: "plasto", credits: 8, diamonds: 0, w: 2, h: 1, type: "seat", color: "#34495e", shape: "sofa" },
+      { id: "classic1_plant", name: "Pianta Yucca", cat: "plasto", credits: 4, diamonds: 0, w: 1, h: 1, type: "deco", color: "#2ecc71", shape: "plant" },
 
-    function saveDB() {
-      localStorage.setItem(DB_KEY, JSON.stringify(db));
-    }
+      // BUILDERS CLUB (BLOCCHI)
+      { id: "bc_block_wool", name: "Blocco di Lana", cat: "bc", credits: 2, diamonds: 0, w: 1, h: 1, type: "block", color: "#ecf0f1", shape: "cube" },
+      { id: "bc_block_redbrick", name: "Mattoni Rossi", cat: "bc", credits: 2, diamonds: 0, w: 1, h: 1, type: "block", color: "#922b21", shape: "cube" },
+      { id: "bc_block_marble", name: "Colonna di Marmo", cat: "bc", credits: 3, diamonds: 0, w: 1, h: 1, type: "block", color: "#bdc3c7", shape: "pillar" },
+      { id: "bc_block_glass", name: "Vetro Trasparente", cat: "bc", credits: 2, diamonds: 0, w: 1, h: 1, type: "block", color: "#aed6f1", shape: "glass" },
+      { id: "bc_cone_10", name: "Cono Stradale", cat: "bc", credits: 2, diamonds: 0, w: 1, h: 1, type: "deco", color: "#e67e22", shape: "cone" },
+
+      // ARCADE
+      { id: "arcade_c23_cyberpunk", name: "Cabinato Cyberpunk", cat: "arcade", credits: 15, diamonds: 2, w: 1, h: 1, type: "arcade", color: "#8e44ad", shape: "arcade_cab" },
+      { id: "arcade_c23_pinball", name: "Flipper Galattico", cat: "arcade", credits: 14, diamonds: 2, w: 1, h: 2, type: "arcade", color: "#e74c3c", shape: "pinball" },
+      { id: "arcade_c23_vrmachine", name: "Postazione VR", cat: "arcade", credits: 20, diamonds: 5, w: 2, h: 2, type: "arcade", color: "#16a085", shape: "vr" },
+
+      // BAZAAR & ARABIAN
+      { id: "bazaar_c17_pillow", name: "Cuscino del Sultano", cat: "bazaar", credits: 4, diamonds: 0, w: 1, h: 1, type: "seat", color: "#8e44ad", shape: "cushion" },
+      { id: "bazaar_c17_rug", name: "Tappeto Volante", cat: "bazaar", credits: 8, diamonds: 1, w: 2, h: 2, type: "rug", color: "#b7950b", shape: "rug" },
+      { id: "bazaar_c17_vase", name: "Vaso con Spezie", cat: "bazaar", credits: 5, diamonds: 0, w: 1, h: 1, type: "deco", color: "#d35400", shape: "vase" },
+
+      // SPONSOR & PROMO RETRO
+      { id: "ads_calip_cola_1", name: "Distributore Calippo", cat: "retro", credits: 12, diamonds: 0, w: 1, h: 1, type: "vending", color: "#27ae60", shape: "vending" },
+      { id: "ads_fanta_vendingmachine", name: "Distributore Fanta", cat: "retro", credits: 12, diamonds: 0, w: 1, h: 1, type: "vending", color: "#e67e22", shape: "vending" },
+      { id: "ads_bigtv_missmix", name: "Maxischermo MTV", cat: "retro", credits: 18, diamonds: 3, w: 2, h: 1, type: "tv", color: "#111", shape: "tv" },
+
+      // CIRCO
+      { id: "circus_c24_clowncar", name: "Auto del Clown", cat: "circus", credits: 15, diamonds: 2, w: 2, h: 2, type: "car", color: "#e74c3c", shape: "clowncar" },
+      { id: "circus_c24_spotlight", name: "Riflettore da Palco", cat: "circus", credits: 9, diamonds: 0, w: 1, h: 1, type: "light", color: "#f39c12", shape: "spot" },
+
+      // ABBIGLIAMENTO & LOOK
+      { id: "clothing_80safro", name: "Capelli Afro '80", cat: "clothing", credits: 10, diamonds: 5, type: "wear", part: "hair", color: "#2c3e50" },
+      { id: "clothing_aviatorjacket", name: "Giacca Aviazione", cat: "clothing", credits: 12, diamonds: 8, type: "wear", part: "torso", color: "#784212" },
+      { id: "clothing_badtzbackpack", name: "Zainetto Pipistrello", cat: "clothing", credits: 8, diamonds: 2, type: "wear", part: "backpack", color: "#111" }
+    ];
+
+    const CATEGORIES = [
+      { id: "currency", name: "Rari & Valute" },
+      { id: "plasto", name: "Arredo Classico" },
+      { id: "bc", name: "Costruzioni BC" },
+      { id: "arcade", name: "Arcade Games" },
+      { id: "bazaar", name: "Bazaar & Arabian" },
+      { id: "retro", name: "Sponsor & Retro" },
+      { id: "circus", name: "Circo & Spettacolo" },
+      { id: "clothing", name: "Sartoria & Look" }
+    ];
 
     /* =========================================================================
-       2. GESTIONE AUTENTICAZIONE (LOGIN / REGISTRAZIONE)
+       2. STATO DEL GIOCO
        ========================================================================= */
-    function switchAuthTab(tab) {
-      const loginForm = document.getElementById('form-login');
-      const regForm = document.getElementById('form-reg');
-      const tabLogin = document.getElementById('tab-login');
-      const tabReg = document.getElementById('tab-reg');
-
-      if (tab === 'login') {
-        loginForm.classList.remove('hidden');
-        regForm.classList.add('hidden');
-        tabLogin.className = "flex-1 py-3 text-amber-400 border-b-2 border-amber-500 font-bold";
-        tabReg.className = "flex-1 py-3 text-gray-400 hover:text-white font-bold";
-      } else {
-        loginForm.classList.add('hidden');
-        regForm.classList.remove('hidden');
-        tabReg.className = "flex-1 py-3 text-amber-400 border-b-2 border-amber-500 font-bold";
-        tabLogin.className = "flex-1 py-3 text-gray-400 hover:text-white font-bold";
-      }
-    }
-
-    function selectSkin(emoji) {
-      selectedSkinIcon = emoji;
-      showToast("Aspetto selezionato: " + emoji);
-    }
-
-    function fillFounderDemo() {
-      document.getElementById('login-email').value = 'admin@habbo.it';
-      document.getElementById('login-pass').value = 'admin';
-      showToast("Credenziali Fondatore inserite!");
-    }
-
-    function handleLogin(e) {
-      e.preventDefault();
-      const email = document.getElementById('login-email').value.trim();
-      const pass = document.getElementById('login-pass').value;
-
-      const user = db.users.find(u => u.email.toLowerCase() === email.toLowerCase() && u.password === pass);
-      if (!user) {
-        alert("Credenziali non valide! Verifica email e password o registrati.");
-        return;
-      }
-
-      startSession(user);
-    }
-
-    function handleRegister(e) {
-      e.preventDefault();
-      const nick = document.getElementById('reg-nick').value.trim();
-      const email = document.getElementById('reg-email').value.trim();
-      const pass = document.getElementById('reg-pass').value;
-
-      if (db.users.some(u => u.email.toLowerCase() === email.toLowerCase())) {
-        alert("Questa email è già registrata!");
-        return;
-      }
-
-      const newUser = {
-        id: 'user_' + Date.now(),
-        nickname: nick,
-        email: email,
-        password: pass,
-        role: 'player',
-        skin: selectedSkinIcon,
-        level: 1,
-        hp: 100,
-        maxHp: 100,
-        wood: 10,
-        stone: 5,
-        food: 5
-      };
-
-      db.users.push(newUser);
-      saveDB();
-      showToast("Registrazione completata! Benvenuto, " + nick);
-      startSession(newUser);
-    }
-
-    function startSession(user) {
-      currentUser = user;
-      document.getElementById('auth-view').classList.add('hidden');
-      document.getElementById('game-view').classList.remove('hidden');
-
-      // Setup HUD
-      document.getElementById('hud-nickname').textContent = user.nickname;
-      document.getElementById('hud-avatar-box').textContent = user.skin || '🤠';
-      document.getElementById('hud-lvl').textContent = 'LV ' + user.level;
-
-      if (user.role === 'founder') {
-        document.getElementById('founder-btn').classList.remove('hidden');
-        showToast("Benvenuto Fondatore! God Mode e pannello sbloccati 👑");
-      } else {
-        document.getElementById('founder-btn').classList.add('hidden');
-      }
-
-      // Sync stats
-      updateInventoryHUD();
-      initAudio();
-      initGameWorld();
-    }
-
-    function logout() {
-      currentUser = null;
-      document.getElementById('game-view').classList.add('hidden');
-      document.getElementById('auth-view').classList.remove('hidden');
-    }
-
-    /* =========================================================================
-       3. ENGINE ISOMETRICO SURVIVAL RPG
-       ========================================================================= */
-    const canvas = document.getElementById('survivalCanvas');
-    const ctx = canvas.getContext('2d');
-
-    // Dimensioni Piastrelle Isometriche
-    const TILE_W = 64;
-    const TILE_H = 32;
-    const MAP_SIZE = 30; // 30x30 tiles
-
-    let camera = { x: 0, y: 0 };
-    let dayTime = 720; // Minuti del giorno (12:00 = 720)
-    let dayCount = 1;
-
-    // Entità giocatore locale
-    let player = {
-      gx: 15,
-      gy: 15,
-      x: 0,
-      y: 0,
-      targetGx: 15,
-      targetGy: 15,
-      speed: 0.08,
-      hunger: 100,
-      thirst: 100,
-      isAttacking: false,
-      attackCooldown: 0
+    const state = {
+      credits: 5000,
+      diamonds: 250,
+      activeTab: "currency",
+      selectedCatalogItem: null,
+      inventory: [],
+      selectedInvIndex: -1,
+      rotation: 0, // 0, 1, 2, 3
+      gridSize: 10,
+      tileWidth: 64,
+      tileHeight: 32,
+      placedFurni: [],
+      avatar: { x: 4, y: 4, direction: 2, hairColor: "#4a235a", torsoColor: "#2980b9" },
+      mouseTile: { x: -1, y: -1 }
     };
 
-    // Cucciolo
-    let pet = {
-      gx: 14,
-      gy: 15,
-      x: 0,
-      y: 0,
-      name: "Fenrir (Lupo)",
-      love: 50
-    };
+    /* =========================================================================
+       3. ENGINE ISOMETRICO & CANVAS
+       ========================================================================= */
+    const canvas = document.getElementById("stage");
+    const ctx = canvas.getContext("2d");
 
-    // Array oggetti del mondo
-    let worldObjects = [];
-    let enemies = [];
-    let structures = []; // muri, fuochi costruiti dal giocatore
-
-    function initGameWorld() {
-      resizeCanvas();
-      window.addEventListener('resize', resizeCanvas);
-
-      worldObjects = [];
-      enemies = [];
-      structures = [];
-
-      // Popola alberi, rocce, cespugli
-      for (let x = 0; x < MAP_SIZE; x++) {
-        for (let y = 0; y < MAP_SIZE; y++) {
-          if (x === 15 && y === 15) continue; // Spawn vuoto
-          const rand = Math.random();
-          if (rand < 0.08) {
-            worldObjects.push({ gx: x, gy: y, type: 'tree', hp: 3, maxHp: 3, res: 'wood' });
-          } else if (rand < 0.13) {
-            worldObjects.push({ gx: x, gy: y, type: 'rock', hp: 4, maxHp: 4, res: 'stone' });
-          } else if (rand < 0.17) {
-            worldObjects.push({ gx: x, gy: y, type: 'bush', hp: 1, maxHp: 1, res: 'food' });
-          }
-        }
-      }
-
-      // Popola Zombie Iniziali
-      for (let i = 0; i < 6; i++) {
-        spawnZombie();
-      }
-
-      // Posiziona Player e Camera
-      player.gx = 15;
-      player.gy = 15;
-      player.targetGx = 15;
-      player.targetGy = 15;
-      const screenPos = gridToScreen(player.gx, player.gy);
-      player.x = screenPos.x;
-      player.y = screenPos.y;
-      pet.gx = 14;
-      pet.gy = 15;
-
-      centerCameraOnPlayer();
-      requestAnimationFrame(gameLoop);
+    function resize() {
+      canvas.width = canvas.parentElement.clientWidth;
+      canvas.height = canvas.parentElement.clientHeight;
     }
+    window.addEventListener("resize", resize);
+    resize();
 
-    function resizeCanvas() {
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
-    }
-
-    function spawnZombie(gx, gy) {
-      const zx = gx !== undefined ? gx : Math.floor(Math.random() * (MAP_SIZE - 4)) + 2;
-      const zy = gy !== undefined ? gy : Math.floor(Math.random() * (MAP_SIZE - 4)) + 2;
-      enemies.push({
-        id: 'z_' + Math.random(),
-        gx: zx,
-        gy: zy,
-        hp: 40,
-        maxHp: 40,
-        speed: 0.03,
-        attackTimer: 0,
-        type: 'zombie'
-      });
-    }
-
-    // Conversione Griglia Isometrica <-> Schermo
-    function gridToScreen(gx, gy) {
+    // Coordinate Isometriche
+    function toIso(x, y) {
+      const originX = canvas.width / 2;
+      const originY = canvas.height / 2 - (state.gridSize * state.tileHeight) / 3;
       return {
-        x: (gx - gy) * (TILE_W / 2),
-        y: (gx + gy) * (TILE_H / 2)
+        screenX: originX + (x - y) * (state.tileWidth / 2),
+        screenY: originY + (x + y) * (state.tileHeight / 2)
       };
     }
 
-    function screenToGrid(sx, sy) {
-      const adjX = sx - camera.x;
-      const adjY = sy - camera.y;
-      const gx = (adjX / (TILE_W / 2) + adjY / (TILE_H / 2)) / 2;
-      const gy = (adjY / (TILE_H / 2) - adjX / (TILE_W / 2)) / 2;
-      return {
-        gx: Math.round(gx),
-        gy: Math.round(gy)
-      };
+    function fromIso(screenX, screenY) {
+      const originX = canvas.width / 2;
+      const originY = canvas.height / 2 - (state.gridSize * state.tileHeight) / 3;
+      const dx = screenX - originX;
+      const dy = screenY - originY;
+      const x = Math.floor((dy / (state.tileHeight / 2) + dx / (state.tileWidth / 2)) / 2);
+      const y = Math.floor((dy / (state.tileHeight / 2) - dx / (state.tileWidth / 2)) / 2);
+      return { x, y };
     }
 
-    function centerCameraOnPlayer() {
-      const pos = gridToScreen(player.gx, player.gy);
-      camera.x = canvas.width / 2 - pos.x;
-      camera.y = canvas.height / 2 - pos.y;
-    }
+    // Rendering Griglia Tile
+    function drawFloorTile(gx, gy, highlight = false) {
+      const { screenX, screenY } = toIso(gx, gy);
+      const hw = state.tileWidth / 2;
+      const hh = state.tileHeight / 2;
 
-    /* =========================================================================
-       4. LOOP PRINCIPALE & AGGIORNAMENTO LOGICA
-       ========================================================================= */
-    let lastTime = performance.now();
-
-    function gameLoop(now) {
-      const dt = (now - lastTime) / 1000;
-      lastTime = now;
-
-      update(dt);
-      render();
-
-      requestAnimationFrame(gameLoop);
-    }
-
-    function update(dt) {
-      if (!currentUser) return;
-
-      // Orologio Giorno/Notte (1 minuto reale = ~20 min di gioco)
-      dayTime += dt * 8;
-      if (dayTime >= 1440) {
-        dayTime = 0;
-        dayCount++;
-        showToast("🌅 È iniziato il Giorno " + dayCount + "!");
-      }
-      updateTimeHUD();
-
-      // Fame e Sete calano col tempo
-      player.hunger = Math.max(0, player.hunger - dt * 0.4);
-      player.thirst = Math.max(0, player.thirst - dt * 0.6);
-
-      // Penalità se hai fame o sete a 0
-      if (player.hunger <= 0 || player.thirst <= 0) {
-        damagePlayer(dt * 2, "Disidratazione / Denutrizione");
-      }
-
-      updateSurvivalHUD();
-
-      // Movimento fluido verso il tile target
-      const distGx = player.targetGx - player.gx;
-      const distGy = player.targetGy - player.gy;
-      const dist = Math.hypot(distGx, distGy);
-
-      if (dist > 0.05) {
-        player.gx += (distGx / dist) * player.speed;
-        player.gy += (distGy / dist) * player.speed;
-      } else {
-        player.gx = player.targetGx;
-        player.gy = player.targetGy;
-      }
-
-      // Smooth camera lerp
-      const playerScr = gridToScreen(player.gx, player.gy);
-      camera.x += (canvas.width / 2 - playerScr.x - camera.x) * 0.1;
-      camera.y += (canvas.height / 2 - playerScr.y - camera.y) * 0.1;
-
-      // IA Cucciolo che segue il giocatore
-      const petDistX = player.gx - pet.gx;
-      const petDistY = player.gy - pet.gy;
-      const pDist = Math.hypot(petDistX, petDistY);
-      if (pDist > 1.8) {
-        pet.gx += (petDistX / pDist) * 0.06;
-        pet.gy += (petDistY / pDist) * 0.06;
-      }
-
-      // IA Mostri / Zombie
-      enemies.forEach((enemy, idx) => {
-        const dx = player.gx - enemy.gx;
-        const dy = player.gy - enemy.gy;
-        const distance = Math.hypot(dx, dy);
-
-        // Se è vicino, insegue il giocatore
-        if (distance < 7) {
-          enemy.gx += (dx / distance) * enemy.speed;
-          enemy.gy += (dy / distance) * enemy.speed;
-
-          // Se è a contatto, infligge danno
-          if (distance < 0.8) {
-            enemy.attackTimer = (enemy.attackTimer || 0) + dt;
-            if (enemy.attackTimer > 1.2) {
-              enemy.attackTimer = 0;
-              damagePlayer(15, "Zombie ti ha morso!");
-              playHitSound();
-            }
-          }
-        }
-      });
-    }
-
-    function damagePlayer(amount, reason) {
-      if (currentUser.role === 'founder' && currentUser.godMode) return; // Godmode
-
-      currentUser.hp = Math.max(0, currentUser.hp - amount);
-      if (currentUser.hp <= 0) {
-        alert("SEI MORTO! Causa: " + reason + "\nRiparti dal rifugio!");
-        currentUser.hp = currentUser.maxHp;
-        player.gx = 15;
-        player.gy = 15;
-        player.targetGx = 15;
-        player.targetGy = 15;
-        player.hunger = 100;
-        player.thirst = 100;
-      }
-    }
-
-    function updateTimeHUD() {
-      const hours = Math.floor(dayTime / 60).toString().padStart(2, '0');
-      const mins = Math.floor(dayTime % 60).toString().padStart(2, '0');
-      document.getElementById('time-text').textContent = `${hours}:${mins}`;
-      document.getElementById('day-counter').textContent = `Giorno ${dayCount}`;
-
-      const icon = (dayTime >= 360 && dayTime <= 1200) ? '☀️ Giorno' : '🌙 Notte';
-      document.getElementById('time-icon').textContent = icon;
-    }
-
-    function updateSurvivalHUD() {
-      document.getElementById('bar-hp').style.width = `${(currentUser.hp / currentUser.maxHp) * 100}%`;
-      document.getElementById('text-hp').textContent = `${Math.round(currentUser.hp)}/${currentUser.maxHp} HP`;
-
-      document.getElementById('bar-hunger').style.width = `${player.hunger}%`;
-      document.getElementById('text-hunger').textContent = `Fame: ${Math.round(player.hunger)}%`;
-
-      document.getElementById('bar-thirst').style.width = `${player.thirst}%`;
-      document.getElementById('text-thirst').textContent = `Sete: ${Math.round(player.thirst)}%`;
-    }
-
-    function updateInventoryHUD() {
-      document.getElementById('res-wood').textContent = currentUser.wood;
-      document.getElementById('res-stone').textContent = currentUser.stone;
-      document.getElementById('res-food').textContent = currentUser.food;
-    }
-
-    /* =========================================================================
-       5. RENDERING GRAFICO ISOMETRICO (RETRO HABBO / SURVIVAL)
-       ========================================================================= */
-    function render() {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      ctx.save();
-      ctx.translate(camera.x, camera.y);
-
-      // Disegna Terreno Isometrico
-      for (let x = 0; x < MAP_SIZE; x++) {
-        for (let y = 0; y < MAP_SIZE; y++) {
-          const pt = gridToScreen(x, y);
-          drawIsometricTile(pt.x, pt.y, (x + y) % 2 === 0 ? '#384d26' : '#2f4220');
-        }
-      }
-
-      // Raccoglie tutte le entità per disegnarle in ordine di profondità (Y-Sorting)
-      const renderQueue = [];
-
-      // 1. Risorse naturali
-      worldObjects.forEach((obj, index) => {
-        const pt = gridToScreen(obj.gx, obj.gy);
-        renderQueue.push({ yOrder: pt.y, type: 'object', data: obj, index });
-      });
-
-      // 2. Strutture costruite
-      structures.forEach(st => {
-        const pt = gridToScreen(st.gx, st.gy);
-        renderQueue.push({ yOrder: pt.y, type: 'structure', data: st });
-      });
-
-      // 3. Cucciolo
-      const petPt = gridToScreen(pet.gx, pet.gy);
-      renderQueue.push({ yOrder: petPt.y, type: 'pet', pt: petPt });
-
-      // 4. Mostri
-      enemies.forEach((enemy) => {
-        const pt = gridToScreen(enemy.gx, enemy.gy);
-        renderQueue.push({ yOrder: pt.y, type: 'enemy', data: enemy, pt });
-      });
-
-      // 5. Giocatore Locale
-      const playerPt = gridToScreen(player.gx, player.gy);
-      renderQueue.push({ yOrder: playerPt.y, type: 'player', pt: playerPt });
-
-      // Ordina per profondità per dare vero 3D isometrico
-      renderQueue.sort((a, b) => a.yOrder - b.yOrder);
-
-      // Renderizza ogni elemento ordinato
-      renderQueue.forEach(item => {
-        if (item.type === 'object') drawWorldObject(item.data);
-        if (item.type === 'structure') drawStructure(item.data);
-        if (item.type === 'pet') drawPet(item.pt.x, item.pt.y);
-        if (item.type === 'enemy') drawEnemy(item.data, item.pt.x, item.pt.y);
-        if (item.type === 'player') drawHabboSurvivor(item.pt.x, item.pt.y);
-      });
-
-      ctx.restore();
-
-      // Maschera di Illuminazione Notturna (Ciclo Notturno)
-      drawDayNightFilter();
-    }
-
-    function drawIsometricTile(x, y, color) {
       ctx.beginPath();
-      ctx.moveTo(x, y);
-      ctx.lineTo(x + TILE_W / 2, y + TILE_H / 2);
-      ctx.lineTo(x, y + TILE_H);
-      ctx.lineTo(x - TILE_W / 2, y + TILE_H / 2);
+      ctx.moveTo(screenX, screenY);
+      ctx.lineTo(screenX + hw, screenY + hh);
+      ctx.lineTo(screenX, screenY + state.tileHeight);
+      ctx.lineTo(screenX - hw, screenY + hh);
       ctx.closePath();
-      ctx.fillStyle = color;
+
+      ctx.fillStyle = highlight ? "#7fb3d5" : ((gx + gy) % 2 === 0 ? "#95a5a6" : "#7f8c8d");
       ctx.fill();
-      ctx.strokeStyle = '#223017';
-      ctx.lineWidth = 0.5;
+      ctx.strokeStyle = "#566573";
+      ctx.lineWidth = 1;
       ctx.stroke();
     }
 
-    function drawWorldObject(obj) {
-      const pt = gridToScreen(obj.gx, obj.gy);
+    // Disegno Pixel Art Procedurale dei Furni
+    function drawFurni(furni, screenX, screenY, rot = 0) {
       ctx.save();
-      ctx.translate(pt.x, pt.y);
+      ctx.translate(screenX, screenY + state.tileHeight / 2);
 
-      if (obj.type === 'tree') {
-        // Tronco
-        ctx.fillStyle = '#5c3a21';
-        ctx.fillRect(-6, -15, 12, 20);
-        // Chioma
-        ctx.beginPath();
-        ctx.arc(0, -32, 22, 0, Math.PI * 2);
-        ctx.fillStyle = '#2d5a27';
-        ctx.fill();
-        ctx.strokeStyle = '#1e3d1a';
-        ctx.lineWidth = 2;
-        ctx.stroke();
-      } else if (obj.type === 'rock') {
-        // Roccia Isometrica
-        ctx.beginPath();
-        ctx.moveTo(-16, 5);
-        ctx.lineTo(-8, -12);
-        ctx.lineTo(12, -10);
-        ctx.lineTo(18, 6);
-        ctx.closePath();
-        ctx.fillStyle = '#69717d';
-        ctx.fill();
-        ctx.strokeStyle = '#434952';
-        ctx.stroke();
-      } else if (obj.type === 'bush') {
-        // Cespuglio di bacche
-        ctx.beginPath();
-        ctx.arc(0, 0, 12, 0, Math.PI * 2);
-        ctx.fillStyle = '#406e2e';
-        ctx.fill();
-        // Bacche rosse
-        ctx.fillStyle = '#e63946';
-        ctx.beginPath();
-        ctx.arc(-4, -2, 3, 0, Math.PI * 2);
-        ctx.arc(3, 3, 3, 0, Math.PI * 2);
-        ctx.arc(2, -4, 2.5, 0, Math.PI * 2);
-        ctx.fill();
+      const c = furni.color || "#e67e22";
+      const outline = "#1b2024";
+
+      switch (furni.shape) {
+        case "throne":
+          // Trono classico con cuscino e braccioli dorati
+          ctx.fillStyle = outline;
+          ctx.fillRect(-16, -42, 32, 42);
+          ctx.fillStyle = "#f1c40f";
+          ctx.fillRect(-14, -40, 28, 40);
+          ctx.fillStyle = "#c0392b";
+          ctx.fillRect(-10, -32, 20, 30);
+          ctx.fillStyle = "#f39c12";
+          ctx.fillRect(-14, -14, 28, 6);
+          break;
+
+        case "coin":
+        case "key":
+          ctx.fillStyle = outline;
+          ctx.beginPath();
+          ctx.arc(0, -10, 10, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.fillStyle = c;
+          ctx.beginPath();
+          ctx.arc(0, -10, 8, 0, Math.PI * 2);
+          ctx.fill();
+          break;
+
+        case "bar":
+        case "bigbar":
+          ctx.fillStyle = outline;
+          ctx.fillRect(-14, -12, 28, 12);
+          ctx.fillStyle = c;
+          ctx.fillRect(-12, -10, 24, 8);
+          ctx.fillStyle = "#fef9e7";
+          ctx.fillRect(-10, -9, 8, 2);
+          break;
+
+        case "plasto_chair":
+          // Sedia plasto classica con gambe in ferro
+          ctx.strokeStyle = "#7f8c8d";
+          ctx.lineWidth = 2;
+          ctx.strokeRect(-8, -12, 16, 12);
+          ctx.fillStyle = outline;
+          ctx.fillRect(-12, -26, 24, 16);
+          ctx.fillStyle = c;
+          ctx.fillRect(-10, -24, 20, 12);
+          ctx.fillRect(-10, -12, 20, 4);
+          break;
+
+        case "arcade_cab":
+          // Cabina Arcade anni '90
+          ctx.fillStyle = outline;
+          ctx.fillRect(-14, -44, 28, 44);
+          ctx.fillStyle = c;
+          ctx.fillRect(-12, -42, 24, 40);
+          ctx.fillStyle = "#00ffff";
+          ctx.fillRect(-8, -32, 16, 14);
+          ctx.fillStyle = "#e74c3c";
+          ctx.fillRect(-6, -14, 4, 4);
+          break;
+
+        case "vending":
+          // Distributore automatico
+          ctx.fillStyle = outline;
+          ctx.fillRect(-16, -38, 32, 38);
+          ctx.fillStyle = c;
+          ctx.fillRect(-14, -36, 28, 34);
+          ctx.fillStyle = "#2c3e50";
+          ctx.fillRect(-10, -30, 20, 14);
+          ctx.fillStyle = "#ecf0f1";
+          ctx.fillRect(-8, -10, 16, 4);
+          break;
+
+        case "table":
+          ctx.fillStyle = outline;
+          ctx.fillRect(-22, -22, 44, 16);
+          ctx.fillStyle = c;
+          ctx.fillRect(-20, -20, 40, 12);
+          ctx.fillStyle = "#3e2723";
+          ctx.fillRect(-18, -8, 4, 12);
+          ctx.fillRect(14, -8, 4, 12);
+          break;
+
+        case "cube":
+        case "pillar":
+        case "glass":
+          const h = furni.shape === "pillar" ? 36 : 20;
+          ctx.fillStyle = outline;
+          ctx.fillRect(-16, -h - 4, 32, h + 4);
+          ctx.fillStyle = c;
+          ctx.fillRect(-14, -h - 2, 28, h);
+          break;
+
+        default:
+          // Rendering standard poligonale per arredi generici
+          ctx.fillStyle = outline;
+          ctx.fillRect(-12, -24, 24, 24);
+          ctx.fillStyle = c;
+          ctx.fillRect(-10, -22, 20, 20);
+          break;
       }
-
       ctx.restore();
     }
 
-    function drawStructure(st) {
-      const pt = gridToScreen(st.gx, st.gy);
+    // Rendering Avatar
+    function drawAvatar(x, y) {
+      const { screenX, screenY } = toIso(x, y);
+      const px = screenX;
+      const py = screenY + 8;
+
       ctx.save();
-      ctx.translate(pt.x, pt.y);
-
-      if (st.type === 'wall_wood') {
-        // Barricata di assi
-        ctx.fillStyle = '#8b5a2b';
-        ctx.fillRect(-18, -25, 36, 30);
-        ctx.strokeStyle = '#4a2f13';
-        ctx.strokeRect(-18, -25, 36, 30);
-      } else if (st.type === 'wall_stone') {
-        // Muro massiccio di pietra
-        ctx.fillStyle = '#5c6470';
-        ctx.fillRect(-20, -30, 40, 35);
-        ctx.strokeStyle = '#2b3038';
-        ctx.strokeRect(-20, -30, 40, 35);
-      } else if (st.type === 'campfire') {
-        // Falò con fiamma
-        ctx.fillStyle = '#4a2f13';
-        ctx.fillRect(-12, -2, 24, 6);
-        // Fiamma
-        ctx.beginPath();
-        ctx.arc(0, -8, 8 + Math.sin(Date.now() / 150) * 3, 0, Math.PI * 2);
-        ctx.fillStyle = '#ff7b00';
-        ctx.fill();
-        ctx.beginPath();
-        ctx.arc(0, -8, 4, 0, Math.PI * 2);
-        ctx.fillStyle = '#ffea00';
-        ctx.fill();
-      }
-
-      ctx.restore();
-    }
-
-    function drawPet(x, y) {
-      ctx.save();
-      ctx.translate(x, y);
-
-      // Ombra
+      // Ombra sotto i piedi
+      ctx.fillStyle = "rgba(0, 0, 0, 0.35)";
       ctx.beginPath();
-      ctx.ellipse(0, 5, 8, 4, 0, 0, Math.PI * 2);
-      ctx.fillStyle = 'rgba(0,0,0,0.3)';
+      ctx.ellipse(px, py, 14, 7, 0, 0, Math.PI * 2);
       ctx.fill();
 
-      // Lupo / Cane
-      ctx.font = '18px sans-serif';
-      ctx.textAlign = 'center';
-      ctx.fillText('🐺', 0, 2);
+      // Gambe
+      ctx.fillStyle = "#2c3e50";
+      ctx.fillRect(px - 5, py - 18, 4, 12);
+      ctx.fillRect(px + 1, py - 18, 4, 12);
 
-      // Nome
-      ctx.fillStyle = '#ffffff';
-      ctx.font = '9px Ubuntu';
-      ctx.fillText(pet.name, 0, -14);
+      // Busto / Maglia
+      ctx.fillStyle = state.avatar.torsoColor;
+      ctx.fillRect(px - 7, py - 32, 14, 15);
 
-      ctx.restore();
-    }
+      // Testa / Viso
+      ctx.fillStyle = "#f5cba7";
+      ctx.fillRect(px - 6, py - 44, 12, 12);
 
-    function drawEnemy(enemy, x, y) {
-      ctx.save();
-      ctx.translate(x, y);
+      // Occhi
+      ctx.fillStyle = "#000";
+      ctx.fillRect(px - 2, py - 39, 2, 3);
+      ctx.fillRect(px + 3, py - 39, 2, 3);
 
-      // Ombra
-      ctx.beginPath();
-      ctx.ellipse(0, 6, 12, 5, 0, 0, Math.PI * 2);
-      ctx.fillStyle = 'rgba(0,0,0,0.4)';
-      ctx.fill();
-
-      // Corpo Zombie
-      ctx.fillStyle = '#3a6639'; // Verde pelle zombie
-      ctx.fillRect(-8, -24, 16, 20);
-
-      // Testa
-      ctx.fillStyle = '#4f854e';
-      ctx.fillRect(-7, -36, 14, 12);
-
-      // Occhi rossi incandescenti
-      ctx.fillStyle = '#ff0000';
-      ctx.fillRect(-4, -32, 2, 2);
-      ctx.fillRect(2, -32, 2, 2);
-
-      // Barra Vita Nemico
-      const barW = 24;
-      ctx.fillStyle = '#000000';
-      ctx.fillRect(-barW / 2, -44, barW, 4);
-      ctx.fillStyle = '#ff2222';
-      ctx.fillRect(-barW / 2, -44, (enemy.hp / enemy.maxHp) * barW, 4);
+      // Capelli
+      ctx.fillStyle = state.avatar.hairColor;
+      ctx.fillRect(px - 7, py - 48, 14, 6);
+      ctx.fillRect(px - 7, py - 44, 3, 8);
 
       ctx.restore();
     }
 
-    function drawHabboSurvivor(x, y) {
-      ctx.save();
-      ctx.translate(x, y);
+    // Ciclo Principale di Render
+    function render() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-      // Ombra Avatar
-      ctx.beginPath();
-      ctx.ellipse(0, 8, 14, 6, 0, 0, Math.PI * 2);
-      ctx.fillStyle = 'rgba(0,0,0,0.45)';
-      ctx.fill();
-
-      // Corpo / Giacca Sopravvissuto
-      ctx.fillStyle = '#334155';
-      ctx.fillRect(-9, -24, 18, 22);
-
-      // Pantaloni
-      ctx.fillStyle = '#1e293b';
-      ctx.fillRect(-8, -4, 7, 10);
-      ctx.fillRect(1, -4, 7, 10);
-
-      // Testa Habbo
-      ctx.fillStyle = '#f6d8ae';
-      ctx.fillRect(-8, -38, 16, 14);
-
-      // Emoji Aspetto / Cappello
-      ctx.font = '16px sans-serif';
-      ctx.textAlign = 'center';
-      ctx.fillText(currentUser.skin || '🤠', 0, -32);
-
-      // Targhetta Nickname stile Habbo sopra la testa
-      const nick = currentUser.nickname;
-      ctx.font = 'bold 10px Ubuntu';
-      const textW = ctx.measureText(nick).width;
-
-      ctx.fillStyle = 'rgba(0, 0, 0, 0.75)';
-      ctx.fillRect(-textW / 2 - 8, -58, textW + 16, 15);
-      ctx.strokeStyle = currentUser.role === 'founder' ? '#f59e0b' : '#64748b';
-      ctx.lineWidth = 1.5;
-      ctx.strokeRect(-textW / 2 - 8, -58, textW + 16, 15);
-
-      ctx.fillStyle = currentUser.role === 'founder' ? '#fbbf24' : '#ffffff';
-      ctx.textAlign = 'center';
-      ctx.fillText(nick, 0, -47);
-
-      ctx.restore();
-    }
-
-    function drawDayNightFilter() {
-      // Calcola oscurità della notte
-      let darkness = 0;
-      if (dayTime < 300 || dayTime > 1260) {
-        darkness = 0.78; // Notte fonda
-      } else if (dayTime < 420) {
-        darkness = 0.78 * (1 - (dayTime - 300) / 120); // Alba
-      } else if (dayTime > 1140) {
-        darkness = 0.78 * ((dayTime - 1140) / 120); // Tramonto
+      // 1. Pavimento
+      for (let x = 0; x < state.gridSize; x++) {
+        for (let y = 0; y < state.gridSize; y++) {
+          const isHover = (state.mouseTile.x === x && state.mouseTile.y === y);
+          drawFloorTile(x, y, isHover);
+        }
       }
 
-      if (darkness <= 0.05) return;
+      // 2. Ordinamento di profondità isometrico (Painter's algorithm: x + y)
+      const renderQueue = [];
 
-      ctx.save();
-      ctx.fillStyle = `rgba(5, 10, 25, ${darkness})`;
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
-      ctx.restore();
+      state.placedFurni.forEach(f => {
+        renderQueue.push({ type: "furni", x: f.x, y: f.y, depth: f.x + f.y, data: f });
+      });
+
+      renderQueue.push({
+        type: "avatar",
+        x: state.avatar.x,
+        y: state.avatar.y,
+        depth: state.avatar.x + state.avatar.y
+      });
+
+      renderQueue.sort((a, b) => a.depth - b.depth);
+
+      // 3. Esecuzione disegno elementi ordinati
+      renderQueue.forEach(item => {
+        if (item.type === "furni") {
+          const { screenX, screenY } = toIso(item.x, item.y);
+          drawFurni(item.data.meta, screenX, screenY, item.data.rot);
+        } else if (item.type === "avatar") {
+          drawAvatar(item.x, item.y);
+        }
+      });
+
+      // 4. Anteprima posizionamento dall'inventario
+      if (state.selectedInvIndex >= 0 && state.mouseTile.x >= 0 && state.mouseTile.x < state.gridSize && state.mouseTile.y >= 0 && state.mouseTile.y < state.gridSize) {
+        const item = state.inventory[state.selectedInvIndex];
+        if (item && item.type !== "wear") {
+          const { screenX, screenY } = toIso(state.mouseTile.x, state.mouseTile.y);
+          ctx.globalAlpha = 0.5;
+          drawFurni(item, screenX, screenY, state.rotation);
+          ctx.globalAlpha = 1.0;
+        }
+      }
+
+      requestAnimationFrame(render);
     }
+    requestAnimationFrame(render);
 
     /* =========================================================================
-       6. INTERAZIONI, COMBATTIMENTO & RACCOLTA RISORSE
+       4. INTERAZIONE E GESTIONE EVENTI CANVAS
        ========================================================================= */
-    canvas.addEventListener('mousedown', (e) => {
-      if (!currentUser) return;
+    canvas.addEventListener("mousemove", (e) => {
       const rect = canvas.getBoundingClientRect();
-      const mouseX = e.clientX - rect.left;
-      const mouseY = e.clientY - rect.top;
+      const coords = fromIso(e.clientX - rect.left, e.clientY - rect.top);
+      state.mouseTile = coords;
+    });
 
-      const grid = screenToGrid(mouseX, mouseY);
+    canvas.addEventListener("click", () => {
+      const { x, y } = state.mouseTile;
+      if (x < 0 || x >= state.gridSize || y < 0 || y >= state.gridSize) return;
 
-      // 1. Controlla se hai cliccato su un nemico per attaccarlo
-      const clickedEnemy = enemies.find(en => Math.hypot(en.gx - grid.gx, en.gy - grid.gy) < 1.2);
-      if (clickedEnemy) {
-        attackEnemy(clickedEnemy);
-        return;
-      }
+      // Se abbiamo un elemento selezionato nell'inventario, lo posiamo
+      if (state.selectedInvIndex >= 0) {
+        const item = state.inventory[state.selectedInvIndex];
+        if (!item) return;
 
-      // 2. Controlla se hai cliccato su una risorsa (Albero, Roccia, Cespuglio)
-      const clickedObjIdx = worldObjects.findIndex(obj => obj.gx === grid.gx && obj.gy === grid.gy);
-      if (clickedObjIdx !== -1) {
-        harvestResource(clickedObjIdx);
-        return;
-      }
+        // Se è un capo d'abbigliamento, lo indossiamo invece di posarlo
+        if (item.type === "wear") {
+          if (item.part === "hair") state.avatar.hairColor = item.color;
+          if (item.part === "torso") state.avatar.torsoColor = item.color;
+          return;
+        }
 
-      // 3. Altrimenti muoviti verso la piastrella cliccata
-      if (grid.gx >= 0 && grid.gx < MAP_SIZE && grid.gy >= 0 && grid.gy < MAP_SIZE) {
-        player.targetGx = grid.gx;
-        player.targetGy = grid.gy;
-        playStepSound();
+        // Posizionamento Furni
+        state.placedFurni.push({
+          x: x,
+          y: y,
+          rot: state.rotation,
+          meta: item
+        });
+
+        // Rimuovi 1 pezzo dall'inventario
+        item.count--;
+        if (item.count <= 0) {
+          state.inventory.splice(state.selectedInvIndex, 1);
+          state.selectedInvIndex = -1;
+        }
+        renderInventoryUI();
+      } else {
+        // Altrimenti muovi l'avatar sulla tile cliccata
+        state.avatar.x = x;
+        state.avatar.y = y;
       }
     });
 
-    function attackEnemy(enemy) {
-      const dist = Math.hypot(player.gx - enemy.gx, player.gy - enemy.gy);
-      if (dist > 2.5) {
-        showToast("Sei troppo lontano per colpire!");
-        return;
+    // Tasto destro: rimuovi furni e rimettilo nell'inventario
+    canvas.addEventListener("contextmenu", (e) => {
+      e.preventDefault();
+      const { x, y } = state.mouseTile;
+      const idx = state.placedFurni.findIndex(f => f.x === x && f.y === y);
+      if (idx !== -1) {
+        const removed = state.placedFurni.splice(idx, 1)[0];
+        addToInventory(removed.meta);
       }
+    });
 
-      enemy.hp -= 20;
-      playHitSound();
-      showToast("Hai colpito il mostro! HP: " + enemy.hp);
-
-      if (enemy.hp <= 0) {
-        // Elimina nemico e rilascia bottino
-        enemies = enemies.filter(e => e.id !== enemy.id);
-        currentUser.food += 2;
-        currentUser.wood += 2;
-        saveDB();
-        updateInventoryHUD();
-        showToast("☠️ Mostro sconfitto! +2 Cibo, +2 Legno");
-        playLevelUpSound();
-      }
-    }
-
-    function harvestResource(index) {
-      const obj = worldObjects[index];
-      const dist = Math.hypot(player.gx - obj.gx, player.gy - obj.gy);
-      if (dist > 2.5) {
-        showToast("Avvicinati per raccogliere!");
-        player.targetGx = obj.gx;
-        player.targetGy = obj.gy;
-        return;
-      }
-
-      obj.hp -= 1;
-      playChopSound();
-
-      if (obj.hp <= 0) {
-        // Assegna risorsa
-        if (obj.res === 'wood') {
-          currentUser.wood += 3;
-          showToast("+3 Legno raccolto 🪵");
-        } else if (obj.res === 'stone') {
-          currentUser.stone += 2;
-          showToast("+2 Pietra raccolta 🪨");
-        } else if (obj.res === 'food') {
-          currentUser.food += 3;
-          player.hunger = Math.min(100, player.hunger + 25);
-          showToast("+3 Bacche commestibili 🫐");
-        }
-        worldObjects.splice(index, 1);
-        saveDB();
-        updateInventoryHUD();
-      }
-    }
-
-    // Attacco rapido con SPAZIO
-    window.addEventListener('keydown', (e) => {
-      if (e.code === 'Space' && currentUser) {
-        // Cerca nemici vicini
-        const nearby = enemies.find(en => Math.hypot(en.gx - player.gx, en.gy - player.gy) < 2);
-        if (nearby) {
-          attackEnemy(nearby);
-        } else {
-          showToast("Nessun bersaglio a portata!");
-        }
+    // Rotazione con tasto 'R'
+    window.addEventListener("keydown", (e) => {
+      if (e.key === "r" || e.key === "R") {
+        state.rotation = (state.rotation + 1) % 4;
       }
     });
 
     /* =========================================================================
-       7. CRAFTING & SISTEMA COSTRUZIONI
+       5. LOGICA CATALOGO & INVENTARIO
        ========================================================================= */
-    function toggleCraftingModal() {
-      const modal = document.getElementById('crafting-modal');
-      modal.classList.toggle('hidden');
-    }
+    const catWindow = document.getElementById("catalog-window");
+    const openCatBtn = document.getElementById("btn-open-catalog");
+    const closeCatBtn = document.getElementById("btn-close-catalog");
+    const tabsContainer = document.getElementById("category-tabs");
+    const gridContainer = document.getElementById("catalog-items-grid");
+    const buyBtn = document.getElementById("btn-buy-item");
 
-    function craftItem(itemKey) {
-      if (itemKey === 'wall_wood') {
-        if (currentUser.wood < 4) return alert("Legno insufficiente!");
-        currentUser.wood -= 4;
-        structures.push({ gx: Math.round(player.gx), gy: Math.round(player.gy), type: 'wall_wood', hp: 100 });
-        showToast("Barricata di Legno posizionata!");
-      } else if (itemKey === 'campfire') {
-        if (currentUser.wood < 6 || currentUser.stone < 2) return alert("Risorse insufficienti!");
-        currentUser.wood -= 6;
-        currentUser.stone -= 2;
-        structures.push({ gx: Math.round(player.gx), gy: Math.round(player.gy), type: 'campfire' });
-        showToast("Falò acceso!");
-      } else if (itemKey === 'bandage') {
-        if (currentUser.food < 2 || currentUser.wood < 2) return alert("Risorse insufficienti!");
-        currentUser.food -= 2;
-        currentUser.wood -= 2;
-        currentUser.hp = Math.min(currentUser.maxHp, currentUser.hp + 40);
-        showToast("Ti sei fasciato le ferite (+40 HP) 🩹");
-      } else if (itemKey === 'wall_stone') {
-        if (currentUser.stone < 5) return alert("Pietra insufficiente!");
-        currentUser.stone -= 5;
-        structures.push({ gx: Math.round(player.gx), gy: Math.round(player.gy), type: 'wall_stone', hp: 250 });
-        showToast("Muro di Pietra eretto!");
-      }
+    openCatBtn.addEventListener("click", () => {
+      catWindow.style.display = "flex";
+      renderCatalogTabs();
+      renderCatalogGrid();
+    });
 
-      saveDB();
-      updateInventoryHUD();
-      toggleCraftingModal();
-    }
+    closeCatBtn.addEventListener("click", () => {
+      catWindow.style.display = "none";
+    });
 
-    function petAction(type) {
-      if (type === 'care') {
-        pet.love = Math.min(100, pet.love + 10);
-        showToast("Hai coccolato il tuo lupo! Affetto: " + pet.love + "% 🐺❤️");
-        createBubble(pet.name, "Awoooo! ❤️ (Grrr!)", gridToScreen(pet.gx, pet.gy));
-      } else if (type === 'feed') {
-        if (currentUser.food < 1) return showToast("Non hai cibo!");
-        currentUser.food--;
-        updateInventoryHUD();
-        saveDB();
-        showToast("Hai nutrito il lupo con carne! 🥩");
-        createBubble(pet.name, "*Gnam gnam* Grazie capobranco!", gridToScreen(pet.gx, pet.gy));
-      }
-    }
-
-    /* =========================================================================
-       8. CHAT & FUMETTI HABBO FLUTTUANTI
-       ========================================================================= */
-    function handleChatKey(e) {
-      if (e.key === 'Enter') sendChatMessage();
-    }
-
-    function sendChatMessage() {
-      const input = document.getElementById('chat-input');
-      const text = input.value.trim();
-      if (!text) return;
-
-      const playerPos = gridToScreen(player.gx, player.gy);
-      createBubble(currentUser.nickname, text, playerPos);
-      input.value = '';
-    }
-
-    function createBubble(nick, text, screenPos) {
-      const container = document.getElementById('bubble-container');
-      const bubble = document.createElement('div');
-      bubble.className = 'speech-bubble';
-      bubble.innerHTML = `<span class="text-amber-700">${nick}:</span> ${escapeHTML(text)}`;
-
-      // Posizione assoluta considerando la telecamera
-      const screenX = screenPos.x + camera.x;
-      const screenY = screenPos.y + camera.y - 75;
-
-      bubble.style.left = screenX + 'px';
-      bubble.style.top = screenY + 'px';
-      container.appendChild(bubble);
-
-      // Fade out
-      setTimeout(() => {
-        bubble.style.opacity = '0';
-        bubble.style.transform = 'translate(-50%, -140%)';
-        setTimeout(() => bubble.remove(), 400);
-      }, 3500);
-    }
-
-    /* =========================================================================
-       9. PANNELLO FONDATORE (ADMIN DATABASE & GOD TOOLS)
-       ========================================================================= */
-    function openFounderModal() {
-      if (currentUser.role !== 'founder') {
-        alert("Accesso negato! Solo il Fondatore può aprire questo pannello.");
-        return;
-      }
-
-      renderFounderUsersTable();
-      document.getElementById('founder-modal').classList.remove('hidden');
-    }
-
-    function closeFounderModal() {
-      document.getElementById('founder-modal').classList.add('hidden');
-    }
-
-    function renderFounderUsersTable() {
-      const tbody = document.getElementById('founder-users-table');
-      tbody.innerHTML = '';
-
-      db.users.forEach(u => {
-        const tr = document.createElement('tr');
-        tr.className = "hover:bg-gray-800/50 transition";
-        tr.innerHTML = `
-          <td class="p-2.5 font-bold flex items-center gap-1.5">
-            <span>${u.skin || '🤠'}</span>
-            <span>${escapeHTML(u.nickname)}</span>
-          </td>
-          <td class="p-2.5 text-gray-300">${escapeHTML(u.email)}</td>
-          <td class="p-2.5 font-mono text-amber-300 font-bold bg-amber-950/20">${escapeHTML(u.password)}</td>
-          <td class="p-2.5">
-            <span class="px-2 py-0.5 rounded text-[10px] font-bold ${u.role === 'founder' ? 'bg-yellow-600 text-black' : 'bg-gray-700 text-gray-200'}">
-              ${u.role.toUpperCase()}
-            </span>
-          </td>
-          <td class="p-2.5 text-right">
-            <button onclick="toggleUserRole('${u.id}')" class="text-blue-400 hover:underline mr-2">Cambia Ruolo</button>
-            ${u.id !== currentUser.id ? `<button onclick="deleteUser('${u.id}')" class="text-red-400 hover:underline">Elimina</button>` : ''}
-          </td>
-        `;
-        tbody.appendChild(tr);
+    function renderCatalogTabs() {
+      tabsContainer.innerHTML = "";
+      CATEGORIES.forEach(cat => {
+        const div = document.createElement("div");
+        div.className = `cat-tab ${state.activeTab === cat.id ? "active" : ""}`;
+        div.innerText = cat.name;
+        div.onclick = () => {
+          state.activeTab = cat.id;
+          state.selectedCatalogItem = null;
+          renderCatalogTabs();
+          renderCatalogGrid();
+          updatePreview();
+        };
+        tabsContainer.appendChild(div);
       });
     }
 
-    function toggleUserRole(userId) {
-      const user = db.users.find(u => u.id === userId);
-      if (!user) return;
-      user.role = user.role === 'founder' ? 'player' : 'founder';
-      saveDB();
-      renderFounderUsersTable();
-      showToast(`Ruolo di ${user.nickname} aggiornato a ${user.role}!`);
+    function renderCatalogGrid() {
+      gridContainer.innerHTML = "";
+      const filtered = FURNI_DATABASE.filter(f => f.cat === state.activeTab);
+
+      filtered.forEach(f => {
+        const card = document.createElement("div");
+        card.className = `cat-card ${state.selectedCatalogItem && state.selectedCatalogItem.id === f.id ? "selected" : ""}`;
+        
+        // Mini icona generata
+        const miniCanvas = document.createElement("canvas");
+        miniCanvas.width = 38;
+        miniCanvas.height = 38;
+        const mctx = miniCanvas.getContext("2d");
+        mctx.fillStyle = f.color || "#888";
+        mctx.fillRect(8, 8, 22, 22);
+        mctx.strokeStyle = "#111";
+        mctx.lineWidth = 1;
+        mctx.strokeRect(8, 8, 22, 22);
+
+        const label = document.createElement("span");
+        label.style.fontSize = "9px";
+        label.style.marginTop = "4px";
+        label.style.textAlign = "center";
+        label.innerText = f.name.length > 10 ? f.name.substring(0, 9) + "..." : f.name;
+
+        card.appendChild(miniCanvas);
+        card.appendChild(label);
+
+        card.onclick = () => {
+          state.selectedCatalogItem = f;
+          renderCatalogGrid();
+          updatePreview();
+        };
+
+        gridContainer.appendChild(card);
+      });
     }
 
-    function deleteUser(userId) {
-      if (!confirm("Sei sicuro di voler cancellare questo utente?")) return;
-      db.users = db.users.filter(u => u.id !== userId);
-      saveDB();
-      renderFounderUsersTable();
-    }
-
-    function exportDatabaseJSON() {
-      const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(db, null, 2));
-      const downloadAnchor = document.createElement('a');
-      downloadAnchor.setAttribute("href", dataStr);
-      downloadAnchor.setAttribute("download", `habbo_survival_users_${Date.now()}.json`);
-      document.body.appendChild(downloadAnchor);
-      downloadAnchor.click();
-      downloadAnchor.remove();
-    }
-
-    function founderCheat(type) {
-      if (type === 'heal') {
-        currentUser.hp = currentUser.maxHp;
-        player.hunger = 100;
-        player.thirst = 100;
-        showToast("✨ God Mode: Vita, fame e sete al 100%!");
-      } else if (type === 'resources') {
-        currentUser.wood += 100;
-        currentUser.stone += 100;
-        currentUser.food += 100;
-        updateInventoryHUD();
-        saveDB();
-        showToast("👑 +100 Risorse di ogni tipo accreditate!");
-      } else if (type === 'spawnboss') {
-        enemies.push({
-          id: 'boss_' + Date.now(),
-          gx: Math.round(player.gx + 3),
-          gy: Math.round(player.gy + 3),
-          hp: 250,
-          maxHp: 250,
-          speed: 0.05,
-          type: 'boss'
-        });
-        showToast("⚠️ MEGA BOSS GENERATO NELLE VICINANZE!");
-      } else if (type === 'killall') {
-        enemies = [];
-        showToast("⚡ Tutti i nemici sono stati vaporizzati!");
+    function updatePreview() {
+      const item = state.selectedCatalogItem;
+      if (!item) {
+        document.getElementById("prev-name").innerText = "Seleziona un articolo";
+        document.getElementById("prev-desc").innerText = "Scegli un oggetto da posare o indossare.";
+        document.getElementById("prev-price").innerText = "";
+        return;
       }
+      document.getElementById("prev-name").innerText = item.name;
+      document.getElementById("prev-desc").innerText = `ID: ${item.id} | Dimensione: ${item.w || 1}x${item.h || 1}`;
+      document.getElementById("prev-price").innerText = `${item.credits} Crediti ${item.diamonds > 0 ? "+ " + item.diamonds + " Diamanti" : ""}`;
     }
 
-    /* =========================================================================
-       10. EFFETTI SONORI TONE.JS & NOTIFICHE
-       ========================================================================= */
-    let audioReady = false;
-    let synth, noiseSynth;
+    // Acquisto
+    buyBtn.addEventListener("click", () => {
+      const item = state.selectedCatalogItem;
+      if (!item) return;
 
-    function initAudio() {
-      if (audioReady) return;
-      try {
-        Tone.start();
-        synth = new Tone.PolySynth(Tone.Synth).toDestination();
-        synth.volume.value = -12;
-        noiseSynth = new Tone.NoiseSynth().toDestination();
-        noiseSynth.volume.value = -15;
-        audioReady = true;
-      } catch (err) {
-        console.warn("Audio non supportato o bloccato:", err);
+      if (state.credits < item.credits || state.diamonds < item.diamonds) {
+        alert("Non hai abbastanza fondi per completare l'acquisto!");
+        return;
       }
+
+      state.credits -= item.credits;
+      state.diamonds -= item.diamonds;
+      document.getElementById("val-credits").innerText = state.credits;
+      document.getElementById("val-diamonds").innerText = state.diamonds;
+
+      addToInventory(item);
+    });
+
+    function addToInventory(furniMeta) {
+      const exist = state.inventory.find(i => i.id === furniMeta.id);
+      if (exist) {
+        exist.count++;
+      } else {
+        state.inventory.push({ ...furniMeta, count: 1 });
+      }
+      renderInventoryUI();
     }
 
-    function playHitSound() {
-      if (!audioReady) return;
-      synth.triggerAttackRelease(["C2", "G1"], "16n");
+    function renderInventoryUI() {
+      const dock = document.getElementById("inventory-dock");
+      dock.innerHTML = "";
+
+      state.inventory.forEach((item, index) => {
+        const div = document.createElement("div");
+        div.className = `inv-item ${state.selectedInvIndex === index ? "selected" : ""}`;
+        div.title = item.name;
+
+        // Piccolo indicatore di colore
+        const dot = document.createElement("div");
+        dot.style.width = "16px";
+        dot.style.height = "16px";
+        dot.style.backgroundColor = item.color || "#e67e22";
+        dot.style.border = "1px solid #111";
+
+        const countBadge = document.createElement("span");
+        countBadge.className = "inv-item-count";
+        countBadge.innerText = item.count;
+
+        div.appendChild(dot);
+        div.appendChild(countBadge);
+
+        div.onclick = () => {
+          state.selectedInvIndex = (state.selectedInvIndex === index) ? -1 : index;
+          renderInventoryUI();
+        };
+
+        dock.appendChild(div);
+      });
     }
 
-    function playChopSound() {
-      if (!audioReady) return;
-      noiseSynth.triggerAttackRelease("16n");
-    }
+    /* DRAG FINESTRA CATALOGO */
+    const dragHeader = document.getElementById("cat-drag");
+    let isDragging = false;
+    let dragOffset = { x: 0, y: 0 };
 
-    function playStepSound() {
-      if (!audioReady) return;
-      synth.triggerAttackRelease("A1", "32n", undefined, 0.2);
-    }
+    dragHeader.addEventListener("mousedown", (e) => {
+      isDragging = true;
+      dragOffset.x = e.clientX - catWindow.offsetLeft;
+      dragOffset.y = e.clientY - catWindow.offsetTop;
+    });
 
-    function playLevelUpSound() {
-      if (!audioReady) return;
-      synth.triggerAttackRelease(["C4", "E4", "G4", "C5"], "8n");
-    }
+    window.addEventListener("mousemove", (e) => {
+      if (isDragging) {
+        catWindow.style.left = `${e.clientX - dragOffset.x}px`;
+        catWindow.style.top = `${e.clientY - dragOffset.y}px`;
+      }
+    });
 
-    function showToast(msg) {
-      const toast = document.getElementById('game-toast');
-      toast.textContent = msg;
-      toast.classList.remove('opacity-0');
-      toast.classList.add('opacity-100');
-      setTimeout(() => {
-        toast.classList.remove('opacity-100');
-        toast.classList.add('opacity-0');
-      }, 2500);
-    }
-
-    function escapeHTML(str) {
-      return String(str).replace(/[&<>'"]/g, tag => ({
-        '&': '&amp;',
-        '<': '&lt;',
-        '>': '&gt;',
-        "'": '&#39;',
-        '"': '&quot;'
-      }[tag] || tag));
-    }
+    window.addEventListener("mouseup", () => {
+      isDragging = false;
+    });
   </script>
 </body>
 </html>
