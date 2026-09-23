@@ -2,58 +2,33 @@
 <html lang="it">
 <head>
   <meta charset="UTF-8">
-  <title>Habbo Retro Engine - Catalogo Completo & Stanza Isometrica</title>
+  <title>Habbo Hotel - Client Ufficiale & Catalogo Grafiche Originali</title>
   <style>
+    @import url('https://fonts.googleapis.com/css2?family=Ubuntu:wght@400;700&display=swap');
+
     * {
       box-sizing: border-box;
       user-select: none;
       margin: 0;
       padding: 0;
-      font-family: "Volter Goldfish", "Ubuntu", Tahoma, sans-serif;
+      font-family: 'Ubuntu', Tahoma, Verdana, sans-serif;
       font-size: 11px;
     }
+
     body {
-      background: #1e262c;
+      background: #000;
       color: #fff;
       overflow: hidden;
+      height: 100vh;
       display: flex;
       flex-direction: column;
-      height: 100vh;
     }
 
-    /* TOP BAR STATS */
-    #topbar {
-      height: 38px;
-      background: #2b3339;
-      border-bottom: 2px solid #101518;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 0 16px;
-      z-index: 10;
-    }
-    .wallet-box {
-      display: flex;
-      gap: 15px;
-    }
-    .badge {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      background: #1b2024;
-      padding: 4px 10px;
-      border-radius: 4px;
-      border: 1px solid #3d474e;
-      font-weight: bold;
-    }
-    .coin-gold { color: #f5b041; }
-    .diamond { color: #5dade2; }
-
-    /* VIEWPORT STANZA */
-    #game-container {
+    /* AREA STANZA */
+    #room-viewport {
       flex: 1;
       position: relative;
-      background: radial-gradient(circle at center, #2e3943 0%, #171d22 100%);
+      background: #000;
       overflow: hidden;
     }
     canvas {
@@ -61,159 +36,212 @@
       image-rendering: pixelated;
     }
 
-    /* TOOLBAR INFERIORE */
+    /* BARRA INFERIORE ORIGINALE HABBO */
     #bottom-bar {
-      height: 48px;
-      background: #242b31;
-      border-top: 2px solid #14181b;
+      height: 52px;
+      background: linear-gradient(180deg, #444f56 0%, #293237 50%, #1c2327 100%);
+      border-top: 2px solid #5a676f;
+      box-shadow: 0 -2px 10px rgba(0,0,0,0.6);
       display: flex;
       align-items: center;
-      padding: 0 10px;
-      gap: 10px;
+      padding: 0 16px;
+      gap: 12px;
       z-index: 10;
     }
-    .btn {
-      background: #41515d;
-      border: 2px solid #5a6e7e;
-      border-bottom-color: #28323a;
-      border-right-color: #28323a;
+
+    .habbo-btn {
+      background: linear-gradient(180deg, #008cd2 0%, #005f93 100%);
+      border: 1px solid #73d2ff;
+      border-bottom: 2px solid #003653;
+      border-right: 2px solid #003653;
+      border-radius: 4px;
       color: #fff;
-      padding: 6px 14px;
-      font-weight: bold;
+      font-weight: 700;
+      font-size: 12px;
+      padding: 7px 16px;
       cursor: pointer;
+      text-shadow: 1px 1px 2px #000;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.4);
       display: flex;
       align-items: center;
       gap: 6px;
     }
-    .btn:hover { background: #4e606e; }
-    .btn:active {
-      border-color: #28323a #5a6e7e #5a6e7e #28323a;
+    .habbo-btn:hover {
+      background: linear-gradient(180deg, #1aa4ed 0%, #0074b4 100%);
+    }
+    .habbo-btn:active {
+      border: 1px solid #003653;
+      border-top: 2px solid #00253a;
+      background: #005482;
+      box-shadow: none;
     }
 
-    /* INVENTARIO DOCK */
-    #inventory-dock {
-      flex: 1;
+    /* WALLET BOX TOP-RIGHT */
+    #purse {
+      position: absolute;
+      top: 14px;
+      right: 14px;
       display: flex;
+      flex-direction: column;
+      gap: 6px;
+      z-index: 5;
+    }
+    .purse-badge {
+      background: rgba(28, 35, 39, 0.9);
+      border: 1px solid #48565f;
+      border-radius: 4px;
+      padding: 5px 12px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      min-width: 125px;
+      font-weight: bold;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.6);
+    }
+
+    /* INVENTARIO SLOTS */
+    #inventory-tray {
+      flex: 1;
+      height: 42px;
+      background: #14181a;
+      border: 1px solid #3d474e;
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      padding: 0 6px;
       gap: 6px;
       overflow-x: auto;
-      padding: 4px;
-      background: #1b2024;
-      border: 1px solid #343f47;
-      border-radius: 4px;
-      height: 38px;
-      align-items: center;
     }
-    .inv-item {
-      min-width: 32px;
-      height: 32px;
-      background: #2d373f;
-      border: 1px solid #4a5966;
-      border-radius: 3px;
+    .inv-slot {
+      width: 36px;
+      height: 36px;
+      background: #252e33;
+      border: 1px solid #48565f;
+      border-radius: 4px;
       cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: center;
       position: relative;
     }
-    .inv-item.selected {
-      border-color: #f1c40f;
-      box-shadow: 0 0 5px #f1c40f;
+    .inv-slot:hover { border-color: #f1c40f; }
+    .inv-slot.selected {
+      border: 2px solid #f1c40f;
+      background: #39464e;
     }
-    .inv-item-count {
+    .inv-slot img {
+      max-width: 30px;
+      max-height: 30px;
+      image-rendering: pixelated;
+    }
+    .inv-count {
       position: absolute;
       bottom: 1px;
       right: 2px;
       font-size: 9px;
-      color: #ddd;
+      color: #f1c40f;
+      font-weight: bold;
+      text-shadow: 1px 1px 1px #000;
     }
 
-    /* FINESTRA CATALOGO */
-    .habbo-window {
+    /* FINESTRA CATALOGO HABBO ORIGINS */
+    #catalog-modal {
       position: absolute;
-      top: 50px;
-      left: 50px;
-      width: 580px;
-      height: 440px;
-      background: #e2e2e2;
-      color: #222;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 630px;
+      height: 490px;
+      background: #e9ecef;
       border-radius: 6px;
-      box-shadow: 0 8px 24px rgba(0,0,0,0.6);
+      border: 2px solid #ffffff;
+      box-shadow: 0 12px 40px rgba(0,0,0,0.85);
       display: none;
       flex-direction: column;
-      border: 2px solid #ffffff;
       z-index: 100;
+      color: #333;
     }
-    .habbo-header {
-      background: #1c5274;
+    .modal-header {
+      height: 34px;
+      background: linear-gradient(180deg, #1c5576 0%, #11364d 100%);
       color: #fff;
-      padding: 6px 10px;
       font-weight: bold;
+      padding: 0 14px;
       display: flex;
-      justify-content: space-between;
       align-items: center;
+      justify-content: space-between;
       border-radius: 4px 4px 0 0;
+      border-bottom: 2px solid #0b2230;
       cursor: move;
     }
-    .habbo-close {
-      background: #d9534f;
+    .close-btn {
+      width: 20px;
+      height: 20px;
+      background: #c0392b;
       color: #fff;
       border: 1px solid #fff;
-      padding: 0 6px;
-      cursor: pointer;
+      border-radius: 3px;
       font-weight: bold;
+      line-height: 18px;
+      text-align: center;
+      cursor: pointer;
     }
-    .catalog-body {
+    .catalog-main {
       flex: 1;
       display: flex;
-      padding: 8px;
-      gap: 8px;
+      padding: 10px;
+      gap: 10px;
       overflow: hidden;
     }
-    .catalog-tabs {
-      width: 140px;
-      background: #ced5d9;
-      border: 1px solid #a4b0b7;
+    .catalog-menu {
+      width: 165px;
+      background: #c5ced4;
+      border: 1px solid #9eabb3;
+      border-radius: 4px;
+      padding: 5px;
       display: flex;
       flex-direction: column;
-      gap: 2px;
-      padding: 4px;
+      gap: 3px;
       overflow-y: auto;
     }
-    .cat-tab {
-      padding: 6px 8px;
-      background: #b5c1c7;
-      border: 1px solid #94a3ab;
+    .menu-item {
+      padding: 8px 10px;
+      background: #b1bcc3;
+      border: 1px solid #8e9ca4;
+      border-radius: 3px;
       cursor: pointer;
       font-weight: bold;
-      border-radius: 3px;
+      color: #24333c;
     }
-    .cat-tab.active {
+    .menu-item.active {
       background: #fff;
-      border-color: #1c5274;
-      color: #1c5274;
+      color: #11364d;
+      border-color: #11364d;
     }
-    .catalog-content {
+    .catalog-page {
       flex: 1;
+      background: #fff;
+      border: 1px solid #9eabb3;
+      border-radius: 4px;
       display: flex;
       flex-direction: column;
-      background: #fff;
-      border: 1px solid #a4b0b7;
-      padding: 8px;
+      padding: 10px;
     }
     .catalog-grid {
       flex: 1;
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(68px, 1fr));
       grid-auto-rows: 68px;
-      gap: 6px;
+      gap: 8px;
       overflow-y: auto;
-      padding: 4px;
-      background: #f7f9fa;
-      border: 1px solid #d5dcde;
+      background: #f4f6f7;
+      border: 1px solid #d0d7db;
+      padding: 8px;
+      border-radius: 3px;
     }
-    .cat-card {
-      border: 1px solid #c9d2d6;
+    .furni-slot {
       background: #fff;
+      border: 1px solid #c2cbcf;
       border-radius: 4px;
       display: flex;
       flex-direction: column;
@@ -223,90 +251,98 @@
       padding: 4px;
       position: relative;
     }
-    .cat-card:hover {
-      background: #eef5f9;
-      border-color: #1c5274;
+    .furni-slot:hover { border-color: #008cd2; background: #f0f7fb; }
+    .furni-slot.selected {
+      border: 2px solid #e67e22;
+      background: #fef5e7;
     }
-    .cat-card.selected {
-      border: 2px solid #f39c12;
-      background: #fef9e7;
+    .furni-slot img {
+      max-width: 42px;
+      max-height: 42px;
+      image-rendering: pixelated;
     }
-    .catalog-preview {
+    .furni-preview-bar {
       height: 95px;
-      border-top: 1px solid #d5dcde;
+      border-top: 1px solid #d0d7db;
       margin-top: 8px;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 6px;
+      padding: 0 8px;
     }
-    .preview-info {
+    .preview-left {
       display: flex;
-      flex-direction: column;
-      gap: 4px;
+      align-items: center;
+      gap: 12px;
     }
-    .preview-title {
-      font-weight: bold;
+    .preview-img-box {
+      width: 50px;
+      height: 50px;
+      background: #f7f9fa;
+      border: 1px solid #c8d3d8;
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .preview-img-box img {
+      max-width: 44px;
+      max-height: 44px;
+      image-rendering: pixelated;
+    }
+    .price-tag {
       font-size: 13px;
-      color: #1c5274;
-    }
-    .preview-cost {
       font-weight: bold;
       color: #d35400;
-    }
-    .rotate-hint {
-      position: absolute;
-      bottom: 60px;
-      left: 10px;
-      background: rgba(0,0,0,0.7);
-      padding: 6px 12px;
-      border-radius: 4px;
-      font-size: 11px;
-      pointer-events: none;
     }
   </style>
 </head>
 <body>
 
-  <!-- BARRA SUPERIORE -->
-  <div id="topbar">
-    <div style="font-size:14px; font-weight:bold; letter-spacing:1px; color:#f1c40f;">HABBO ORIGINS ENGINE</div>
-    <div class="wallet-box">
-      <div class="badge coin-gold">● Crediti: <span id="val-credits">5000</span></div>
-      <div class="badge diamond">◆ Diamanti: <span id="val-diamonds">250</span></div>
+  <div id="purse">
+    <div class="purse-badge">
+      <span style="color:#f1c40f;">🪙 Crediti:</span>
+      <span id="cr-count">3000</span>
+    </div>
+    <div class="purse-badge">
+      <span style="color:#5dade2;">💎 Diamanti:</span>
+      <span id="dia-count">250</span>
     </div>
   </div>
 
-  <!-- STANZA ISOMETRICA -->
-  <div id="game-container">
-    <canvas id="stage"></canvas>
-    <div class="rotate-hint">Premi <b>R</b> per ruotare l'oggetto selezionato prima di posarlo. Clicca con tasto destro su un furni per rimuoverlo.</div>
+  <div id="room-viewport">
+    <canvas id="habbo-canvas"></canvas>
   </div>
 
-  <!-- TOOLBAR INFERIORE -->
   <div id="bottom-bar">
-    <button class="btn" id="btn-open-catalog">🛒 Catalogo</button>
-    <div style="color:#aaa; font-weight:bold;">Inventario:</div>
-    <div id="inventory-dock"></div>
+    <button class="habbo-btn" id="open-cat-btn">🛒 Negozio</button>
+    <div style="font-weight:bold; color:#a2b1bb; margin-left:6px;">Inventario:</div>
+    <div id="inventory-tray"></div>
+    <div style="font-size:10px; color:#8496a3;">Premi <b>[R]</b> per ruotare i furni • <b>Tasto destro</b> sul furni posizionato per ritirarlo</div>
   </div>
 
-  <!-- FINESTRA CATALOGO -->
-  <div class="habbo-window" id="catalog-window">
-    <div class="habbo-header" id="cat-drag">
-      <span>Catalogo Ufficiale</span>
-      <span class="habbo-close" id="btn-close-catalog">✕</span>
+  <!-- MODALE CATALOGO -->
+  <div id="catalog-modal">
+    <div class="modal-header" id="modal-drag">
+      <span>Catalogo Ufficiale Arredi</span>
+      <div class="close-btn" id="close-cat-btn">✕</div>
     </div>
-    <div class="catalog-body">
-      <div class="catalog-tabs" id="category-tabs"></div>
-      <div class="catalog-content">
-        <div class="catalog-grid" id="catalog-items-grid"></div>
-        <div class="catalog-preview">
-          <div class="preview-info">
-            <span class="preview-title" id="prev-name">Seleziona un articolo</span>
-            <span id="prev-desc" style="color:#666;">Esplora i mobili inseriti nel gioco.</span>
-            <span class="preview-cost" id="prev-price"></span>
+    <div class="catalog-main">
+      <div class="catalog-menu" id="cat-tabs-container"></div>
+      <div class="catalog-page">
+        <div class="catalog-grid" id="cat-items-container"></div>
+        <div class="furni-preview-bar">
+          <div class="preview-left">
+            <div class="preview-img-box">
+              <img id="prev-icon" src="" style="display:none;" />
+            </div>
+            <div>
+              <div id="prev-title" style="font-weight:bold; font-size:13px; color:#1c5576;">Seleziona un articolo</div>
+              <div id="prev-desc" style="color:#666;">Scegli un furni dal catalogo per visualizzarne il prezzo</div>
+              <div id="prev-cost" class="price-tag" style="margin-top:2px;"></div>
+            </div>
           </div>
-          <button class="btn" id="btn-buy-item" style="background:#27ae60; border-color:#2ecc71;">Acquista</button>
+          <button class="habbo-btn" id="btn-buy" style="background:linear-gradient(180deg, #27ae60 0%, #196f3d 100%); border-color:#58d68d; font-size:13px; padding:8px 24px;">Compra</button>
         </div>
       </div>
     </div>
@@ -314,577 +350,479 @@
 
   <script>
     /* =========================================================================
-       1. DATABASE FURNI INSERITI (DERIVATI DAL TUO ASSET PACK)
+       1. URL BASE CDN GITHUB UFFICIALE (REPOSITORY HIGOKA)
        ========================================================================= */
-    const FURNI_DATABASE = [
-      // CAMBIO VALUTE & RARI
-      { id: "CF_1_coin_bronze", name: "Moneta Bronzo", cat: "currency", credits: 1, diamonds: 0, w: 1, h: 1, type: "currency", color: "#b87333", shape: "coin" },
-      { id: "CF_10_coin_gold", name: "Moneta Oro (x10)", cat: "currency", credits: 10, diamonds: 0, w: 1, h: 1, type: "currency", color: "#f1c40f", shape: "coin" },
-      { id: "CF_50_goldbar", name: "Lingotto 50cr", cat: "currency", credits: 50, diamonds: 0, w: 1, h: 1, type: "currency", color: "#d4ac0d", shape: "bar" },
-      { id: "CFC_500_goldbar", name: "Barra Oro Massiccio", cat: "currency", credits: 500, diamonds: 0, w: 1, h: 1, type: "currency", color: "#f39c12", shape: "bigbar" },
-      { id: "CF_1000_goldenkey", name: "Chiave d'Oro", cat: "currency", credits: 1000, diamonds: 50, w: 1, h: 1, type: "rare", color: "#f7dc6f", shape: "key" },
-      { id: "anniversary_r18_throne", name: "Trono Anniversario", cat: "currency", credits: 250, diamonds: 25, w: 1, h: 1, type: "seat", color: "#c0392b", shape: "throne" },
+    const CDN_BASE = "https://cdn.jsdelivr.net/gh/higoka/habbo-furniture-icon/icon/";
 
-      // CLASSICI & PLASTO
-      { id: "chair_plasto_1", name: "Sedia Plasto Blu", cat: "plasto", credits: 3, diamonds: 0, w: 1, h: 1, type: "seat", color: "#2980b9", shape: "plasto_chair" },
-      { id: "chair_plasto_2", name: "Sedia Plasto Verde", cat: "plasto", credits: 3, diamonds: 0, w: 1, h: 1, type: "seat", color: "#27ae60", shape: "plasto_chair" },
-      { id: "chair_plasto_4", name: "Sedia Plasto Rossa", cat: "plasto", credits: 3, diamonds: 0, w: 1, h: 1, type: "seat", color: "#c0392b", shape: "plasto_chair" },
-      { id: "chair_plasto_8", name: "Sedia Plasto Nera", cat: "plasto", credits: 3, diamonds: 0, w: 1, h: 1, type: "seat", color: "#2c3e50", shape: "plasto_chair" },
-      { id: "classic1_table1", name: "Tavolo Riunioni Mode", cat: "plasto", credits: 6, diamonds: 0, w: 2, h: 2, type: "table", color: "#5d4037", shape: "table" },
-      { id: "classic1_sofa", name: "Sofà Executive", cat: "plasto", credits: 8, diamonds: 0, w: 2, h: 1, type: "seat", color: "#34495e", shape: "sofa" },
-      { id: "classic1_plant", name: "Pianta Yucca", cat: "plasto", credits: 4, diamonds: 0, w: 1, h: 1, type: "deco", color: "#2ecc71", shape: "plant" },
+    const FURNI_ITEMS = [
+      // 1. RARI & VALUTE
+      { id: "CFC_500_goldbar", name: "Lingotto 500cr", cat: "currency", credits: 500, diamonds: 0, icon: "CFC_500_goldbar_icon.png" },
+      { id: "LT_throne", name: "Trono Habbo Classico", cat: "currency", credits: 250, diamonds: 50, icon: "LT_throne_icon.png" },
+      { id: "CF_10_coin_gold", name: "Moneta d'Oro (10cr)", cat: "currency", credits: 10, diamonds: 0, icon: "CF_10_coin_gold_icon.png" },
+      { id: "CF_20_moneybag", name: "Sacco di Denaro", cat: "currency", credits: 20, diamonds: 0, icon: "CF_20_moneybag_icon.png" },
+      { id: "CF_200_ruby", name: "Rubino Prezioso", cat: "currency", credits: 200, diamonds: 10, icon: "CF_200_ruby_icon.png" },
+      { id: "CF_240_sapphire", name: "Zaffiro Reale", cat: "currency", credits: 240, diamonds: 15, icon: "CF_240_sapphire_icon.png" },
+      { id: "CF_1000_goldenkey", name: "Chiave d'Oro", cat: "currency", credits: 1000, diamonds: 75, icon: "CF_1000_goldenkey_icon.png" },
 
-      // BUILDERS CLUB (BLOCCHI)
-      { id: "bc_block_wool", name: "Blocco di Lana", cat: "bc", credits: 2, diamonds: 0, w: 1, h: 1, type: "block", color: "#ecf0f1", shape: "cube" },
-      { id: "bc_block_redbrick", name: "Mattoni Rossi", cat: "bc", credits: 2, diamonds: 0, w: 1, h: 1, type: "block", color: "#922b21", shape: "cube" },
-      { id: "bc_block_marble", name: "Colonna di Marmo", cat: "bc", credits: 3, diamonds: 0, w: 1, h: 1, type: "block", color: "#bdc3c7", shape: "pillar" },
-      { id: "bc_block_glass", name: "Vetro Trasparente", cat: "bc", credits: 2, diamonds: 0, w: 1, h: 1, type: "block", color: "#aed6f1", shape: "glass" },
-      { id: "bc_cone_10", name: "Cono Stradale", cat: "bc", credits: 2, diamonds: 0, w: 1, h: 1, type: "deco", color: "#e67e22", shape: "cone" },
+      // 2. PLASTO CLASSICO
+      { id: "chair_plasto_1", name: "Sedia Plasto Blu", cat: "plasto", credits: 3, diamonds: 0, icon: "chair_plasto_1_icon.png" },
+      { id: "chair_plasto_2", name: "Sedia Plasto Verde", cat: "plasto", credits: 3, diamonds: 0, icon: "chair_plasto_2_icon.png" },
+      { id: "chair_plasto_3", name: "Sedia Plasto Gialla", cat: "plasto", credits: 3, diamonds: 0, icon: "chair_plasto_3_icon.png" },
+      { id: "chair_plasto_4", name: "Sedia Plasto Rossa", cat: "plasto", credits: 3, diamonds: 0, icon: "chair_plasto_4_icon.png" },
+      { id: "chair_plasto_8", name: "Sedia Plasto Nera", cat: "plasto", credits: 3, diamonds: 0, icon: "chair_plasto_8_icon.png" },
+      { id: "chair_plasto_10", name: "Sedia Plasto Bianca", cat: "plasto", credits: 3, diamonds: 0, icon: "chair_plasto_10_icon.png" },
 
-      // ARCADE
-      { id: "arcade_c23_cyberpunk", name: "Cabinato Cyberpunk", cat: "arcade", credits: 15, diamonds: 2, w: 1, h: 1, type: "arcade", color: "#8e44ad", shape: "arcade_cab" },
-      { id: "arcade_c23_pinball", name: "Flipper Galattico", cat: "arcade", credits: 14, diamonds: 2, w: 1, h: 2, type: "arcade", color: "#e74c3c", shape: "pinball" },
-      { id: "arcade_c23_vrmachine", name: "Postazione VR", cat: "arcade", credits: 20, diamonds: 5, w: 2, h: 2, type: "arcade", color: "#16a085", shape: "vr" },
+      // 3. SPONSOR & RETRÒ
+      { id: "ads_calip_cola_1", name: "Distributore Calippo", cat: "retro", credits: 15, diamonds: 0, icon: "ads_calip_cola_1_icon.png" },
+      { id: "ads_fanta_vendingmachine", name: "Distributore Fanta", cat: "retro", credits: 15, diamonds: 0, icon: "ads_fanta_vendingmachine_icon.png" },
+      { id: "ads_bigtv_missmix", name: "Maxischermo MTV", cat: "retro", credits: 25, diamonds: 5, icon: "ads_bigtv_missmix_icon.png" },
+      { id: "ads_capri_arcade", name: "Arcade Capri-Sun", cat: "retro", credits: 18, diamonds: 2, icon: "ads_capri_arcade_icon.png" },
 
-      // BAZAAR & ARABIAN
-      { id: "bazaar_c17_pillow", name: "Cuscino del Sultano", cat: "bazaar", credits: 4, diamonds: 0, w: 1, h: 1, type: "seat", color: "#8e44ad", shape: "cushion" },
-      { id: "bazaar_c17_rug", name: "Tappeto Volante", cat: "bazaar", credits: 8, diamonds: 1, w: 2, h: 2, type: "rug", color: "#b7950b", shape: "rug" },
-      { id: "bazaar_c17_vase", name: "Vaso con Spezie", cat: "bazaar", credits: 5, diamonds: 0, w: 1, h: 1, type: "deco", color: "#d35400", shape: "vase" },
+      // 4. ARCADE & GAMING
+      { id: "arcade_c23_cyberpunk", name: "Cabina Cyberpunk", cat: "arcade", credits: 20, diamonds: 3, icon: "arcade_c23_cyberpunk_icon.png" },
+      { id: "arcade_c23_pinball", name: "Flipper Galattico", cat: "arcade", credits: 18, diamonds: 2, icon: "arcade_c23_pinball_icon.png" },
+      { id: "arcade_c23_vrmachine", name: "Postazione VR", cat: "arcade", credits: 25, diamonds: 5, icon: "arcade_c23_vrmachine_icon.png" },
 
-      // SPONSOR & PROMO RETRO
-      { id: "ads_calip_cola_1", name: "Distributore Calippo", cat: "retro", credits: 12, diamonds: 0, w: 1, h: 1, type: "vending", color: "#27ae60", shape: "vending" },
-      { id: "ads_fanta_vendingmachine", name: "Distributore Fanta", cat: "retro", credits: 12, diamonds: 0, w: 1, h: 1, type: "vending", color: "#e67e22", shape: "vending" },
-      { id: "ads_bigtv_missmix", name: "Maxischermo MTV", cat: "retro", credits: 18, diamonds: 3, w: 2, h: 1, type: "tv", color: "#111", shape: "tv" },
+      // 5. BAZAAR & ARABIAN
+      { id: "bazaar_c17_pillow", name: "Cuscino Orientale", cat: "bazaar", credits: 4, diamonds: 0, icon: "bazaar_c17_pillow_icon.png" },
+      { id: "bazaar_c17_rug", name: "Tappeto Arabo", cat: "bazaar", credits: 8, diamonds: 1, icon: "bazaar_c17_rug_icon.png" },
+      { id: "bazaar_c17_vase", name: "Vaso con Spezie", cat: "bazaar", credits: 5, diamonds: 0, icon: "bazaar_c17_vase_icon.png" },
+      { id: "bazaar_c17_lamp", name: "Lanterna del Sultano", cat: "bazaar", credits: 6, diamonds: 0, icon: "bazaar_c17_lamp_icon.png" },
 
-      // CIRCO
-      { id: "circus_c24_clowncar", name: "Auto del Clown", cat: "circus", credits: 15, diamonds: 2, w: 2, h: 2, type: "car", color: "#e74c3c", shape: "clowncar" },
-      { id: "circus_c24_spotlight", name: "Riflettore da Palco", cat: "circus", credits: 9, diamonds: 0, w: 1, h: 1, type: "light", color: "#f39c12", shape: "spot" },
-
-      // ABBIGLIAMENTO & LOOK
-      { id: "clothing_80safro", name: "Capelli Afro '80", cat: "clothing", credits: 10, diamonds: 5, type: "wear", part: "hair", color: "#2c3e50" },
-      { id: "clothing_aviatorjacket", name: "Giacca Aviazione", cat: "clothing", credits: 12, diamonds: 8, type: "wear", part: "torso", color: "#784212" },
-      { id: "clothing_badtzbackpack", name: "Zainetto Pipistrello", cat: "clothing", credits: 8, diamonds: 2, type: "wear", part: "backpack", color: "#111" }
+      // 6. BUILDERS CLUB
+      { id: "bc_block_wool_1", name: "Blocco Lana Bianca", cat: "bc", credits: 2, diamonds: 0, icon: "bc_block_wool_1_icon.png" },
+      { id: "bc_block_redbrick_1", name: "Mattoni Rossi", cat: "bc", credits: 2, diamonds: 0, icon: "bc_block_redbrick_1_icon.png" },
+      { id: "bc_cone_10", name: "Cono Stradale", cat: "bc", credits: 2, diamonds: 0, icon: "bc_cone_10_icon.png" },
+      { id: "bc_block_grass_1", name: "Blocco Erba Viva", cat: "bc", credits: 2, diamonds: 0, icon: "bc_block_grass_1_icon.png" }
     ];
 
     const CATEGORIES = [
       { id: "currency", name: "Rari & Valute" },
-      { id: "plasto", name: "Arredo Classico" },
-      { id: "bc", name: "Costruzioni BC" },
+      { id: "plasto", name: "Plasto Classico" },
+      { id: "retro", name: "Sponsor Retrò" },
       { id: "arcade", name: "Arcade Games" },
       { id: "bazaar", name: "Bazaar & Arabian" },
-      { id: "retro", name: "Sponsor & Retro" },
-      { id: "circus", name: "Circo & Spettacolo" },
-      { id: "clothing", name: "Sartoria & Look" }
+      { id: "bc", name: "Builders Club" }
     ];
 
     /* =========================================================================
-       2. STATO DEL GIOCO
+       2. CACHE IMMAGINI ORIGINALI
        ========================================================================= */
+    const imageCache = {};
+
+    function getFurniImage(iconName) {
+      if (!imageCache[iconName]) {
+        const img = new Image();
+        img.crossOrigin = "anonymous";
+        img.src = CDN_BASE + iconName;
+        imageCache[iconName] = img;
+      }
+      return imageCache[iconName];
+    }
+
+    // Precarica gli asset principali
+    FURNI_ITEMS.forEach(f => getFurniImage(f.icon));
+
+    /* =========================================================================
+       3. ENGINE ISOMETRICO DELLA STANZA
+       ========================================================================= */
+    const canvas = document.getElementById("habbo-canvas");
+    const ctx = canvas.getContext("2d");
+
     const state = {
-      credits: 5000,
+      credits: 3000,
       diamonds: 250,
-      activeTab: "currency",
-      selectedCatalogItem: null,
-      inventory: [],
-      selectedInvIndex: -1,
-      rotation: 0, // 0, 1, 2, 3
-      gridSize: 10,
-      tileWidth: 64,
-      tileHeight: 32,
-      placedFurni: [],
-      avatar: { x: 4, y: 4, direction: 2, hairColor: "#4a235a", torsoColor: "#2980b9" },
+      gridSize: 9,
+      tileW: 64,
+      tileH: 32,
+      activeCategory: "currency",
+      selectedCatalog: null,
+      inventory: [
+        { ...FURNI_ITEMS[0], count: 2 },
+        { ...FURNI_ITEMS[1], count: 1 }
+      ],
+      selectedInvIdx: -1,
+      rotation: 0,
+      placedFurni: [
+        { x: 3, y: 3, item: FURNI_ITEMS[1], rot: 0 }
+      ],
+      avatar: { x: 4, y: 4 },
       mouseTile: { x: -1, y: -1 }
     };
 
-    /* =========================================================================
-       3. ENGINE ISOMETRICO & CANVAS
-       ========================================================================= */
-    const canvas = document.getElementById("stage");
-    const ctx = canvas.getContext("2d");
-
-    function resize() {
+    function resizeCanvas() {
       canvas.width = canvas.parentElement.clientWidth;
       canvas.height = canvas.parentElement.clientHeight;
     }
-    window.addEventListener("resize", resize);
-    resize();
+    window.addEventListener("resize", resizeCanvas);
+    resizeCanvas();
 
-    // Coordinate Isometriche
     function toIso(x, y) {
-      const originX = canvas.width / 2;
-      const originY = canvas.height / 2 - (state.gridSize * state.tileHeight) / 3;
+      const ox = canvas.width / 2;
+      const oy = canvas.height / 2 - (state.gridSize * state.tileH) / 3.2;
       return {
-        screenX: originX + (x - y) * (state.tileWidth / 2),
-        screenY: originY + (x + y) * (state.tileHeight / 2)
+        sx: ox + (x - y) * (state.tileW / 2),
+        sy: oy + (x + y) * (state.tileH / 2)
       };
     }
 
-    function fromIso(screenX, screenY) {
-      const originX = canvas.width / 2;
-      const originY = canvas.height / 2 - (state.gridSize * state.tileHeight) / 3;
-      const dx = screenX - originX;
-      const dy = screenY - originY;
-      const x = Math.floor((dy / (state.tileHeight / 2) + dx / (state.tileWidth / 2)) / 2);
-      const y = Math.floor((dy / (state.tileHeight / 2) - dx / (state.tileWidth / 2)) / 2);
-      return { x, y };
+    function fromIso(sx, sy) {
+      const ox = canvas.width / 2;
+      const oy = canvas.height / 2 - (state.gridSize * state.tileH) / 3.2;
+      const dx = sx - ox;
+      const dy = sy - oy;
+      return {
+        x: Math.floor((dy / (state.tileH / 2) + dx / (state.tileW / 2)) / 2),
+        y: Math.floor((dy / (state.tileH / 2) - dx / (state.tileW / 2)) / 2)
+      };
     }
 
-    // Rendering Griglia Tile
-    function drawFloorTile(gx, gy, highlight = false) {
-      const { screenX, screenY } = toIso(gx, gy);
-      const hw = state.tileWidth / 2;
-      const hh = state.tileHeight / 2;
+    function drawRoomTile(x, y, isHover) {
+      const { sx, sy } = toIso(x, y);
+      const hw = state.tileW / 2;
+      const hh = state.tileH / 2;
 
       ctx.beginPath();
-      ctx.moveTo(screenX, screenY);
-      ctx.lineTo(screenX + hw, screenY + hh);
-      ctx.lineTo(screenX, screenY + state.tileHeight);
-      ctx.lineTo(screenX - hw, screenY + hh);
+      ctx.moveTo(sx, sy);
+      ctx.lineTo(sx + hw, sy + hh);
+      ctx.lineTo(sx, sy + state.tileH);
+      ctx.lineTo(sx - hw, sy + hh);
       ctx.closePath();
 
-      ctx.fillStyle = highlight ? "#7fb3d5" : ((gx + gy) % 2 === 0 ? "#95a5a6" : "#7f8c8d");
+      ctx.fillStyle = isHover ? "#ffffff" : ((x + y) % 2 === 0 ? "#98aab4" : "#8c9ea8");
       ctx.fill();
-      ctx.strokeStyle = "#566573";
+      ctx.strokeStyle = isHover ? "#00c0ff" : "#72838c";
       ctx.lineWidth = 1;
       ctx.stroke();
-    }
 
-    // Disegno Pixel Art Procedurale dei Furni
-    function drawFurni(furni, screenX, screenY, rot = 0) {
-      ctx.save();
-      ctx.translate(screenX, screenY + state.tileHeight / 2);
-
-      const c = furni.color || "#e67e22";
-      const outline = "#1b2024";
-
-      switch (furni.shape) {
-        case "throne":
-          // Trono classico con cuscino e braccioli dorati
-          ctx.fillStyle = outline;
-          ctx.fillRect(-16, -42, 32, 42);
-          ctx.fillStyle = "#f1c40f";
-          ctx.fillRect(-14, -40, 28, 40);
-          ctx.fillStyle = "#c0392b";
-          ctx.fillRect(-10, -32, 20, 30);
-          ctx.fillStyle = "#f39c12";
-          ctx.fillRect(-14, -14, 28, 6);
-          break;
-
-        case "coin":
-        case "key":
-          ctx.fillStyle = outline;
-          ctx.beginPath();
-          ctx.arc(0, -10, 10, 0, Math.PI * 2);
-          ctx.fill();
-          ctx.fillStyle = c;
-          ctx.beginPath();
-          ctx.arc(0, -10, 8, 0, Math.PI * 2);
-          ctx.fill();
-          break;
-
-        case "bar":
-        case "bigbar":
-          ctx.fillStyle = outline;
-          ctx.fillRect(-14, -12, 28, 12);
-          ctx.fillStyle = c;
-          ctx.fillRect(-12, -10, 24, 8);
-          ctx.fillStyle = "#fef9e7";
-          ctx.fillRect(-10, -9, 8, 2);
-          break;
-
-        case "plasto_chair":
-          // Sedia plasto classica con gambe in ferro
-          ctx.strokeStyle = "#7f8c8d";
-          ctx.lineWidth = 2;
-          ctx.strokeRect(-8, -12, 16, 12);
-          ctx.fillStyle = outline;
-          ctx.fillRect(-12, -26, 24, 16);
-          ctx.fillStyle = c;
-          ctx.fillRect(-10, -24, 20, 12);
-          ctx.fillRect(-10, -12, 20, 4);
-          break;
-
-        case "arcade_cab":
-          // Cabina Arcade anni '90
-          ctx.fillStyle = outline;
-          ctx.fillRect(-14, -44, 28, 44);
-          ctx.fillStyle = c;
-          ctx.fillRect(-12, -42, 24, 40);
-          ctx.fillStyle = "#00ffff";
-          ctx.fillRect(-8, -32, 16, 14);
-          ctx.fillStyle = "#e74c3c";
-          ctx.fillRect(-6, -14, 4, 4);
-          break;
-
-        case "vending":
-          // Distributore automatico
-          ctx.fillStyle = outline;
-          ctx.fillRect(-16, -38, 32, 38);
-          ctx.fillStyle = c;
-          ctx.fillRect(-14, -36, 28, 34);
-          ctx.fillStyle = "#2c3e50";
-          ctx.fillRect(-10, -30, 20, 14);
-          ctx.fillStyle = "#ecf0f1";
-          ctx.fillRect(-8, -10, 16, 4);
-          break;
-
-        case "table":
-          ctx.fillStyle = outline;
-          ctx.fillRect(-22, -22, 44, 16);
-          ctx.fillStyle = c;
-          ctx.fillRect(-20, -20, 40, 12);
-          ctx.fillStyle = "#3e2723";
-          ctx.fillRect(-18, -8, 4, 12);
-          ctx.fillRect(14, -8, 4, 12);
-          break;
-
-        case "cube":
-        case "pillar":
-        case "glass":
-          const h = furni.shape === "pillar" ? 36 : 20;
-          ctx.fillStyle = outline;
-          ctx.fillRect(-16, -h - 4, 32, h + 4);
-          ctx.fillStyle = c;
-          ctx.fillRect(-14, -h - 2, 28, h);
-          break;
-
-        default:
-          // Rendering standard poligonale per arredi generici
-          ctx.fillStyle = outline;
-          ctx.fillRect(-12, -24, 24, 24);
-          ctx.fillStyle = c;
-          ctx.fillRect(-10, -22, 20, 20);
-          break;
+      if (isHover) {
+        ctx.strokeStyle = "#ffffff";
+        ctx.lineWidth = 2;
+        ctx.stroke();
       }
-      ctx.restore();
     }
 
-    // Rendering Avatar
+    function drawWalls() {
+      // Muro Sinistro
+      for (let y = 0; y < state.gridSize; y++) {
+        const { sx, sy } = toIso(0, y);
+        ctx.fillStyle = "#55646d";
+        ctx.beginPath();
+        ctx.moveTo(sx - state.tileW/2, sy + state.tileH/2);
+        ctx.lineTo(sx, sy);
+        ctx.lineTo(sx, sy - 85);
+        ctx.lineTo(sx - state.tileW/2, sy + state.tileH/2 - 85);
+        ctx.closePath();
+        ctx.fill();
+        ctx.strokeStyle = "#38434a";
+        ctx.stroke();
+      }
+
+      // Muro Destro
+      for (let x = 0; x < state.gridSize; x++) {
+        const { sx, sy } = toIso(x, 0);
+        ctx.fillStyle = "#697a85";
+        ctx.beginPath();
+        ctx.moveTo(sx, sy);
+        ctx.lineTo(sx + state.tileW/2, sy + state.tileH/2);
+        ctx.lineTo(sx + state.tileW/2, sy + state.tileH/2 - 85);
+        ctx.lineTo(sx, sy - 85);
+        ctx.closePath();
+        ctx.fill();
+        ctx.strokeStyle = "#38434a";
+        ctx.stroke();
+      }
+    }
+
     function drawAvatar(x, y) {
-      const { screenX, screenY } = toIso(x, y);
-      const px = screenX;
-      const py = screenY + 8;
+      const { sx, sy } = toIso(x, y);
+      const px = sx;
+      const py = sy + 6;
 
       ctx.save();
-      // Ombra sotto i piedi
-      ctx.fillStyle = "rgba(0, 0, 0, 0.35)";
+      // Ombra ovale a terra
+      ctx.fillStyle = "rgba(0,0,0,0.35)";
       ctx.beginPath();
       ctx.ellipse(px, py, 14, 7, 0, 0, Math.PI * 2);
       ctx.fill();
 
-      // Gambe
-      ctx.fillStyle = "#2c3e50";
-      ctx.fillRect(px - 5, py - 18, 4, 12);
-      ctx.fillRect(px + 1, py - 18, 4, 12);
+      // Scarpe
+      ctx.fillStyle = "#111";
+      ctx.fillRect(px - 5, py - 4, 4, 3);
+      ctx.fillRect(px + 2, py - 4, 4, 3);
 
-      // Busto / Maglia
-      ctx.fillStyle = state.avatar.torsoColor;
+      // Pantaloni
+      ctx.fillStyle = "#1b4f72";
+      ctx.fillRect(px - 5, py - 18, 4, 14);
+      ctx.fillRect(px + 1, py - 18, 4, 14);
+
+      // Busto
+      ctx.fillStyle = "#111";
       ctx.fillRect(px - 7, py - 32, 14, 15);
+      ctx.fillStyle = "#f39c12";
+      ctx.fillRect(px - 6, py - 31, 12, 13);
 
       // Testa / Viso
       ctx.fillStyle = "#f5cba7";
-      ctx.fillRect(px - 6, py - 44, 12, 12);
+      ctx.fillRect(px - 5, py - 43, 10, 11);
 
-      // Occhi
+      // Occhi Habbo
       ctx.fillStyle = "#000";
-      ctx.fillRect(px - 2, py - 39, 2, 3);
-      ctx.fillRect(px + 3, py - 39, 2, 3);
+      ctx.fillRect(px - 2, py - 38, 2, 2);
+      ctx.fillRect(px + 2, py - 38, 2, 2);
 
       // Capelli
-      ctx.fillStyle = state.avatar.hairColor;
-      ctx.fillRect(px - 7, py - 48, 14, 6);
-      ctx.fillRect(px - 7, py - 44, 3, 8);
+      ctx.fillStyle = "#4a235a";
+      ctx.fillRect(px - 6, py - 47, 12, 5);
+      ctx.fillRect(px - 7, py - 44, 3, 7);
 
       ctx.restore();
     }
 
-    // Ciclo Principale di Render
-    function render() {
+    function drawFurniSprite(item, sx, sy, alpha = 1.0) {
+      const img = getFurniImage(item.icon);
+      if (img.complete && img.naturalWidth !== 0) {
+        ctx.save();
+        ctx.globalAlpha = alpha;
+        // Posiziona l'icona centrata sopra la tile isometrica
+        const iw = img.naturalWidth * 1.25;
+        const ih = img.naturalHeight * 1.25;
+        ctx.drawImage(img, sx - iw / 2, sy + state.tileH / 2 - ih + 4, iw, ih);
+        ctx.restore();
+      }
+    }
+
+    function loop() {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-      // 1. Pavimento
+      drawWalls();
+
+      // Disegno piastrelle
       for (let x = 0; x < state.gridSize; x++) {
         for (let y = 0; y < state.gridSize; y++) {
-          const isHover = (state.mouseTile.x === x && state.mouseTile.y === y);
-          drawFloorTile(x, y, isHover);
+          const isH = (state.mouseTile.x === x && state.mouseTile.y === y);
+          drawRoomTile(x, y, isH);
         }
       }
 
-      // 2. Ordinamento di profondità isometrico (Painter's algorithm: x + y)
-      const renderQueue = [];
+      // Ordinamento isometrico (x + y)
+      const renderList = [];
 
       state.placedFurni.forEach(f => {
-        renderQueue.push({ type: "furni", x: f.x, y: f.y, depth: f.x + f.y, data: f });
+        renderList.push({ type: "furni", x: f.x, y: f.y, depth: f.x + f.y, data: f });
       });
 
-      renderQueue.push({
+      renderList.push({
         type: "avatar",
         x: state.avatar.x,
         y: state.avatar.y,
         depth: state.avatar.x + state.avatar.y
       });
 
-      renderQueue.sort((a, b) => a.depth - b.depth);
+      renderList.sort((a, b) => a.depth - b.depth);
 
-      // 3. Esecuzione disegno elementi ordinati
-      renderQueue.forEach(item => {
-        if (item.type === "furni") {
-          const { screenX, screenY } = toIso(item.x, item.y);
-          drawFurni(item.data.meta, screenX, screenY, item.data.rot);
-        } else if (item.type === "avatar") {
-          drawAvatar(item.x, item.y);
+      renderList.forEach(obj => {
+        if (obj.type === "furni") {
+          const { sx, sy } = toIso(obj.x, obj.y);
+          drawFurniSprite(obj.data.item, sx, sy);
+        } else if (obj.type === "avatar") {
+          drawAvatar(obj.x, obj.y);
         }
       });
 
-      // 4. Anteprima posizionamento dall'inventario
-      if (state.selectedInvIndex >= 0 && state.mouseTile.x >= 0 && state.mouseTile.x < state.gridSize && state.mouseTile.y >= 0 && state.mouseTile.y < state.gridSize) {
-        const item = state.inventory[state.selectedInvIndex];
-        if (item && item.type !== "wear") {
-          const { screenX, screenY } = toIso(state.mouseTile.x, state.mouseTile.y);
-          ctx.globalAlpha = 0.5;
-          drawFurni(item, screenX, screenY, state.rotation);
-          ctx.globalAlpha = 1.0;
+      // Preview posizionamento
+      if (state.selectedInvIdx >= 0 && state.mouseTile.x >= 0 && state.mouseTile.x < state.gridSize && state.mouseTile.y >= 0 && state.mouseTile.y < state.gridSize) {
+        const item = state.inventory[state.selectedInvIdx];
+        if (item) {
+          const { sx, sy } = toIso(state.mouseTile.x, state.mouseTile.y);
+          drawFurniSprite(item, sx, sy, 0.55);
         }
       }
 
-      requestAnimationFrame(render);
+      requestAnimationFrame(loop);
     }
-    requestAnimationFrame(render);
+    requestAnimationFrame(loop);
 
     /* =========================================================================
-       4. INTERAZIONE E GESTIONE EVENTI CANVAS
+       4. INTERAZIONE STANZA
        ========================================================================= */
     canvas.addEventListener("mousemove", (e) => {
-      const rect = canvas.getBoundingClientRect();
-      const coords = fromIso(e.clientX - rect.left, e.clientY - rect.top);
-      state.mouseTile = coords;
+      const r = canvas.getBoundingClientRect();
+      state.mouseTile = fromIso(e.clientX - r.left, e.clientY - r.top);
     });
 
     canvas.addEventListener("click", () => {
       const { x, y } = state.mouseTile;
       if (x < 0 || x >= state.gridSize || y < 0 || y >= state.gridSize) return;
 
-      // Se abbiamo un elemento selezionato nell'inventario, lo posiamo
-      if (state.selectedInvIndex >= 0) {
-        const item = state.inventory[state.selectedInvIndex];
-        if (!item) return;
-
-        // Se è un capo d'abbigliamento, lo indossiamo invece di posarlo
-        if (item.type === "wear") {
-          if (item.part === "hair") state.avatar.hairColor = item.color;
-          if (item.part === "torso") state.avatar.torsoColor = item.color;
-          return;
-        }
-
-        // Posizionamento Furni
+      if (state.selectedInvIdx >= 0) {
+        const item = state.inventory[state.selectedInvIdx];
         state.placedFurni.push({
           x: x,
           y: y,
-          rot: state.rotation,
-          meta: item
+          item: item,
+          rot: state.rotation
         });
 
-        // Rimuovi 1 pezzo dall'inventario
         item.count--;
         if (item.count <= 0) {
-          state.inventory.splice(state.selectedInvIndex, 1);
-          state.selectedInvIndex = -1;
+          state.inventory.splice(state.selectedInvIdx, 1);
+          state.selectedInvIdx = -1;
         }
-        renderInventoryUI();
+        updateInventoryUI();
       } else {
-        // Altrimenti muovi l'avatar sulla tile cliccata
         state.avatar.x = x;
         state.avatar.y = y;
       }
     });
 
-    // Tasto destro: rimuovi furni e rimettilo nell'inventario
     canvas.addEventListener("contextmenu", (e) => {
       e.preventDefault();
       const { x, y } = state.mouseTile;
       const idx = state.placedFurni.findIndex(f => f.x === x && f.y === y);
       if (idx !== -1) {
         const removed = state.placedFurni.splice(idx, 1)[0];
-        addToInventory(removed.meta);
-      }
-    });
-
-    // Rotazione con tasto 'R'
-    window.addEventListener("keydown", (e) => {
-      if (e.key === "r" || e.key === "R") {
-        state.rotation = (state.rotation + 1) % 4;
+        const exist = state.inventory.find(i => i.id === removed.item.id);
+        if (exist) {
+          exist.count++;
+        } else {
+          state.inventory.push({ ...removed.item, count: 1 });
+        }
+        updateInventoryUI();
       }
     });
 
     /* =========================================================================
-       5. LOGICA CATALOGO & INVENTARIO
+       5. LOGICA CATALOGO CON IMMAGINI GITHUB
        ========================================================================= */
-    const catWindow = document.getElementById("catalog-window");
-    const openCatBtn = document.getElementById("btn-open-catalog");
-    const closeCatBtn = document.getElementById("btn-close-catalog");
-    const tabsContainer = document.getElementById("category-tabs");
-    const gridContainer = document.getElementById("catalog-items-grid");
-    const buyBtn = document.getElementById("btn-buy-item");
+    const catModal = document.getElementById("catalog-modal");
+    const openBtn = document.getElementById("open-cat-btn");
+    const closeBtn = document.getElementById("close-cat-btn");
+    const tabsCont = document.getElementById("cat-tabs-container");
+    const itemsCont = document.getElementById("cat-items-container");
+    const buyBtn = document.getElementById("btn-buy");
 
-    openCatBtn.addEventListener("click", () => {
-      catWindow.style.display = "flex";
-      renderCatalogTabs();
-      renderCatalogGrid();
-    });
+    openBtn.onclick = () => {
+      catModal.style.display = "flex";
+      buildTabs();
+      buildItems();
+    };
 
-    closeCatBtn.addEventListener("click", () => {
-      catWindow.style.display = "none";
-    });
+    closeBtn.onclick = () => {
+      catModal.style.display = "none";
+    };
 
-    function renderCatalogTabs() {
-      tabsContainer.innerHTML = "";
-      CATEGORIES.forEach(cat => {
+    function buildTabs() {
+      tabsCont.innerHTML = "";
+      CATEGORIES.forEach(c => {
         const div = document.createElement("div");
-        div.className = `cat-tab ${state.activeTab === cat.id ? "active" : ""}`;
-        div.innerText = cat.name;
+        div.className = `menu-item ${state.activeCategory === c.id ? "active" : ""}`;
+        div.innerText = c.name;
         div.onclick = () => {
-          state.activeTab = cat.id;
-          state.selectedCatalogItem = null;
-          renderCatalogTabs();
-          renderCatalogGrid();
+          state.activeCategory = c.id;
+          state.selectedCatalog = null;
+          buildTabs();
+          buildItems();
           updatePreview();
         };
-        tabsContainer.appendChild(div);
+        tabsCont.appendChild(div);
       });
     }
 
-    function renderCatalogGrid() {
-      gridContainer.innerHTML = "";
-      const filtered = FURNI_DATABASE.filter(f => f.cat === state.activeTab);
+    function buildItems() {
+      itemsCont.innerHTML = "";
+      const filtered = FURNI_ITEMS.filter(f => f.cat === state.activeCategory);
 
-      filtered.forEach(f => {
-        const card = document.createElement("div");
-        card.className = `cat-card ${state.selectedCatalogItem && state.selectedCatalogItem.id === f.id ? "selected" : ""}`;
-        
-        // Mini icona generata
-        const miniCanvas = document.createElement("canvas");
-        miniCanvas.width = 38;
-        miniCanvas.height = 38;
-        const mctx = miniCanvas.getContext("2d");
-        mctx.fillStyle = f.color || "#888";
-        mctx.fillRect(8, 8, 22, 22);
-        mctx.strokeStyle = "#111";
-        mctx.lineWidth = 1;
-        mctx.strokeRect(8, 8, 22, 22);
+      filtered.forEach(item => {
+        const slot = document.createElement("div");
+        slot.className = `furni-slot ${state.selectedCatalog && state.selectedCatalog.id === item.id ? "selected" : ""}`;
 
-        const label = document.createElement("span");
-        label.style.fontSize = "9px";
-        label.style.marginTop = "4px";
-        label.style.textAlign = "center";
-        label.innerText = f.name.length > 10 ? f.name.substring(0, 9) + "..." : f.name;
+        // Vera icona pixel art da GitHub
+        const img = document.createElement("img");
+        img.src = CDN_BASE + item.icon;
 
-        card.appendChild(miniCanvas);
-        card.appendChild(label);
+        slot.appendChild(img);
 
-        card.onclick = () => {
-          state.selectedCatalogItem = f;
-          renderCatalogGrid();
+        slot.onclick = () => {
+          state.selectedCatalog = item;
+          buildItems();
           updatePreview();
         };
 
-        gridContainer.appendChild(card);
+        itemsCont.appendChild(slot);
       });
     }
 
     function updatePreview() {
-      const item = state.selectedCatalogItem;
-      if (!item) {
-        document.getElementById("prev-name").innerText = "Seleziona un articolo";
-        document.getElementById("prev-desc").innerText = "Scegli un oggetto da posare o indossare.";
-        document.getElementById("prev-price").innerText = "";
+      const it = state.selectedCatalog;
+      const prevIcon = document.getElementById("prev-icon");
+
+      if (!it) {
+        document.getElementById("prev-title").innerText = "Seleziona un articolo";
+        document.getElementById("prev-desc").innerText = "Scegli un furni dal catalogo per visualizzarne il prezzo";
+        document.getElementById("prev-cost").innerText = "";
+        prevIcon.style.display = "none";
         return;
       }
-      document.getElementById("prev-name").innerText = item.name;
-      document.getElementById("prev-desc").innerText = `ID: ${item.id} | Dimensione: ${item.w || 1}x${item.h || 1}`;
-      document.getElementById("prev-price").innerText = `${item.credits} Crediti ${item.diamonds > 0 ? "+ " + item.diamonds + " Diamanti" : ""}`;
+
+      prevIcon.src = CDN_BASE + it.icon;
+      prevIcon.style.display = "block";
+      document.getElementById("prev-title").innerText = it.name;
+      document.getElementById("prev-desc").innerText = `Asset Ufficiale: ${it.icon}`;
+      document.getElementById("prev-cost").innerText = `${it.credits} Crediti ${it.diamonds > 0 ? "+ " + it.diamonds + " Diamanti" : ""}`;
     }
 
-    // Acquisto
-    buyBtn.addEventListener("click", () => {
-      const item = state.selectedCatalogItem;
-      if (!item) return;
+    buyBtn.onclick = () => {
+      const it = state.selectedCatalog;
+      if (!it) return;
 
-      if (state.credits < item.credits || state.diamonds < item.diamonds) {
-        alert("Non hai abbastanza fondi per completare l'acquisto!");
+      if (state.credits < it.credits || state.diamonds < it.diamonds) {
+        alert("Crediti insufficienti!");
         return;
       }
 
-      state.credits -= item.credits;
-      state.diamonds -= item.diamonds;
-      document.getElementById("val-credits").innerText = state.credits;
-      document.getElementById("val-diamonds").innerText = state.diamonds;
+      state.credits -= it.credits;
+      state.diamonds -= it.diamonds;
+      document.getElementById("cr-count").innerText = state.credits;
+      document.getElementById("dia-count").innerText = state.diamonds;
 
-      addToInventory(item);
-    });
-
-    function addToInventory(furniMeta) {
-      const exist = state.inventory.find(i => i.id === furniMeta.id);
+      const exist = state.inventory.find(i => i.id === it.id);
       if (exist) {
         exist.count++;
       } else {
-        state.inventory.push({ ...furniMeta, count: 1 });
+        state.inventory.push({ ...it, count: 1 });
       }
-      renderInventoryUI();
-    }
+      updateInventoryUI();
+    };
 
-    function renderInventoryUI() {
-      const dock = document.getElementById("inventory-dock");
-      dock.innerHTML = "";
+    function updateInventoryUI() {
+      const tray = document.getElementById("inventory-tray");
+      tray.innerHTML = "";
 
-      state.inventory.forEach((item, index) => {
-        const div = document.createElement("div");
-        div.className = `inv-item ${state.selectedInvIndex === index ? "selected" : ""}`;
-        div.title = item.name;
+      state.inventory.forEach((item, idx) => {
+        const slot = document.createElement("div");
+        slot.className = `inv-slot ${state.selectedInvIdx === idx ? "selected" : ""}`;
 
-        // Piccolo indicatore di colore
-        const dot = document.createElement("div");
-        dot.style.width = "16px";
-        dot.style.height = "16px";
-        dot.style.backgroundColor = item.color || "#e67e22";
-        dot.style.border = "1px solid #111";
+        const img = document.createElement("img");
+        img.src = CDN_BASE + item.icon;
 
-        const countBadge = document.createElement("span");
-        countBadge.className = "inv-item-count";
-        countBadge.innerText = item.count;
+        const count = document.createElement("span");
+        count.className = "inv-count";
+        count.innerText = item.count;
 
-        div.appendChild(dot);
-        div.appendChild(countBadge);
+        slot.appendChild(img);
+        slot.appendChild(count);
 
-        div.onclick = () => {
-          state.selectedInvIndex = (state.selectedInvIndex === index) ? -1 : index;
-          renderInventoryUI();
+        slot.onclick = () => {
+          state.selectedInvIdx = (state.selectedInvIdx === idx) ? -1 : idx;
+          updateInventoryUI();
         };
 
-        dock.appendChild(div);
+        tray.appendChild(slot);
       });
     }
 
-    /* DRAG FINESTRA CATALOGO */
-    const dragHeader = document.getElementById("cat-drag");
-    let isDragging = false;
-    let dragOffset = { x: 0, y: 0 };
-
-    dragHeader.addEventListener("mousedown", (e) => {
-      isDragging = true;
-      dragOffset.x = e.clientX - catWindow.offsetLeft;
-      dragOffset.y = e.clientY - catWindow.offsetTop;
-    });
-
-    window.addEventListener("mousemove", (e) => {
-      if (isDragging) {
-        catWindow.style.left = `${e.clientX - dragOffset.x}px`;
-        catWindow.style.top = `${e.clientY - dragOffset.y}px`;
-      }
-    });
-
-    window.addEventListener("mouseup", () => {
-      isDragging = false;
-    });
+    updateInventoryUI();
   </script>
 </body>
 </html>
