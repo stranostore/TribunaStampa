@@ -2,7 +2,7 @@
 <html lang="it">
 <head>
   <meta charset="UTF-8">
-  <title>Habbo Hotel - Client Ufficiale & Catalogo Grafiche Originali</title>
+  <title>Habbo Hotel - Stanza & Catalogo Originale</title>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Ubuntu:wght@400;700&display=swap');
 
@@ -24,7 +24,6 @@
       flex-direction: column;
     }
 
-    /* AREA STANZA */
     #room-viewport {
       flex: 1;
       position: relative;
@@ -36,12 +35,11 @@
       image-rendering: pixelated;
     }
 
-    /* BARRA INFERIORE ORIGINALE HABBO */
+    /* BARRA INFERIORE HABBO */
     #bottom-bar {
       height: 52px;
       background: linear-gradient(180deg, #444f56 0%, #293237 50%, #1c2327 100%);
       border-top: 2px solid #5a676f;
-      box-shadow: 0 -2px 10px rgba(0,0,0,0.6);
       display: flex;
       align-items: center;
       padding: 0 16px;
@@ -61,7 +59,6 @@
       padding: 7px 16px;
       cursor: pointer;
       text-shadow: 1px 1px 2px #000;
-      box-shadow: inset 0 1px 0 rgba(255,255,255,0.4);
       display: flex;
       align-items: center;
       gap: 6px;
@@ -69,14 +66,8 @@
     .habbo-btn:hover {
       background: linear-gradient(180deg, #1aa4ed 0%, #0074b4 100%);
     }
-    .habbo-btn:active {
-      border: 1px solid #003653;
-      border-top: 2px solid #00253a;
-      background: #005482;
-      box-shadow: none;
-    }
 
-    /* WALLET BOX TOP-RIGHT */
+    /* WALLET */
     #purse {
       position: absolute;
       top: 14px;
@@ -87,7 +78,7 @@
       z-index: 5;
     }
     .purse-badge {
-      background: rgba(28, 35, 39, 0.9);
+      background: rgba(28, 35, 39, 0.92);
       border: 1px solid #48565f;
       border-radius: 4px;
       padding: 5px 12px;
@@ -96,7 +87,6 @@
       justify-content: space-between;
       min-width: 125px;
       font-weight: bold;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.6);
     }
 
     /* INVENTARIO SLOTS */
@@ -113,8 +103,8 @@
       overflow-x: auto;
     }
     .inv-slot {
-      width: 36px;
-      height: 36px;
+      width: 38px;
+      height: 38px;
       background: #252e33;
       border: 1px solid #48565f;
       border-radius: 4px;
@@ -130,8 +120,8 @@
       background: #39464e;
     }
     .inv-slot img {
-      max-width: 30px;
-      max-height: 30px;
+      max-width: 32px;
+      max-height: 32px;
       image-rendering: pixelated;
     }
     .inv-count {
@@ -144,7 +134,7 @@
       text-shadow: 1px 1px 1px #000;
     }
 
-    /* FINESTRA CATALOGO HABBO ORIGINS */
+    /* CATALOGO */
     #catalog-modal {
       position: absolute;
       top: 50%;
@@ -230,8 +220,8 @@
     .catalog-grid {
       flex: 1;
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(68px, 1fr));
-      grid-auto-rows: 68px;
+      grid-template-columns: repeat(auto-fill, minmax(70px, 1fr));
+      grid-auto-rows: 70px;
       gap: 8px;
       overflow-y: auto;
       background: #f4f6f7;
@@ -257,8 +247,8 @@
       background: #fef5e7;
     }
     .furni-slot img {
-      max-width: 42px;
-      max-height: 42px;
+      max-width: 46px;
+      max-height: 46px;
       image-rendering: pixelated;
     }
     .furni-preview-bar {
@@ -276,8 +266,8 @@
       gap: 12px;
     }
     .preview-img-box {
-      width: 50px;
-      height: 50px;
+      width: 52px;
+      height: 52px;
       background: #f7f9fa;
       border: 1px solid #c8d3d8;
       border-radius: 4px;
@@ -286,8 +276,8 @@
       justify-content: center;
     }
     .preview-img-box img {
-      max-width: 44px;
-      max-height: 44px;
+      max-width: 48px;
+      max-height: 48px;
       image-rendering: pixelated;
     }
     .price-tag {
@@ -315,10 +305,10 @@
   </div>
 
   <div id="bottom-bar">
-    <button class="habbo-btn" id="open-cat-btn">🛒 Negozio</button>
+    <button class="habbo-btn" id="open-cat-btn">🛒 Catalogo Negozio</button>
     <div style="font-weight:bold; color:#a2b1bb; margin-left:6px;">Inventario:</div>
     <div id="inventory-tray"></div>
-    <div style="font-size:10px; color:#8496a3;">Premi <b>[R]</b> per ruotare i furni • <b>Tasto destro</b> sul furni posizionato per ritirarlo</div>
+    <div style="font-size:10px; color:#8496a3;"><b>Click</b> per posare/muovere • <b>Tasto destro</b> sul furni per ritirarlo</div>
   </div>
 
   <!-- MODALE CATALOGO -->
@@ -350,9 +340,9 @@
 
   <script>
     /* =========================================================================
-       1. URL BASE CDN GITHUB UFFICIALE (REPOSITORY HIGOKA)
+       1. CDN REPOSITORY UFFICIALE (PATH CORRETTO: icons/)
        ========================================================================= */
-    const CDN_BASE = "https://cdn.jsdelivr.net/gh/higoka/habbo-furniture-icon/icon/";
+    const CDN_BASE = "https://cdn.jsdelivr.net/gh/higoka/habbo-furniture-icon/icons/";
 
     const FURNI_ITEMS = [
       // 1. RARI & VALUTE
@@ -406,7 +396,7 @@
     ];
 
     /* =========================================================================
-       2. CACHE IMMAGINI ORIGINALI
+       2. GESTIONE CARICAMENTO IMMAGINI CON FALLBACK AUTOMATICO
        ========================================================================= */
     const imageCache = {};
 
@@ -415,16 +405,20 @@
         const img = new Image();
         img.crossOrigin = "anonymous";
         img.src = CDN_BASE + iconName;
+        img.onerror = () => {
+          // Fallback secondario se jsDelivr ha un timeout
+          img.src = "https://raw.githubusercontent.com/higoka/habbo-furniture-icon/master/icons/" + iconName;
+        };
         imageCache[iconName] = img;
       }
       return imageCache[iconName];
     }
 
-    // Precarica gli asset principali
+    // Precaricamento
     FURNI_ITEMS.forEach(f => getFurniImage(f.icon));
 
     /* =========================================================================
-       3. ENGINE ISOMETRICO DELLA STANZA
+       3. ENGINE ISOMETRICO
        ========================================================================= */
     const canvas = document.getElementById("habbo-canvas");
     const ctx = canvas.getContext("2d");
@@ -442,11 +436,11 @@
         { ...FURNI_ITEMS[1], count: 1 }
       ],
       selectedInvIdx: -1,
-      rotation: 0,
       placedFurni: [
-        { x: 3, y: 3, item: FURNI_ITEMS[1], rot: 0 }
+        { x: 3, y: 3, item: FURNI_ITEMS[1] },
+        { x: 4, y: 3, item: FURNI_ITEMS[0] }
       ],
-      avatar: { x: 4, y: 4 },
+      avatar: { x: 4, y: 5 },
       mouseTile: { x: -1, y: -1 }
     };
 
@@ -503,7 +497,6 @@
     }
 
     function drawWalls() {
-      // Muro Sinistro
       for (let y = 0; y < state.gridSize; y++) {
         const { sx, sy } = toIso(0, y);
         ctx.fillStyle = "#55646d";
@@ -518,7 +511,6 @@
         ctx.stroke();
       }
 
-      // Muro Destro
       for (let x = 0; x < state.gridSize; x++) {
         const { sx, sy } = toIso(x, 0);
         ctx.fillStyle = "#697a85";
@@ -540,33 +532,28 @@
       const py = sy + 6;
 
       ctx.save();
-      // Ombra ovale a terra
       ctx.fillStyle = "rgba(0,0,0,0.35)";
       ctx.beginPath();
       ctx.ellipse(px, py, 14, 7, 0, 0, Math.PI * 2);
       ctx.fill();
 
-      // Scarpe
+      // Pantaloni & Scarpe
       ctx.fillStyle = "#111";
       ctx.fillRect(px - 5, py - 4, 4, 3);
       ctx.fillRect(px + 2, py - 4, 4, 3);
-
-      // Pantaloni
       ctx.fillStyle = "#1b4f72";
       ctx.fillRect(px - 5, py - 18, 4, 14);
       ctx.fillRect(px + 1, py - 18, 4, 14);
 
-      // Busto
+      // Maglia
       ctx.fillStyle = "#111";
       ctx.fillRect(px - 7, py - 32, 14, 15);
       ctx.fillStyle = "#f39c12";
       ctx.fillRect(px - 6, py - 31, 12, 13);
 
-      // Testa / Viso
+      // Viso
       ctx.fillStyle = "#f5cba7";
       ctx.fillRect(px - 5, py - 43, 10, 11);
-
-      // Occhi Habbo
       ctx.fillStyle = "#000";
       ctx.fillRect(px - 2, py - 38, 2, 2);
       ctx.fillRect(px + 2, py - 38, 2, 2);
@@ -575,7 +562,6 @@
       ctx.fillStyle = "#4a235a";
       ctx.fillRect(px - 6, py - 47, 12, 5);
       ctx.fillRect(px - 7, py - 44, 3, 7);
-
       ctx.restore();
     }
 
@@ -584,9 +570,10 @@
       if (img.complete && img.naturalWidth !== 0) {
         ctx.save();
         ctx.globalAlpha = alpha;
-        // Posiziona l'icona centrata sopra la tile isometrica
-        const iw = img.naturalWidth * 1.25;
-        const ih = img.naturalHeight * 1.25;
+        // Ingrandimento pixel art 1.6x calibrato sulla griglia isometrica
+        const scale = 1.6;
+        const iw = img.naturalWidth * scale;
+        const ih = img.naturalHeight * scale;
         ctx.drawImage(img, sx - iw / 2, sy + state.tileH / 2 - ih + 4, iw, ih);
         ctx.restore();
       }
@@ -597,7 +584,6 @@
 
       drawWalls();
 
-      // Disegno piastrelle
       for (let x = 0; x < state.gridSize; x++) {
         for (let y = 0; y < state.gridSize; y++) {
           const isH = (state.mouseTile.x === x && state.mouseTile.y === y);
@@ -605,7 +591,6 @@
         }
       }
 
-      // Ordinamento isometrico (x + y)
       const renderList = [];
 
       state.placedFurni.forEach(f => {
@@ -660,8 +645,7 @@
         state.placedFurni.push({
           x: x,
           y: y,
-          item: item,
-          rot: state.rotation
+          item: item
         });
 
         item.count--;
@@ -693,7 +677,7 @@
     });
 
     /* =========================================================================
-       5. LOGICA CATALOGO CON IMMAGINI GITHUB
+       5. CATALOGO CON ICONE REALI
        ========================================================================= */
     const catModal = document.getElementById("catalog-modal");
     const openBtn = document.getElementById("open-cat-btn");
@@ -737,9 +721,12 @@
         const slot = document.createElement("div");
         slot.className = `furni-slot ${state.selectedCatalog && state.selectedCatalog.id === item.id ? "selected" : ""}`;
 
-        // Vera icona pixel art da GitHub
         const img = document.createElement("img");
         img.src = CDN_BASE + item.icon;
+        img.alt = item.name;
+        img.onerror = () => {
+          img.src = "https://raw.githubusercontent.com/higoka/habbo-furniture-icon/master/icons/" + item.icon;
+        };
 
         slot.appendChild(img);
 
@@ -805,6 +792,9 @@
 
         const img = document.createElement("img");
         img.src = CDN_BASE + item.icon;
+        img.onerror = () => {
+          img.src = "https://raw.githubusercontent.com/higoka/habbo-furniture-icon/master/icons/" + item.icon;
+        };
 
         const count = document.createElement("span");
         count.className = "inv-count";
