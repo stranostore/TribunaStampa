@@ -3,294 +3,454 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>La Mia Pagina Web Moderna</title>
+  <title>Hub Personale - Articoli & Video</title>
   <style>
-    /* Reset e variabili globali */
     :root {
-      --primary: #2563eb;
-      --primary-dark: #1d4ed8;
-      --text: #1f2937;
-      --text-light: #6b7280;
-      --bg: #f9fafb;
-      --white: #ffffff;
-      --radius: 8px;
+      --bg: #0f172a;
+      --card-bg: #1e293b;
+      --border: #334155;
+      --text: #f8fafc;
+      --text-muted: #94a3b8;
+      --primary: #38bdf8;
+      --primary-hover: #0ea5e9;
+      --danger: #ef4444;
+      --tag-article: #3b82f6;
+      --tag-video: #ec4899;
     }
 
     * {
       box-sizing: border-box;
       margin: 0;
       padding: 0;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     }
 
     body {
       background-color: var(--bg);
       color: var(--text);
       line-height: 1.6;
+      padding-bottom: 3rem;
     }
 
-    /* Navbar */
+    /* Intestazione */
     header {
-      background: var(--white);
-      position: sticky;
-      top: 0;
-      z-index: 100;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-    }
-
-    nav {
-      max-width: 1100px;
-      margin: 0 auto;
-      padding: 1rem 1.5rem;
+      background-color: var(--card-bg);
+      border-bottom: 1px solid var(--border);
+      padding: 1.25rem 2rem;
       display: flex;
       justify-content: space-between;
       align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 50;
     }
 
-    .logo {
-      font-size: 1.4rem;
+    .brand {
+      font-size: 1.3rem;
       font-weight: 700;
       color: var(--primary);
-      text-decoration: none;
     }
 
-    .nav-links {
-      display: flex;
-      list-style: none;
-      gap: 1.5rem;
+    /* Contenitore Principale */
+    .container {
+      max-width: 850px;
+      margin: 2rem auto;
+      padding: 0 1rem;
     }
 
-    .nav-links a {
-      text-decoration: none;
-      color: var(--text);
-      font-weight: 500;
-      transition: color 0.2s;
+    /* Sezione Modulo di Creazione */
+    .editor-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin-bottom: 2.5rem;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
     }
 
-    .nav-links a:hover {
-      color: var(--primary);
-    }
-
-    /* Hero Section */
-    .hero {
-      max-width: 1100px;
-      margin: 3rem auto;
-      padding: 2rem 1.5rem;
-      text-align: center;
-    }
-
-    .hero h1 {
-      font-size: 2.8rem;
-      margin-bottom: 1rem;
-      color: #111827;
-      line-height: 1.2;
-    }
-
-    .hero p {
+    .editor-card h2 {
       font-size: 1.2rem;
-      color: var(--text-light);
-      max-width: 600px;
-      margin: 0 auto 2rem;
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .form-group {
+      margin-bottom: 1rem;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 0.4rem;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+
+    input[type="text"],
+    textarea,
+    select {
+      width: 100%;
+      background: #0b1120;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 0.75rem;
+      color: var(--text);
+      font-size: 0.95rem;
+      outline: none;
+    }
+
+    input:focus, textarea:focus, select:focus {
+      border-color: var(--primary);
     }
 
     .btn {
-      display: inline-block;
       background: var(--primary);
-      color: var(--white);
-      padding: 0.8rem 1.8rem;
-      border-radius: var(--radius);
-      text-decoration: none;
-      font-weight: 600;
+      color: #0b1120;
       border: none;
+      padding: 0.75rem 1.5rem;
+      border-radius: 8px;
+      font-weight: 700;
       cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
       transition: background-color 0.2s;
     }
 
     .btn:hover {
-      background: var(--primary-dark);
+      background: var(--primary-hover);
     }
 
-    /* Griglia Servizi */
-    .services {
-      max-width: 1100px;
-      margin: 4rem auto;
-      padding: 0 1.5rem;
+    /* Feed Contenuti */
+    .feed-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.5rem;
     }
 
-    .section-title {
-      text-align: center;
-      margin-bottom: 2.5rem;
-      font-size: 2rem;
+    .filter-btn {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+      padding: 0.4rem 0.8rem;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.85rem;
     }
 
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-      gap: 2rem;
+    .filter-btn.active {
+      background: var(--border);
+      color: var(--text);
+      font-weight: 600;
     }
 
-    .card {
-      background: var(--white);
-      padding: 2rem;
-      border-radius: var(--radius);
-      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
-      border: 1px solid #e5e7eb;
-      transition: transform 0.2s;
+    .post-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      margin-bottom: 1.75rem;
+      overflow: hidden;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
     }
 
-    .card:hover {
-      transform: translateY(-4px);
+    .post-header {
+      padding: 1.25rem 1.5rem 0.5rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
     }
 
-    .card-icon {
-      font-size: 2rem;
+    .post-title {
+      font-size: 1.3rem;
+      color: #fff;
+      margin-bottom: 0.25rem;
+    }
+
+    .badge {
+      display: inline-block;
+      font-size: 0.75rem;
+      font-weight: 600;
+      padding: 0.2rem 0.5rem;
+      border-radius: 4px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .badge-article { background: var(--tag-article); color: #fff; }
+    .badge-video { background: var(--tag-video); color: #fff; }
+
+    .post-meta {
+      font-size: 0.8rem;
+      color: var(--text-muted);
       margin-bottom: 1rem;
     }
 
-    .card h3 {
-      margin-bottom: 0.5rem;
-    }
-
-    .card p {
-      color: var(--text-light);
-    }
-
-    /* Modulo Contatto */
-    .contact {
-      max-width: 600px;
-      margin: 4rem auto;
-      padding: 2rem 1.5rem;
-      background: var(--white);
-      border-radius: var(--radius);
-      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
-    }
-
-    .contact h2 {
-      margin-bottom: 1.5rem;
-      text-align: center;
-    }
-
-    .form-group {
-      margin-bottom: 1.2rem;
-    }
-
-    .form-group label {
-      display: block;
-      margin-bottom: 0.4rem;
-      font-weight: 500;
-    }
-
-    .form-group input,
-    .form-group textarea {
+    .post-media-container {
       width: 100%;
-      padding: 0.75rem;
-      border: 1px solid #d1d5db;
-      border-radius: var(--radius);
-      outline: none;
-      font-size: 1rem;
+      background: #000;
     }
 
-    .form-group input:focus,
-    .form-group textarea:focus {
-      border-color: var(--primary);
+    .post-media-container img {
+      width: 100%;
+      max-height: 450px;
+      object-fit: cover;
+      display: block;
     }
 
-    /* Footer */
-    footer {
-      background: #111827;
-      color: #9ca3af;
+    .video-wrapper {
+      position: relative;
+      padding-bottom: 56.25%; /* 16:9 Aspect Ratio */
+      height: 0;
+    }
+
+    .video-wrapper iframe {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      border: 0;
+    }
+
+    .post-body {
+      padding: 1.25rem 1.5rem;
+      white-space: pre-wrap;
+      color: #cbd5e1;
+    }
+
+    .delete-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      cursor: pointer;
+      font-size: 1.1rem;
+      padding: 0.2rem;
+    }
+
+    .delete-btn:hover {
+      color: var(--danger);
+    }
+
+    .empty-state {
       text-align: center;
-      padding: 2rem;
-      margin-top: 4rem;
-    }
-
-    /* Responsive */
-    @media (max-width: 640px) {
-      .hero h1 {
-        font-size: 2rem;
-      }
-      .nav-links {
-        display: none; /* Versione semplificata per schermi piccoli */
-      }
+      padding: 3rem 1rem;
+      color: var(--text-muted);
     }
   </style>
 </head>
 <body>
 
-  <!-- Barra di Navigazione -->
   <header>
-    <nav>
-      <a href="#" class="logo">MioBrand</a>
-      <ul class="nav-links">
-        <li><a href="#home">Home</a></li>
-        <li><a href="#servizi">Servizi</a></li>
-        <li><a href="#contatti">Contatti</a></li>
-      </ul>
-    </nav>
+    <div class="brand">CreatorsHub</div>
+    <div style="font-size: 0.9rem; color: var(--text-muted);">Il mio diario multimediale</div>
   </header>
 
-  <!-- Sezione Hero -->
-  <section class="hero" id="home">
-    <h1>Costruisci progetti digitali solidi e veloci</h1>
-    <p>Soluzioni moderne per aziende e professionisti. Progettiamo interfacce curate e orientate ai risultati.</p>
-    <a href="#contatti" class="btn">Inizia Ora</a>
-  </section>
+  <div class="container">
+    
+    <!-- Modulo di creazione -->
+    <section class="editor-card">
+      <h2>✍️ Crea un nuovo post</h2>
+      <form id="postForm">
+        <div class="form-group">
+          <label for="postType">Tipologia contenuto</label>
+          <select id="postType">
+            <option value="article">Articolo (Testo con eventuale immagine)</option>
+            <option value="video">Video YouTube</option>
+          </select>
+        </div>
 
-  <!-- Sezione Servizi -->
-  <section class="services" id="servizi">
-    <h2 class="section-title">Cosa possiamo fare</h2>
-    <div class="grid">
-      <div class="card">
-        <div class="card-icon">⚡</div>
-        <h3>Velocità ed Efficienza</h3>
-        <p>Codice pulito, tempi di caricamento ridotti e architettura ottimizzata per tutti i dispositivi.</p>
-      </div>
-      <div class="card">
-        <div class="card-icon">📱</div>
-        <h3>Design Responsive</h3>
-        <p>Layout flessibili progettati per adattarsi perfettamente a smartphone, tablet e desktop.</p>
-      </div>
-      <div class="card">
-        <div class="card-icon">🔒</div>
-        <h3>Sicurezza e Affidabilità</h3>
-        <p>Standard di sviluppo moderni per garantire stabilità e protezione delle informazioni.</p>
+        <div class="form-group">
+          <label for="postTitle">Titolo</label>
+          <input type="text" id="postTitle" required placeholder="Inserisci un titolo accattivante...">
+        </div>
+
+        <div class="form-group" id="mediaUrlGroup">
+          <label for="postMedia" id="mediaUrlLabel">URL Immagine di copertina (facoltativa)</label>
+          <input type="text" id="postMedia" placeholder="https://example.com/immagine.jpg">
+        </div>
+
+        <div class="form-group">
+          <label for="postBody">Testo dell'articolo / Descrizione</label>
+          <textarea id="postBody" rows="5" required placeholder="Scrivi qui i tuoi pensieri, note o trascrizioni..."></textarea>
+        </div>
+
+        <button type="submit" class="btn">Pubblica Ora</button>
+      </form>
+    </section>
+
+    <!-- Filtri e Feed -->
+    <div class="feed-header">
+      <h3>Feed Contenuti</h3>
+      <div style="display: flex; gap: 0.5rem;">
+        <button class="filter-btn active" data-filter="all">Tutti</button>
+        <button class="filter-btn" data-filter="article">Solo Articoli</button>
+        <button class="filter-btn" data-filter="video">Solo Video</button>
       </div>
     </div>
-  </section>
 
-  <!-- Sezione Contatti -->
-  <section class="contact" id="contatti">
-    <h2>Scrivici un messaggio</h2>
-    <form id="contactForm">
-      <div class="form-group">
-        <label for="name">Nome</label>
-        <input type="text" id="name" required placeholder="Mario Rossi">
-      </div>
-      <div class="form-group">
-        <label for="email">Email</label>
-        <input type="email" id="email" required placeholder="mario@example.com">
-      </div>
-      <div class="form-group">
-        <label for="message">Messaggio</label>
-        <textarea id="message" rows="4" required placeholder="Come possiamo aiutarti?"></textarea>
-      </div>
-      <button type="submit" class="btn" style="width: 100%;">Invia</button>
-    </form>
-  </section>
+    <!-- Lista Post -->
+    <div id="postsFeed"></div>
 
-  <!-- Footer -->
-  <footer>
-    <p>&copy; 2026 MioBrand. Tutti i diritti riservati.</p>
-  </footer>
+  </div>
 
-  <!-- Interattività JavaScript -->
   <script>
-    document.getElementById('contactForm').addEventListener('submit', function(e) {
-      e.preventDefault();
-      const nome = document.getElementById('name').value;
-      alert(`Grazie ${nome}! Il tuo messaggio è stato ricevuto con successo.`);
-      this.reset();
+    // Gestione persistenza tramite localStorage
+    const STORAGE_KEY = "creators_hub_posts";
+    let currentFilter = "all";
+
+    // Contenuti di esempio precaricati se vuoto
+    const defaultPosts = [
+      {
+        id: "1",
+        type: "video",
+        title: "Guida Introduttiva allo Sviluppo Web Moderno",
+        media: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+        body: "In questo video parliamo dei concetti fondamentali di HTML5, CSS moderno e delle nuove API del browser. Buona visione!",
+        date: "2026-03-20"
+      },
+      {
+        id: "2",
+        type: "article",
+        title: "Perché scrivere regolarmente migliora le idee",
+        media: "https://images.unsplash.com/photo-1499750310107-5fef28a66643?w=800&q=80",
+        body: "Scrivere articoli costringe a chiarire i pensieri e ordinare concetti altrimenti confusi. Un blog personale è il miglior archivio per la propria crescita.",
+        date: "2026-03-18"
+      }
+    ];
+
+    function getPosts() {
+      const data = localStorage.getItem(STORAGE_KEY);
+      return data ? JSON.parse(data) : defaultPosts;
+    }
+
+    function savePosts(posts) {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(posts));
+    }
+
+    // Estrazione dell'ID YouTube
+    function getYouTubeVideoId(url) {
+      const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+      const match = url.match(regExp);
+      return (match && match[2].length === 11) ? match[2] : null;
+    }
+
+    // Cambia interfaccia input a seconda del tipo
+    const typeSelect = document.getElementById("postType");
+    const mediaLabel = document.getElementById("mediaUrlLabel");
+    const mediaInput = document.getElementById("postMedia");
+
+    typeSelect.addEventListener("change", (e) => {
+      if (e.target.value === "video") {
+        mediaLabel.innerText = "Link Video YouTube (es. https://www.youtube.com/watch?v=...)";
+        mediaInput.placeholder = "https://www.youtube.com/watch?v=...";
+        mediaInput.required = true;
+      } else {
+        mediaLabel.innerText = "URL Immagine di copertina (facoltativa)";
+        mediaInput.placeholder = "https://example.com/immagine.jpg";
+        mediaInput.required = false;
+      }
     });
+
+    // Rendering dei post
+    function renderPosts() {
+      const feed = document.getElementById("postsFeed");
+      const posts = getPosts();
+      feed.innerHTML = "";
+
+      const filtered = posts.filter(p => currentFilter === "all" || p.type === currentFilter);
+
+      if (filtered.length === 0) {
+        feed.innerHTML = `<div class="empty-state">Nessun contenuto presente in questa sezione.</div>`;
+        return;
+      }
+
+      filtered.forEach(post => {
+        const article = document.createElement("article");
+        article.className = "post-card";
+
+        let mediaHtml = "";
+        if (post.type === "video" && post.media) {
+          const videoId = getYouTubeVideoId(post.media);
+          if (videoId) {
+            mediaHtml = `
+              <div class="post-media-container video-wrapper">
+                <iframe src="https://www.youtube.com/embed/${videoId}" allowfullscreen></iframe>
+              </div>`;
+          }
+        } else if (post.type === "article" && post.media) {
+          mediaHtml = `
+            <div class="post-media-container">
+              <img src="${post.media}" alt="${post.title}" onerror="this.style.display='none'">
+            </div>`;
+        }
+
+        article.innerHTML = `
+          <div class="post-header">
+            <div>
+              <span class="badge ${post.type === 'video' ? 'badge-video' : 'badge-article'}">
+                ${post.type === 'video' ? 'Video' : 'Articolo'}
+              </span>
+              <h3 class="post-title">${post.title}</h3>
+              <div class="post-meta">Pubblicato il ${post.date}</div>
+            </div>
+            <button class="delete-btn" onclick="deletePost('${post.id}')" title="Elimina post">🗑️</button>
+          </div>
+          ${mediaHtml}
+          <div class="post-body">${post.body}</div>
+        `;
+
+        feed.appendChild(article);
+      });
+    }
+
+    // Creazione Post
+    document.getElementById("postForm").addEventListener("submit", (e) => {
+      e.preventDefault();
+
+      const newPost = {
+        id: Date.now().toString(),
+        type: document.getElementById("postType").value,
+        title: document.getElementById("postTitle").value,
+        media: document.getElementById("postMedia").value.trim(),
+        body: document.getElementById("postBody").value,
+        date: new Date().toISOString().split("T")[0]
+      };
+
+      const posts = getPosts();
+      posts.unshift(newPost);
+      savePosts(posts);
+
+      e.target.reset();
+      typeSelect.value = "article";
+      mediaLabel.innerText = "URL Immagine di copertina (facoltativa)";
+      mediaInput.required = false;
+
+      renderPosts();
+    });
+
+    // Eliminazione Post
+    window.deletePost = function(id) {
+      if (confirm("Vuoi davvero eliminare questo contenuto?")) {
+        const posts = getPosts().filter(p => p.id !== id);
+        savePosts(posts);
+        renderPosts();
+      }
+    };
+
+    // Filtri
+    document.querySelectorAll(".filter-btn").forEach(btn => {
+      btn.addEventListener("click", () => {
+        document.querySelectorAll(".filter-btn").forEach(b => b.classList.remove("active"));
+        btn.classList.add("active");
+        currentFilter = btn.dataset.filter;
+        renderPosts();
+      });
+    });
+
+    // Inizializzazione
+    renderPosts();
   </script>
 
 </body>
